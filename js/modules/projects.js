@@ -4,6 +4,13 @@ import { handleIntegerInput, formatMoneyVND } from './utils.js';
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
 let projectListContainer = null;
 
+// Hàm định dạng ngày giờ
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return '';
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString('vi-VN');
+}
+
 const resizableStyle = `
 <style>
 .resizable-container {
@@ -82,7 +89,7 @@ function getFilteredProjects() {
 function renderProjectHistory() {
     const transactions = state.data.transactions
         .filter(t => t.type === 'usage' && t.projectId)
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date))
         .slice(0, 50);
     
     if (transactions.length === 0) {
@@ -92,13 +99,14 @@ function renderProjectHistory() {
     return transactions.map(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         const proj = projectById(t.projectId);
+        const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
         return `<tr>
             <td><strong>${proj?.name || 'N/A'}</strong></td>
             <td>${mat?.name || 'N/A'}</td>
             <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
             <td>${formatMoneyVND(t.unitPrice || mat?.cost || 0)}</td>
             <td class="text-warning">${formatMoneyVND(t.totalAmount || 0)}</td>
-            <td>${t.date}</td>
+            <td>${displayDateTime}</td>
         </tr>`;
     }).join('');
 }
@@ -250,7 +258,7 @@ export function showProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
     
-    const transactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.date) - new Date(a.date));
+    const transactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
     const remaining = project.budget - totalSpent;
     const percentUsed = project.budget > 0 ? (totalSpent / project.budget) * 100 : 0;
@@ -298,18 +306,21 @@ export function showProjectDetail(projectId) {
                 }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có vật tư nào được xuất</div></div>'}
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT KHO CHI TIẾT</div>
-            <div class="tbl-wrap"><table style="min-width: 600px;"><thead><tr><th>Ngày</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+            <div class="tbl-wrap"><table style="min-width: 700px;"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th><th>Tệp đính kèm</th></tr></thead>
             <tbody>${transactions.map(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
+                const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
+                const attachmentHtml = t.attachment ? `<a href="${t.attachment}" target="_blank" style="color: var(--accent);">📎 Xem tệp</a>` : (t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Hóa đơn</a>` : '—');
                 return `<tr>
-                    <td>${t.date}</td>
+                    <td>${displayDateTime}</td>
                     <td><strong>${mat?.name || 'N/A'}</strong></td>
                     <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
                     <td>${formatMoneyVND(t.unitPrice)}</td>
                     <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
                     <td>${escapeHtml(t.note || '—')}</td>
+                    <td>${attachmentHtml}</td>
                 </tr>`;
-            }).join('') || '<tr><td colspan="6" style="text-align: center;">📭 Chưa có giao dịch xuất kho nào</td></tr>'}</tbody></table></div>
+            }).join('') || '<tr><td colspan="7" style="text-align: center;">📭 Chưa có giao dịch xuất kho nào</td></tr>'}</tbody></table></div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="sm" onclick="closeModal(); window.exportProjectDetail('${projectId}')">📎 Xuất báo cáo Excel</button>
             </div>
@@ -325,7 +336,7 @@ export function showProjectDetail(projectId) {
 export function exportProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
-    const transactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.date) - new Date(a.date));
+    const transactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
     const remaining = project.budget - totalSpent;
     
@@ -340,7 +351,18 @@ export function exportProjectDetail(projectId) {
     
     const detailData = transactions.map(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
-        return { 'Ngày xuất': t.date, 'Mã vật tư': t.mid, 'Tên vật tư': mat?.name || 'N/A', 'Số lượng': t.qty, 'Đơn vị': mat?.unit || '', 'Đơn giá (VNĐ)': t.unitPrice, 'Thành tiền (VNĐ)': t.totalAmount, 'Ghi chú': t.note || '' };
+        const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
+        return { 
+            'Ngày giờ xuất': displayDateTime, 
+            'Mã vật tư': t.mid, 
+            'Tên vật tư': mat?.name || 'N/A', 
+            'Số lượng': t.qty, 
+            'Đơn vị': mat?.unit || '', 
+            'Đơn giá (VNĐ)': t.unitPrice, 
+            'Thành tiền (VNĐ)': t.totalAmount, 
+            'Ghi chú': t.note || '',
+            'Có tệp đính kèm': t.attachment ? 'Có' : (t.invoiceImage ? 'Có hóa đơn' : 'Không')
+        };
     });
     
     if (typeof XLSX !== 'undefined') {
@@ -388,8 +410,17 @@ export function renderProjects() {
                 </div>
                 <div class="panel-content" style="max-height: 300px; overflow-y: auto;">
                     <div class="tbl-wrap">
-                        <table style="min-width: 700px">
-                            <thead><tr><th>Công trình</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Tổng giá trị</th><th>Ngày xuất</th></tr></thead>
+                        <table style="min-width: 800px; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Công trình</th>
+                                    <th>Vật tư</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Tổng giá trị</th>
+                                    <th>Ngày giờ xuất</th>
+                                </tr>
+                            </thead>
                             <tbody id="project-history-tbody">
                                 ${renderProjectHistory()}
                             </tbody>

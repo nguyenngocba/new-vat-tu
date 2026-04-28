@@ -48,11 +48,11 @@ export function checkLowStockNotification() {
 export function requestNotificationPermission() {
     if ('Notification' in window) {
         if (Notification.permission === 'granted') {
-            new Notification('SteelTrack Pro', { body: 'Thông báo đã được bật!', icon: '🏭' });
+            new Notification('TRIVIETSTEEL Pro', { body: 'Thông báo đã được bật!', icon: '🏭' });
         } else if (Notification.permission !== 'denied') {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
-                    new Notification('SteelTrack Pro', { body: 'Bạn sẽ nhận được cảnh báo khi hàng sắp hết!', icon: '🏭' });
+                    new Notification('TRIVIETSTEEL Pro', { body: 'Bạn sẽ nhận được cảnh báo khi hàng sắp hết!', icon: '🏭' });
                 }
             });
         }
@@ -84,7 +84,8 @@ function getMonthlyStats() {
     }
     
     filteredTransactions.forEach(t => {
-        const date = new Date(t.date);
+        const dateStr = t.datetime || t.date;
+        const date = new Date(dateStr);
         const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         if (months[key]) {
             if (t.type === 'purchase') months[key].import += t.totalAmount || 0;
@@ -124,7 +125,7 @@ export function renderDashboard() {
     
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    let recentImports = state.data.transactions.filter(t => t.type === 'purchase' && new Date(t.date) >= thirtyDaysAgo);
+    let recentImports = state.data.transactions.filter(t => t.type === 'purchase' && new Date(t.datetime || t.date) >= thirtyDaysAgo);
     
     if (currentDashboardFilter) {
         const keyword = currentDashboardFilter.toLowerCase();
@@ -189,7 +190,7 @@ export function renderDashboard() {
                 ${topMaterials.length > 0 ? `
                     <div class="tbl-wrap">
                         <table style="width: 100%;">
-                            <thead><tr><th>#</th><th>Tên vật tư</th><th>Số lượng nhập</th></tr></thead>
+                            <thead><tr><th>#</th><th>Tên vật tư</th><th>Số lượng nhập</th><tr></thead>
                             <tbody>
                                 ${topMaterials.map((m, idx) => `
                                     <tr>
@@ -254,6 +255,11 @@ export function renderDashboardChart() {
                 },
                 options: { maintainAspectRatio: false }
             });
+        } else {
+            supplierCtx.getContext('2d').clearRect(0, 0, supplierCtx.width, supplierCtx.height);
+            supplierCtx.getContext('2d').fillStyle = '#7a8099';
+            supplierCtx.getContext('2d').font = '14px sans-serif';
+            supplierCtx.getContext('2d').fillText('Chưa có dữ liệu nhập hàng', 10, 50);
         }
     }
     
@@ -276,6 +282,11 @@ export function renderDashboardChart() {
                 },
                 options: { maintainAspectRatio: true, responsive: true, plugins: { legend: { position: 'right' } } }
             });
+        } else {
+            categoryCtx.getContext('2d').clearRect(0, 0, categoryCtx.width, categoryCtx.height);
+            categoryCtx.getContext('2d').fillStyle = '#7a8099';
+            categoryCtx.getContext('2d').font = '14px sans-serif';
+            categoryCtx.getContext('2d').fillText('Chưa có dữ liệu danh mục', 10, 50);
         }
     }
     
@@ -292,7 +303,17 @@ export function renderDashboardChart() {
                     { label: 'Xuất kho', data: monthlyStats.map(m => m.export), borderColor: '#F09595', backgroundColor: 'transparent', tension: 0.3, fill: false }
                 ]
             },
-            options: { maintainAspectRatio: true, responsive: true, plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${formatMoneyVND(ctx.raw)}` } } } }
+            options: { 
+                maintainAspectRatio: true, 
+                responsive: true, 
+                plugins: { 
+                    tooltip: { 
+                        callbacks: { 
+                            label: (ctx) => `${ctx.dataset.label}: ${formatMoneyVND(ctx.raw)}` 
+                        } 
+                    } 
+                } 
+            }
         });
     }
 }
