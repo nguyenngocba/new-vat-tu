@@ -46,14 +46,14 @@ button.sm{padding:4px 9px;font-size:12px;}
 .b-ok{background:var(--success-bg);color:var(--success-text);}
 .b-low{background:var(--warn-bg);color:var(--warn-text);}
 
-table{width:100%;border-collapse:collapse;}
+/* Bảng cố định - không bị kéo dãn cột */
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
 th{text-align:left;padding:8px 10px;font-size:11px;font-family:var(--mono);color:var(--muted);border-bottom:1px solid var(--border2);}
-td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--border);}
+td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--border);word-break:break-word;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--surface2);}
 .tbl-wrap{border:0.5px solid var(--border);border-radius:var(--rl);overflow-x:auto;margin-bottom:14px;}
-.tbl-wrap table td{white-space:nowrap;}
-.tbl-wrap table td:first-child{white-space:normal;}
+.tbl-wrap table{min-width:800px;width:100%;table-layout:auto;}
 
 .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
 .form-label{font-size:11px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
@@ -120,6 +120,7 @@ tr:hover td{background:var(--surface2);}
 .search-box{margin-bottom:16px;display:flex;gap:10px;}
 .invoice-img{max-width:100%;max-height:200px;border-radius:var(--r);margin-top:8px;cursor:pointer;}
 
+/* Resize handle cho cột - chỉ áp dụng cho bảng vật tư */
 .resizable-table{position:relative;overflow-x:auto;}
 .resizable-table th{position:relative;user-select:none;}
 .resizable-table .resize-handle{position:absolute;top:0;right:0;width:5px;height:100%;cursor:col-resize;background:transparent;z-index:10;}
@@ -229,9 +230,6 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
     }
     .tbl-wrap {
         overflow-x: auto;
-    }
-    .tbl-wrap table {
-        min-width: 800px;
     }
     .pane {
         padding: 16px;

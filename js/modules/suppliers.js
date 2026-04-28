@@ -57,16 +57,21 @@ function renderSupplierHistory() {
         const supplier = supplierById(t.supplierId);
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
         const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
+        // Định dạng số lượng hiển thị đẹp
+        const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+        const displayUnitPrice = formatMoneyVND(t.unitPrice);
+        const displayTotal = formatMoneyVND(t.totalAmount);
+        
         return `<tr>
-            <td><strong>${supplier?.name || 'N/A'}</strong></td>
-            <td>${mat?.name || 'N/A'}</td>
-            <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
-            <td>${formatMoneyVND(t.unitPrice)}</td>
-            <td>${t.vatRate || 0}%</td>
-            <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
-            <td>${displayDateTime}</td>
-            <td>${invoiceHtml}</td>
-        </table>`;
+            <td style="white-space: nowrap;"><strong>${escapeHtml(supplier?.name || 'N/A')}</strong></td>
+            <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
+            <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
+            <td style="text-align: right; white-space: nowrap;">${displayUnitPrice}</td>
+            <td style="text-align: center; white-space: nowrap;">${t.vatRate || 0}%</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-warning">${displayTotal}</td>
+            <td style="white-space: nowrap;">${displayDateTime}</td>
+            <td style="text-align: center; white-space: nowrap;">${invoiceHtml}</td>
+        </tr>`;
     }).join('');
 }
 
@@ -296,26 +301,46 @@ export function showSupplierDetail(supplierId) {
                         <td class="text-warning">${formatMoneyVND(stat.totalAmount)}</td>
                         <td><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
-                }).join('')}</tbody></tr></div>
+                }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có giao dịch nhập hàng nào</div></div>'}
             
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ NHẬP HÀNG CHI TIẾT</div>
-            <div class="tbl-wrap"><table style="min-width: 800px;"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th><th>Hóa đơn</th></tr></thead>
-            <tbody>${transactions.map(t => {
-                const mat = state.data.materials.find(m => m.id === t.mid);
-                const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
-                const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
-                return `<tr>
-                    <td>${displayDateTime}</td>
-                    <td><strong>${mat?.name || 'N/A'}</strong></td>
-                    <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
-                    <td>${formatMoneyVND(t.unitPrice)}</td>
-                    <td>${t.vatRate || 0}%</td>
-                    <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
-                    <td>${escapeHtml(t.note || '—')}</td>
-                    <td>${invoiceHtml}</td>
-                </tr>`;
-            }).join('') || '<tr><td colspan="8" style="text-align: center;">📭 Chưa có giao dịch nhập hàng nào</td></tr>'}</tbody></table></div>
+            <div class="tbl-wrap">
+                <table style="min-width: 900px; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Nhà cung cấp</th>
+                            <th style="width: 15%;">Vật tư</th>
+                            <th style="width: 10%;">Số lượng</th>
+                            <th style="width: 12%;">Đơn giá</th>
+                            <th style="width: 5%;">VAT</th>
+                            <th style="width: 15%;">Thành tiền</th>
+                            <th style="width: 15%;">Ngày giờ nhập</th>
+                            <th style="width: 8%;">Hóa đơn</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplier-history-modal-tbody">
+                        ${transactions.map(t => {
+                            const mat = state.data.materials.find(m => m.id === t.mid);
+                            const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
+                            const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
+                            const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+                            const displayUnitPrice = formatMoneyVND(t.unitPrice);
+                            const displayTotal = formatMoneyVND(t.totalAmount);
+                            return `<tr>
+                                <td style="white-space: nowrap;"><strong>${escapeHtml(supplier.name)}</strong></td>
+                                <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
+                                <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
+                                <td style="text-align: right; white-space: nowrap;">${displayUnitPrice}</td>
+                                <td style="text-align: center; white-space: nowrap;">${t.vatRate || 0}%</td>
+                                <td style="text-align: right; white-space: nowrap;" class="text-warning">${displayTotal}</td>
+                                <td style="white-space: nowrap;">${displayDateTime}</td>
+                                <td style="text-align: center; white-space: nowrap;">${invoiceHtml}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
             
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="sm" onclick="closeModal(); window.exportSupplierDetail('${supplierId}')">📎 Xuất báo cáo Excel</button>
@@ -369,7 +394,7 @@ export function exportSupplierDetail(supplierId) {
         { 'Thông tin': 'Địa chỉ', 'Giá trị': supplier.address || '' },
         { 'Thông tin': 'Tổng chi', 'Giá trị': formatMoneyVND(totalSpent) },
         { 'Thông tin': 'Số lần nhập hàng', 'Giá trị': transactions.length },
-		{ 'Thông tin': 'Trung bình mỗi lần nhập', 'Giá trị': transactions.length > 0 ? formatMoneyVND(totalSpent / transactions.length) : '0 ₫' }
+        { 'Thông tin': 'Trung bình mỗi lần nhập', 'Giá trị': transactions.length > 0 ? formatMoneyVND(totalSpent / transactions.length) : '0 ₫' }
     ];
     
     const detailData = transactions.map(t => {
@@ -415,9 +440,10 @@ export function exportAllSuppliersReport() {
 }
 
 export function renderSuppliers() {
-    const result = `<div class="card">
-        <div class="sec-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <span>🏭 DANH SÁCH NHÀ CUNG CẤP</span>
+    const result = `
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="sec-title" style="margin-bottom: 0;">🏭 DANH SÁCH NHÀ CUNG CẤP</div>
             <button class="sm" onclick="exportAllSuppliersReport()" style="font-size: 11px;">📎 Xuất tất cả báo cáo</button>
         </div>
         <div class="resizable-container" id="suppliers-resizable-container">
@@ -435,18 +461,19 @@ export function renderSuppliers() {
                     <span class="resize-icon">⤥ Kéo để điều chỉnh</span>
                 </div>
                 <div class="panel-content" style="max-height: 300px; overflow-y: auto;">
+                    ${renderSupplierSearchBar()}
                     <div class="tbl-wrap">
-                        <table style="min-width: 900px; width: 100%;">
+                        <table style="min-width: 1000px; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>Nhà cung cấp</th>
-                                    <th>Vật tư</th>
-                                    <th>Số lượng</th>
-                                    <th>Đơn giá</th>
-                                    <th>VAT</th>
-                                    <th>Thành tiền</th>
-                                    <th>Ngày giờ nhập</th>
-                                    <th>Hóa đơn</th>
+                                    <th style="width: 15%;">Nhà cung cấp</th>
+                                    <th style="width: 15%;">Vật tư</th>
+                                    <th style="width: 10%;">Số lượng</th>
+                                    <th style="width: 12%;">Đơn giá</th>
+                                    <th style="width: 5%;">VAT</th>
+                                    <th style="width: 15%;">Thành tiền</th>
+                                    <th style="width: 15%;">Ngày giờ nhập</th>
+                                    <th style="width: 8%;">Hóa đơn</th>
                                 </tr>
                             </thead>
                             <tbody id="supplier-history-tbody">
@@ -528,7 +555,7 @@ export function viewSupplierHistory(sid) {
   
   showModal(`<div class="modal-hd"><span class="modal-title">📜 Lịch sử nhập hàng - ${escapeHtml(supplier?.name)}</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="metric-card" style="margin-bottom:16px"><div class="metric-label">Tổng chi</div><div class="metric-val" style="font-size:20px">${formatMoneyVND(totalSpent)}</div></div>
-    <div class="tbl-wrap"><table style="min-width:700px"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th><th>Hóa đơn</th></tr></thead>
+    <div class="tbl-wrap"><table style="min-width:900px"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th><th>Hóa đơn</th></tr></thead>
     <tbody>${purchaseTxns.map(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
@@ -543,7 +570,7 @@ export function viewSupplierHistory(sid) {
           <td>${escapeHtml(t.note || '—')}</td>
           <td>${invoiceHtml}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</tr>'}</tbody></table></div>
+    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody>;</table></div>
     </div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>`);
 }
 
