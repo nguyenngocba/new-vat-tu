@@ -116,7 +116,7 @@ tr:hover td{background:var(--surface2);}
 .supplier-card{background:var(--surface2);border-radius:var(--r);padding:12px;margin-bottom:12px;}
 .search-box{margin-bottom:16px;display:flex;gap:10px;}
 .invoice-img{max-width:100%;max-height:200px;border-radius:var(--r);margin-top:8px;cursor:pointer;}
-/* ========== DRAG RESIZE COLUMN ========== */
+
 .resizable-table {
     position: relative;
     overflow-x: auto;
@@ -144,7 +144,6 @@ tr:hover td{background:var(--surface2);}
     opacity: 0.6;
 }
 
-/* ========== COLUMN TOGGLE PANEL ========== */
 .column-toggle-panel {
     position: relative;
     display: inline-block;
@@ -213,7 +212,6 @@ tr:hover td{background:var(--surface2);}
     font-size: 12px;
 }
 
-/* ========== FAVORITE STYLES ========== */
 .favorite-btn {
     background: none;
     border: none;
@@ -250,7 +248,6 @@ tr:hover td{background:var(--surface2);}
     text-shadow: 0 0 2px #f5a623;
 }
 
-/* ========== SORTABLE HEADER ========== */
 .sortable-header {
     cursor: pointer;
     user-select: none;
@@ -278,7 +275,7 @@ tr:hover td{background:var(--surface2);}
     color: var(--accent);
     transform: rotate(180deg);
 }
-/* ========== KEYBOARD SHORTCUT STYLES ========== */
+
 kbd {
     display: inline-block;
     padding: 3px 6px;
@@ -292,7 +289,6 @@ kbd {
     box-shadow: 0 1px 0 rgba(0,0,0,0.2);
 }
 
-/* ========== NOTIFICATION BUTTON STYLE ========== */
 #request-notification {
     background: var(--accent-bg);
     color: var(--accent-text);

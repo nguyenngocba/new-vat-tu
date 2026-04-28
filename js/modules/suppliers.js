@@ -1,7 +1,6 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genSid, supplierById, hasPermission } from './state.js';
-import { debounce, handleIntegerInput, getRawInteger, formatMoneyVND } from './utils.js';
+import { debounce, formatMoneyVND } from './utils.js';
 
-// ========== FILTER NHÀ CUNG CẤP NÂNG CAO ==========
 let supplierFilters = { keyword: '', phone: '', minPurchase: '', maxPurchase: '' };
 let supplierListContainer = null;
 
@@ -123,47 +122,21 @@ function bindSupplierSearchEvents() {
     };
 }
 
-// ========== RENDER CHÍNH ==========
 export function renderSuppliers() {
-  const filtered = getFilteredSuppliers();
   const result = renderSupplierSearchBar() + `<div class="card">
-    <div class="sec-title">🏭 DANH SÁCH NHÀ CUNG CẤP (${filtered.length})</div>
-    <div id="supplier-list-container">
-        <div class="grid2" style="grid-template-columns:repeat(auto-fill, minmax(350px,1fr))">
-            ${filtered.map(s => {
-                const purchaseTxns = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
-                const totalSpent = purchaseTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-                const purchaseCount = purchaseTxns.length;
-                return `<div class="supplier-card">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <strong>${escapeHtml(s.name)}</strong> 
-                        <span class="tag">${s.id}</span>
-                    </div>
-                    <div class="metric-sub">📞 ${s.phone || 'Chưa có'}</div>
-                    <div class="metric-sub">✉️ ${s.email || 'Chưa có'}</div>
-                    <div class="metric-sub">📍 ${s.address || 'Chưa có'}</div>
-                    <div class="metric-sub" style="margin-top:8px">📦 Số lần nhập: ${purchaseCount}</div>
-                    <div class="metric-sub" style="color:var(--success-text)">💰 Tổng chi: ${formatMoneyVND(totalSpent)}</div>
-                    <div style="margin-top:8px;display:flex;gap:8px">
-                        <button class="sm" onclick="openSupplierModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">✏️ Sửa</button>
-                        <button class="sm danger-btn" onclick="window.deleteSupplierHandler('${s.id}')">🗑️ Xóa</button>
-                        <button class="sm" onclick="viewSupplierHistory('${s.id}')">📜 Lịch sử</button>
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>
-    </div>
+    <div class="sec-title">🏭 DANH SÁCH NHÀ CUNG CẤP</div>
+    <div id="supplier-list-container"></div>
     <div id="supplier-history-modal" style="display:none"></div>
   </div>`;
   
   setTimeout(() => {
       bindSupplierSearchEvents();
       supplierListContainer = document.getElementById('supplier-list-container');
+      updateSupplierList();
   }, 50);
   return result;
 }
 
-// ========== THÊM/SỬA NHÀ CUNG CẤP ==========
 export function openSupplierModal(supplier = null) {
   if (!hasPermission('canManageSupplier')) { alert('Bạn không có quyền quản lý nhà cung cấp'); return; }
   const isEdit = !!supplier;
@@ -205,7 +178,6 @@ export function updateSupplier(sid) {
   saveState(); closeModal(); if(window.render) window.render();
 }
 
-// ========== XÓA NHÀ CUNG CẤP ==========
 export function deleteSupplier(sid) {
   if (!hasPermission('canManageSupplier')) { alert('Bạn không có quyền xóa nhà cung cấp'); return; }
   const supplier = supplierById(sid);
@@ -222,10 +194,7 @@ export function deleteSupplier(sid) {
   saveState(); if(window.render) window.render();
 }
 
-// Global handler
-window.deleteSupplierHandler = (sid) => {
-    deleteSupplier(sid);
-};
+window.deleteSupplierHandler = (sid) => { deleteSupplier(sid); };
 
 export function filterSuppliers() {}
 export function clearSupplierSearch() {}
@@ -256,9 +225,8 @@ export function viewSupplierHistory(sid) {
     <div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>`);
 }
 
-// ========== EXPORTS CHO app.js ==========
 export const addSupplier = (data) => {
-    const newId = `S${String(state.data.nextSid++).padStart(3, '0')}`;
+    const newId = genSid();
     const newSupplier = {
         id: newId,
         name: data.name,
@@ -273,6 +241,4 @@ export const addSupplier = (data) => {
     return newSupplier;
 };
 
-export const getSuppliers = () => {
-    return state.data.suppliers;
-};
+export const getSuppliers = () => state.data.suppliers;

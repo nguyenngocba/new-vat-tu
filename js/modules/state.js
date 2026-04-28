@@ -1,4 +1,4 @@
-export const STORAGE_KEY = 'steel_pro_v10';
+export const STORAGE_KEY = 'steel_pro_v11';
 
 export let state = {
   theme: 'dark',
@@ -55,16 +55,21 @@ export function loadState() {
       if (!state.data.projects) state.data.projects = [];
       if (!state.data.suppliers) state.data.suppliers = [];
       if (!state.data.logs) state.data.logs = [];
-      if (!state.data.categories) state.data.categories = ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'];
-      if (!state.data.units) state.data.units = ['tấn', 'kg', 'cái', 'mét', 'thùng', 'tấm', 'cuộn'];
+      if (!state.data.categories || state.data.categories.length === 0) {
+        state.data.categories = ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'];
+      }
+      if (!state.data.units || state.data.units.length === 0) {
+        state.data.units = ['tấn', 'kg', 'cái', 'mét', 'thùng', 'tấm', 'cuộn'];
+      }
       if (!state.data.transactions) state.data.transactions = [];
       if (!state.data.materials) state.data.materials = [];
     }
+    // Seed data nếu chưa có
     if (state.data.projects.length === 0) {
       state.data.projects = [
-        { id: 'P001', name: 'Nhà kho A', budget: 50000, spent: 0 },
-        { id: 'P002', name: 'Mái nhà xưởng B', budget: 35000, spent: 0 },
-        { id: 'P003', name: 'Khung văn phòng C', budget: 28000, spent: 0 }
+        { id: 'P001', name: 'Nhà kho A', budget: 50000000, spent: 0 },
+        { id: 'P002', name: 'Mái nhà xưởng B', budget: 35000000, spent: 0 },
+        { id: 'P003', name: 'Khung văn phòng C', budget: 28000000, spent: 0 }
       ];
       state.data.nextPid = 4;
     }
@@ -85,10 +90,10 @@ export function loadState() {
 
 function seedData() {
   state.data.materials = [
-    { id: 'M001', name: 'Dầm H 200x200', cat: 'Dầm thép', unit: 'tấn', qty: 18.5, cost: 850, low: 5, note: '' },
-    { id: 'M002', name: 'Tôn dày 10mm', cat: 'Tấm thép', unit: 'tấn', qty: 22.0, cost: 760, low: 6, note: '' },
-    { id: 'M003', name: 'Que hàn E7018', cat: 'Vật tư tiêu hao', unit: 'thùng', qty: 40, cost: 12, low: 15, note: '' },
-    { id: 'M004', name: 'Bu lông M20', cat: 'Bu lông - Ốc vít', unit: 'cái', qty: 850, cost: 0.45, low: 200, note: '' }
+    { id: 'M001', name: 'Dầm H 200x200', cat: 'Dầm thép', unit: 'tấn', qty: 18.5, cost: 8500000, low: 5, note: '' },
+    { id: 'M002', name: 'Tôn dày 10mm', cat: 'Tấm thép', unit: 'tấn', qty: 22.0, cost: 7600000, low: 6, note: '' },
+    { id: 'M003', name: 'Que hàn E7018', cat: 'Vật tư tiêu hao', unit: 'thùng', qty: 40, cost: 120000, low: 15, note: '' },
+    { id: 'M004', name: 'Bu lông M20', cat: 'Bu lông - Ốc vít', unit: 'cái', qty: 850, cost: 4500, low: 200, note: '' }
   ];
   state.data.nextMid = 5;
   state.data.transactions = [];
@@ -130,8 +135,6 @@ export function addLog(action, details = '') {
   if (state.data.logs.length > 500) state.data.logs = state.data.logs.slice(0, 500);
   saveState();
 }
-
-// Trong file state.js, tìm hàm formatMoney và thay thế bằng:
 
 export function formatMoney(value) { 
     let num = typeof value === 'string' ? parseFloat(value) : value;

@@ -1,7 +1,6 @@
-import { state, saveState, addLog, formatMoney, escapeHtml, applyTheme, hasPermission, isAdmin } from './state.js';
+import { state, saveState, addLog, escapeHtml, applyTheme, hasPermission, isAdmin } from './state.js';
 import { showModal, closeModal } from './auth.js';
 
-// ========== CẤU HÌNH GIAO DIỆN (THÊM NHẸ - KHÔNG ẢNH HƯỞNG CODE CŨ) ==========
 const UI_CONFIG_KEY = 'steeltrack_ui_config_simple';
 
 let uiConfig = {
@@ -10,6 +9,17 @@ let uiConfig = {
     logoEmoji: '🏭',
     logoImage: null
 };
+
+function ensureDefaultData() {
+    if (!state.data.categories || state.data.categories.length === 0) {
+        state.data.categories = ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'];
+        saveState();
+    }
+    if (!state.data.units || state.data.units.length === 0) {
+        state.data.units = ['tấn', 'kg', 'cái', 'mét', 'thùng', 'tấm', 'cuộn'];
+        saveState();
+    }
+}
 
 function loadUIConfig() {
     try {
@@ -99,100 +109,94 @@ function uploadLogoImage(callback) {
     input.click();
 }
 
-// ========== RENDER CÀI ĐẶT (THÊM PHẦN TÙY CHỈNH GIAO DIỆN VÀ BACKUP) ==========
 export function renderSettings() {
-  if (!hasPermission('canAccessSettings')) return '<div class="card">🔒 Bạn không có quyền truy cập khu vực này.</div>';
-  
-  // Phần tùy chỉnh giao diện (THÊM MỚI - ĐẶT LÊN ĐẦU)
-  const customSection = `
-    <div class="sec-title">🎨 TÙY CHỈNH GIAO DIỆN</div>
-    <div style="margin-bottom: 20px;">
-        <div class="setting-item" style="border-bottom: none; flex-direction: column; align-items: flex-start; gap: 10px;">
-            <div style="width: 100%;">
-                <div style="font-weight: 600; margin-bottom: 5px;">🏷️ Tên ứng dụng</div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="app-name-input" value="${escapeHtml(uiConfig.appName)}" style="flex: 1;">
-                    <button class="sm" id="save-app-name">Lưu</button>
+    ensureDefaultData();
+    
+    if (!hasPermission('canAccessSettings')) return '<div class="card">🔒 Bạn không có quyền truy cập khu vực này.</div>';
+    
+    const customSection = `
+        <div class="sec-title">🎨 TÙY CHỈNH GIAO DIỆN</div>
+        <div style="margin-bottom: 20px;">
+            <div class="setting-item" style="border-bottom: none; flex-direction: column; align-items: flex-start; gap: 10px;">
+                <div style="width: 100%;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">🏷️ Tên ứng dụng</div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="app-name-input" value="${escapeHtml(uiConfig.appName)}" style="flex: 1;">
+                        <button class="sm" id="save-app-name">Lưu</button>
+                    </div>
                 </div>
-            </div>
-            <div style="width: 100%;">
-                <div style="font-weight: 600; margin-bottom: 5px;">🎨 Logo</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <button class="sm" id="select-emoji">😊 Emoji</button>
-                    <button class="sm" id="upload-image">📷 Ảnh</button>
-                    <button class="sm danger-btn" id="reset-logo">🗑️ Mặc định</button>
-                </div>
-                <div id="logo-preview" style="margin-top: 8px; padding: 6px 10px; background: var(--surface2); border-radius: 6px; font-size: 13px;">
-                    ${uiConfig.logoType === 'emoji' ? `📌 Logo: ${uiConfig.logoEmoji}` : 
-                      uiConfig.logoType === 'image' ? '📌 Logo: Ảnh đã tải lên' : 
-                      '📌 Logo: Mặc định (🏭)'}
+                <div style="width: 100%;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">🎨 Logo</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="sm" id="select-emoji">😊 Emoji</button>
+                        <button class="sm" id="upload-image">📷 Ảnh</button>
+                        <button class="sm danger-btn" id="reset-logo">🗑️ Mặc định</button>
+                    </div>
+                    <div id="logo-preview" style="margin-top: 8px; padding: 6px 10px; background: var(--surface2); border-radius: 6px; font-size: 13px;">
+                        ${uiConfig.logoType === 'emoji' ? `📌 Logo: ${uiConfig.logoEmoji}` : 
+                          uiConfig.logoType === 'image' ? '📌 Logo: Ảnh đã tải lên' : 
+                          '📌 Logo: Mặc định (🏭)'}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-  `;
-  
-  // Phần Backup & Restore (THÊM MỚI)
-  const backupSection = `
-    <div class="sec-title">💾 SAO LƯU & KHÔI PHỤC</div>
-    <div style="margin-bottom: 20px;">
-        <div class="setting-item" style="border-bottom: none; gap: 10px; flex-wrap: wrap;">
-            <button class="sm primary" id="export-backup-btn" style="background: var(--success);">📤 Xuất backup (JSON)</button>
-            <button class="sm" id="import-backup-btn">📥 Nhập backup (JSON)</button>
+    `;
+    
+    const backupSection = `
+        <div class="sec-title">💾 SAO LƯU & KHÔI PHỤC</div>
+        <div style="margin-bottom: 20px;">
+            <div class="setting-item" style="border-bottom: none; gap: 10px; flex-wrap: wrap;">
+                <button class="sm primary" id="export-backup-btn" style="background: var(--success);">📤 Xuất backup (JSON)</button>
+                <button class="sm" id="import-backup-btn">📥 Nhập backup (JSON)</button>
+            </div>
+            <div class="metric-sub" style="margin-top: 8px;">💡 Sao lưu dữ liệu định kỳ để tránh mất mát. Dữ liệu được lưu dưới dạng file JSON.</div>
         </div>
-        <div class="metric-sub" style="margin-top: 8px;">💡 Sao lưu dữ liệu định kỳ để tránh mất mát. Dữ liệu được lưu dưới dạng file JSON.</div>
-    </div>
-  `;
-  
-  // Phần quản lý người dùng (GIỮ NGUYÊN)
-  const userSection = `
-    <div class="sec-title">👥 QUẢN LÝ NGƯỜI DÙNG</div>
-    <button class="sm primary" style="margin-bottom:16px" onclick="addUser()">+ Thêm người dùng mới</button>
-    <div class="tbl-wrap"><table style="min-width:800px"><thead><tr><th>Tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Quyền</th><th>Thao tác</th></tr></thead>
-    <tbody>${state.data.users.map(u => `<tr>
-      <td><strong>${escapeHtml(u.name)}</strong>${u.id === state.currentUser.id ? ' <span class="tag">Bạn</span>' : ''}</td>
-      <td>${u.username}</td>
-      <td><span class="tag">${u.role === 'admin' ? 'Admin' : 'Nhân viên'}</span></td>
-      <td style="font-size:11px">
-        ${u.role !== 'admin' ? `
-          <div><input type="checkbox" ${u.permissions.canImport ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canImport')"> 📥 Nhập kho</div>
-          <div><input type="checkbox" ${u.permissions.canExport ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canExport')"> 📤 Xuất kho</div>
-          <div><input type="checkbox" ${u.permissions.canCreateMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canCreateMaterial')"> ➕ Thêm vật tư</div>
-          <div><input type="checkbox" ${u.permissions.canEditMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canEditMaterial')"> ✏️ Sửa vật tư</div>
-          <div><input type="checkbox" ${u.permissions.canDeleteMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canDeleteMaterial')"> 🗑️ Xóa vật tư</div>
-          <div><input type="checkbox" ${u.permissions.canDeleteProject ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canDeleteProject')"> 🏗️ Xóa công trình</div>
-          <div><input type="checkbox" ${u.permissions.canManageSupplier ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canManageSupplier')"> 🏭 QL Nhà cung cấp</div>
-        ` : '🔓 Toàn quyền'}
-      </td>
-      <td><button class="sm" onclick="changePassword('${u.id}')">🔑 Đổi MK</button> ${u.id !== state.currentUser.id ? `<button class="sm danger-btn" onclick="deleteUser('${u.id}')">🗑️</button>` : ''}</td>
-    </td>`).join('')}</tbody></table></div>
-  `;
-  
-  // Phần quản lý danh mục (GIỮ NGUYÊN)
-  const categorySection = `
-    <div style="margin-top:24px"><div class="sec-title">📂 QUẢN LÝ DANH MỤC</div>
-      <div style="margin-bottom:16px"><div class="sec-title">Loại vật tư</div>${state.data.categories.map(c => `<div class="setting-item"><span>📌 ${escapeHtml(c)}</span><button class="sm danger-btn" onclick="deleteCategory('${c}')">Xóa</button></div>`).join('')}
-        <div style="margin-top:12px;display:flex;gap:8px"><input id="newCat" placeholder="Nhập loại mới" style="flex:1"><button class="sm primary" onclick="addCategory()">+ Thêm</button></div>
-      </div>
-      <div style="margin-bottom:16px"><div class="sec-title">Đơn vị tính</div>${state.data.units.map(u => `<div class="setting-item"><span>📏 ${escapeHtml(u)}</span><button class="sm danger-btn" onclick="deleteUnit('${u}')">Xóa</button></div>`).join('')}
-        <div style="margin-top:12px;display:flex;gap:8px"><input id="newUnit" placeholder="Nhập đơn vị mới" style="flex:1"><button class="sm primary" onclick="addUnit()">+ Thêm</button></div>
-      </div>
-    </div>
-  `;
-  
-  // Phần giao diện (GIỮ NGUYÊN)
-  const themeSection = `
-    <div style="margin-top:24px"><div class="sec-title">🌓 GIAO DIỆN</div>
-      <div class="setting-item"><span>Chế độ màu</span><button class="sm" onclick="toggleTheme()">${state.theme === 'dark' ? '☀️ Chuyển sáng' : '🌙 Chuyển tối'}</button></div>
-    </div>
-  `;
-  
-  return `<div class="card">${customSection}${backupSection}${userSection}${categorySection}${themeSection}</div>`;
+    `;
+    
+    const userSection = `
+        <div class="sec-title">👥 QUẢN LÝ NGƯỜI DÙNG</div>
+        <button class="sm primary" style="margin-bottom:16px" onclick="addUser()">+ Thêm người dùng mới</button>
+        <div class="tbl-wrap"><table style="min-width:800px"><thead><tr><th>Tên</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Quyền</th><th>Thao tác</th></tr></thead>
+        <tbody>${state.data.users.map(u => `<tr>
+          <td><strong>${escapeHtml(u.name)}</strong>${u.id === state.currentUser.id ? ' <span class="tag">Bạn</span>' : ''}</td>
+          <td>${u.username}</td>
+          <td><span class="tag">${u.role === 'admin' ? 'Admin' : 'Nhân viên'}</span></td>
+          <td style="font-size:11px">
+            ${u.role !== 'admin' ? `
+              <div><input type="checkbox" ${u.permissions.canImport ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canImport')"> 📥 Nhập kho</div>
+              <div><input type="checkbox" ${u.permissions.canExport ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canExport')"> 📤 Xuất kho</div>
+              <div><input type="checkbox" ${u.permissions.canCreateMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canCreateMaterial')"> ➕ Thêm vật tư</div>
+              <div><input type="checkbox" ${u.permissions.canEditMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canEditMaterial')"> ✏️ Sửa vật tư</div>
+              <div><input type="checkbox" ${u.permissions.canDeleteMaterial ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canDeleteMaterial')"> 🗑️ Xóa vật tư</div>
+              <div><input type="checkbox" ${u.permissions.canDeleteProject ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canDeleteProject')"> 🏗️ Xóa công trình</div>
+              <div><input type="checkbox" ${u.permissions.canManageSupplier ? 'checked' : ''} onchange="toggleUserPermission('${u.id}', 'canManageSupplier')"> 🏭 QL Nhà cung cấp</div>
+            ` : '🔓 Toàn quyền'}
+          </td>
+          <td><button class="sm" onclick="changePassword('${u.id}')">🔑 Đổi MK</button> ${u.id !== state.currentUser.id ? `<button class="sm danger-btn" onclick="deleteUser('${u.id}')">🗑️</button>` : ''}</td>
+        </tr>`).join('')}</tbody></table></div>
+    `;
+    
+    const categorySection = `
+        <div style="margin-top:24px"><div class="sec-title">📂 QUẢN LÝ DANH MỤC</div>
+          <div style="margin-bottom:16px"><div class="sec-title">Loại vật tư</div>${state.data.categories.map(c => `<div class="setting-item"><span>📌 ${escapeHtml(c)}</span><button class="sm danger-btn" onclick="deleteCategory('${c}')">Xóa</button></div>`).join('')}
+            <div style="margin-top:12px;display:flex;gap:8px"><input id="newCat" placeholder="Nhập loại mới" style="flex:1"><button class="sm primary" onclick="addCategory()">+ Thêm</button></div>
+          </div>
+          <div style="margin-bottom:16px"><div class="sec-title">Đơn vị tính</div>${state.data.units.map(u => `<div class="setting-item"><span>📏 ${escapeHtml(u)}</span><button class="sm danger-btn" onclick="deleteUnit('${u}')">Xóa</button></div>`).join('')}
+            <div style="margin-top:12px;display:flex;gap:8px"><input id="newUnit" placeholder="Nhập đơn vị mới" style="flex:1"><button class="sm primary" onclick="addUnit()">+ Thêm</button></div>
+          </div>
+        </div>
+    `;
+    
+    const themeSection = `
+        <div style="margin-top:24px"><div class="sec-title">🌓 GIAO DIỆN</div>
+          <div class="setting-item"><span>Chế độ màu</span><button class="sm" onclick="toggleTheme()">${state.theme === 'dark' ? '☀️ Chuyển sáng' : '🌙 Chuyển tối'}</button></div>
+        </div>
+    `;
+    
+    return `<div class="card">${customSection}${backupSection}${userSection}${categorySection}${themeSection}</div>`;
 }
 
-// ========== BIND SỰ KIỆN CHO TÙY CHỈNH GIAO DIỆN ==========
 export function bindUISettingsEvents() {
-    // Lưu tên ứng dụng
     const saveAppName = document.getElementById('save-app-name');
     const appNameInput = document.getElementById('app-name-input');
     if (saveAppName && appNameInput) {
@@ -208,7 +212,6 @@ export function bindUISettingsEvents() {
         };
     }
     
-    // Chọn emoji
     const selectEmoji = document.getElementById('select-emoji');
     if (selectEmoji) {
         selectEmoji.onclick = () => {
@@ -225,7 +228,6 @@ export function bindUISettingsEvents() {
         };
     }
     
-    // Upload ảnh
     const uploadImage = document.getElementById('upload-image');
     if (uploadImage) {
         uploadImage.onclick = () => {
@@ -243,7 +245,6 @@ export function bindUISettingsEvents() {
         };
     }
     
-    // Reset logo về mặc định
     const resetLogo = document.getElementById('reset-logo');
     if (resetLogo) {
         resetLogo.onclick = () => {
@@ -258,7 +259,6 @@ export function bindUISettingsEvents() {
         };
     }
     
-    // Export backup
     const exportBtn = document.getElementById('export-backup-btn');
     if (exportBtn) {
         exportBtn.onclick = async () => {
@@ -267,7 +267,6 @@ export function bindUISettingsEvents() {
         };
     }
     
-    // Import backup
     const importBtn = document.getElementById('import-backup-btn');
     if (importBtn) {
         importBtn.onclick = async () => {
@@ -277,7 +276,6 @@ export function bindUISettingsEvents() {
     }
 }
 
-// ========== CÁC HÀM QUẢN LÝ NGƯỜI DÙNG (GIỮ NGUYÊN) ==========
 export function addCategory() { 
   const inp = document.getElementById('newCat'); 
   if(inp.value.trim()){ 
@@ -391,5 +389,4 @@ export function deleteUnit(unit) {
   } 
 }
 
-// Khởi tạo cấu hình UI
 loadUIConfig();

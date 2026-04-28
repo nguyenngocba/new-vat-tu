@@ -6,10 +6,9 @@
     <title>SteelTrack Pro - Quản lý kho & Công trình & Nhà cung cấp</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-    <!-- SheetJS XLSX - nhiều CDN dự phòng -->
+    <!-- SheetJS XLSX -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script>
-        // Kiểm tra XLSX đã load chưa, nếu chưa thì thử CDN khác
         window.addEventListener('load', function() {
             if (typeof XLSX === 'undefined') {
                 console.log('Đang tải XLSX từ CDN dự phòng...');

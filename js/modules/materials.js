@@ -1,6 +1,6 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission } from './state.js';
 import { 
-    handleIntegerInput, getIntegerFromInput, getNumberFromInput, setInputValue, formatMoneyVND,
+    handleIntegerInput, getNumberFromInput, formatMoneyVND,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
     getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
 } from './utils.js';
@@ -76,13 +76,13 @@ function updateMaterialList() {
                                     return `<td style="width: ${col.width}px; white-space: nowrap;">
                                         ${hasPermission('canEditMaterial') ? `<button class="sm" onclick="editMaterial('${m.id}')">✏️ Sửa</button>` : ''}
                                         ${hasPermission('canDeleteMaterial') ? `<button class="sm danger-btn" onclick="deleteMaterial('${m.id}')">🗑️ Xóa</button>` : ''}
-                                      </td>`;
+                                       </td>`;
                                 }
                                 if (col.key === 'id') {
                                     return `<td style="width: ${col.width}px; font-family:mono">
                                         <button class="favorite-btn ${favorites.includes(m.id) ? 'active' : ''}" onclick="toggleFavoriteItem('${m.id}')">★</button>
                                         ${m.id}
-                                      </td>`;
+                                       </td>`;
                                 }
                                 if (col.key === 'name') {
                                     return `<td style="width: ${col.width}px;"><strong>${escapeHtml(m.name)}</strong></td>`;
@@ -307,8 +307,6 @@ window.toggleFavoriteFilter = function() {
 };
 
 export function renderMaterials() {
-  if (state.data.materials.length === 0) return `<div class="card">📭 Chưa có vật tư nào. Hãy thêm mới.</div>`;
-  
   const result = renderMaterialSearchBar() + `<div class="card">
     <div class="sec-title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>📋 DANH SÁCH VẬT TƯ TỒN KHO</span>
@@ -338,8 +336,6 @@ window.resetColumnConfig = function() {
         }
     });
 };
-
-export const renderEntry = renderMaterials;
 
 export function openMatModal() {
   if (!hasPermission('canCreateMaterial')) { alert('Bạn không có quyền thêm vật tư'); return; }
@@ -417,7 +413,6 @@ export function editMaterial(mid) {
   }, 100);
 }
 
-// ========== HÀM UPDATE MATERIAL ==========
 export function updateMaterial(mid) {
   const mat = matById(mid);
   if (!mat) return;
@@ -447,7 +442,6 @@ export function deleteMaterial(mid) {
   saveState(); if(window.render) window.render();
 }
 
-// ========== EXPORTS CHO app.js ==========
 export const addMaterial = (data) => {
     const newId = genMid();
     const newMat = {
@@ -467,6 +461,4 @@ export const addMaterial = (data) => {
     return newMat;
 };
 
-export const getMaterials = () => {
-    return state.data.materials;
-};
+export const getMaterials = () => state.data.materials;

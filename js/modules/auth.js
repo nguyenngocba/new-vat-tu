@@ -77,7 +77,6 @@ export function getPaneTitle() {
   return titles[state.currentPane] || '';
 }
 
-// ========== MODAL FUNCTIONS ==========
 let currentModalCallback = null;
 
 export function showModal(html, callback) {

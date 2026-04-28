@@ -1,11 +1,11 @@
-import { state, saveState, loadState, addLog, formatMoney } from './modules/state.js';
-import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal } from './modules/auth.js';
+import { state, saveState, loadState, addLog } from './modules/state.js';
+import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, addMaterial, updateMaterial, deleteMaterial, getMaterials, openMatModal, editMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, addProject, deleteProject, getProjects, openProjectModal, saveProject, filterProjects, clearProjectSearch } from './modules/projects.js';
 import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory } from './modules/suppliers.js';
 import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
-import { renderDashboard, renderCharts, renderProjectCharts, checkAutoBackup, checkLowStockNotification, requestNotificationPermission, renderDashboardChart } from './modules/charts.js';
+import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNotification, requestNotificationPermission } from './modules/charts.js';
 import { exportToExcel } from './modules/export.js';
 import { initShortcuts } from './modules/shortcuts.js';
 import { renderSettings, addCategory, addUnit, toggleTheme, addUser, deleteUser, changePassword, toggleUserPermission } from './modules/settings.js';
@@ -76,16 +76,31 @@ function render() {
     }
     
     if (state.currentPane === 'projects') {
-        setTimeout(renderProjectCharts, 50);
+        setTimeout(() => {
+            const ctx = document.getElementById('ch-project-cost');
+            if (ctx && window.Chart) {
+                const filtered = state.data.projects.map(p => {
+                    const totalCost = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
+                    return { name: p.name, totalCost };
+                });
+                if (filtered.length > 0) {
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: filtered.map(p => p.name),
+                            datasets: [{ label: 'Chi phí đã sử dụng (VNĐ)', data: filtered.map(p => p.totalCost), backgroundColor: '#378ADD', borderRadius: 6 }]
+                        },
+                        options: { maintainAspectRatio: false, responsive: true }
+                    });
+                }
+            }
+        }, 50);
     }
 }
 
 // ========== HÀM ĐĂNG NHẬP/ĐĂNG XUẤT ==========
 function login(userId) {
-    const users = [
-        { id: 'u1', name: 'Admin', role: 'admin' },
-        { id: 'u2', name: 'Nhân viên kho', role: 'user' }
-    ];
+    const users = state.data.users;
     const user = users.find(u => u.id === userId);
     if (user) {
         setCurrentUser(user);
@@ -104,16 +119,24 @@ function logout() {
 window.login = login;
 window.logout = logout;
 window.switchPane = switchPane;
+window.closeModal = closeModal;
+window.showModal = showModal;
+
+// Material functions
 window.openMatModal = openMatModal;
 window.editMaterial = editMaterial;
 window.updateMaterial = updateMaterial;
 window.deleteMaterial = deleteMaterial;
 window.saveMat = saveMat;
+
+// Project functions
 window.openProjectModal = openProjectModal;
 window.saveProject = saveProject;
 window.deleteProject = deleteProject;
 window.filterProjects = filterProjects;
 window.clearProjectSearch = clearProjectSearch;
+
+// Supplier functions
 window.openSupplierModal = openSupplierModal;
 window.saveSupplier = saveSupplier;
 window.updateSupplier = updateSupplier;
@@ -121,12 +144,16 @@ window.deleteSupplier = deleteSupplier;
 window.filterSuppliers = filterSuppliers;
 window.clearSupplierSearch = clearSupplierSearch;
 window.viewSupplierHistory = viewSupplierHistory;
+
+// Transaction functions
 window.openPurchaseModal = openPurchaseModal;
 window.savePurchase = savePurchase;
 window.openTxnModal = openTxnModal;
 window.saveExport = saveExport;
 window.calculatePurchaseTotal = calculatePurchaseTotal;
 window.calculateExportTotal = calculateExportTotal;
+
+// Settings functions
 window.addCategory = addCategory;
 window.addUnit = addUnit;
 window.toggleTheme = toggleTheme;
@@ -134,8 +161,32 @@ window.addUser = addUser;
 window.deleteUser = deleteUser;
 window.changePassword = changePassword;
 window.toggleUserPermission = toggleUserPermission;
+
+// Export function
 window.exportToExcel = exportToExcel;
-window.closeModal = closeModal;
+
+// Preview invoice
+window.previewInvoiceImage = function() {
+    const file = document.getElementById('purchase-invoice')?.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        window.currentInvoiceBase64 = e.target.result;
+        const previewDiv = document.getElementById('invoice-preview');
+        if (previewDiv) {
+            previewDiv.innerHTML = `<img src="${window.currentInvoiceBase64}" class="invoice-img" onclick="window.open(this.src)"><br><button class="sm" onclick="window.clearInvoiceImage()">🗑️ Xóa ảnh</button>`;
+        }
+    };
+    reader.readAsDataURL(file);
+};
+
+window.clearInvoiceImage = function() {
+    window.currentInvoiceBase64 = null;
+    const previewDiv = document.getElementById('invoice-preview');
+    if (previewDiv) previewDiv.innerHTML = '';
+    const fileInput = document.getElementById('purchase-invoice');
+    if (fileInput) fileInput.value = '';
+};
 
 // Expose state and utils for debugging
 window.debug = { state, saveState, addLog };
