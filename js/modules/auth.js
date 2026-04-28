@@ -57,16 +57,19 @@ export function renderTopbar() {
   
   if (state.currentPane === 'entry') {
     btns = `${hasPermission('canCreateMaterial') ? `<button class="sm" onclick="openMatModal()">+ Thêm vật tư</button>` : ''}
-            ${hasPermission('canImport') ? `<button class="sm primary" onclick="openPurchaseModal()">📥 Nhập kho</button>` : ''}
+            ${hasPermission('canImport') ? `<button class="sm" onclick="openPurchaseModal()">📥 Nhập kho</button>` : ''}
             ${hasPermission('canExport') ? `<button class="sm" onclick="openTxnModal('usage')">📤 Xuất kho</button>` : ''}
+            <button class="sm" onclick="showImportModal('materials', () => window.render())">📂 Import Excel</button>
             <button class="sm" onclick="exportToExcel('materials')">📎 Export Excel</button>`;
   }
-  if (state.currentPane === 'projects' && hasPermission('canCreateMaterial')) {
-    btns = `<button class="sm primary" onclick="openProjectModal()">+ Công trình mới</button>
-            <button class="sm" onclick="exportAllProjectsReport()">📎 Xuất tất cả</button>`;
+  if (state.currentPane === 'projects') {
+    btns = `${hasPermission('canCreateMaterial') ? `<button class="sm primary" onclick="openProjectModal()">+ Công trình mới</button>` : ''}
+            <button class="sm" onclick="showImportModal('projects', () => window.render())">📂 Import Excel</button>
+            <button class="sm" onclick="exportAllProjectsReport()">📎 Export Excel</button>`;
   }
-  if (state.currentPane === 'suppliers' && hasPermission('canManageSupplier')) {
-    btns = `<button class="sm primary" onclick="openSupplierModal()">+ Nhà cung cấp mới</button>
+  if (state.currentPane === 'suppliers') {
+    btns = `${hasPermission('canManageSupplier') ? `<button class="sm primary" onclick="openSupplierModal()">+ Nhà cung cấp mới</button>` : ''}
+            <button class="sm" onclick="showImportModal('suppliers', () => window.render())">📂 Import Excel</button>
             <button class="sm" onclick="exportToExcel('suppliers')">📎 Export Excel</button>`;
   }
   return `<div class="topbar"><span class="topbar-title">${getPaneTitle()}</span>${btns}</div>`;

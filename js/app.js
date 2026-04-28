@@ -9,6 +9,7 @@ import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNo
 import { exportToExcel } from './modules/export.js';
 import { initShortcuts } from './modules/shortcuts.js';
 import { renderSettings, addCategory, addUnit, toggleTheme, addUser, deleteUser, changePassword, toggleUserPermission } from './modules/settings.js';
+import { showImportModal, importMaterialsFromExcel, importProjectsFromExcel, importSuppliersFromExcel } from './modules/import.js';
 
 // Initialize
 loadState();
@@ -145,6 +146,12 @@ window.toggleUserPermission = toggleUserPermission;
 
 // Export function
 window.exportToExcel = exportToExcel;
+
+// Import functions
+window.showImportModal = showImportModal;
+window.importMaterialsFromExcel = importMaterialsFromExcel;
+window.importProjectsFromExcel = importProjectsFromExcel;
+window.importSuppliersFromExcel = importSuppliersFromExcel;
 
 // Preview invoice
 window.previewInvoiceImage = function() {
