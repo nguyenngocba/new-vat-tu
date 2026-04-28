@@ -4,58 +4,11 @@ import { handleIntegerInput, formatMoneyVND } from './utils.js';
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
 let projectListContainer = null;
 
-// Hàm định dạng ngày giờ
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
     const date = new Date(dateTimeStr);
     return date.toLocaleString('vi-VN');
 }
-
-const resizableStyle = `
-<style>
-.resizable-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-.resizable-panel {
-    border: 0.5px solid var(--border);
-    border-radius: var(--rl);
-    overflow: hidden;
-    background: var(--surface);
-}
-.panel-header {
-    background: var(--surface2);
-    padding: 12px 16px;
-    cursor: ns-resize;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 0.5px solid var(--border);
-}
-.panel-header .sec-title {
-    margin-bottom: 0;
-}
-.panel-content {
-    overflow: auto;
-    transition: height 0.1s ease;
-    padding: 16px;
-}
-.panel-resize-handle {
-    height: 6px;
-    background: var(--border2);
-    cursor: ns-resize;
-    transition: background 0.2s;
-}
-.panel-resize-handle:hover {
-    background: var(--accent);
-}
-.resize-icon {
-    font-size: 11px;
-    color: var(--muted);
-}
-</style>
-`;
 
 function getFilteredProjects() {
     let result = [...state.data.projects];
@@ -214,10 +167,16 @@ function bindProjectSearchEvents() {
 }
 
 function initResizablePanels() {
-    const handles = document.querySelectorAll('.panel-resize-handle');
+    const container = document.getElementById('projects-resizable-container');
+    if (!container) return;
+    
+    const handles = container.querySelectorAll('.panel-resize-handle');
     
     handles.forEach(handle => {
-        const targetId = handle.dataset.target;
+        const newHandle = handle.cloneNode(true);
+        handle.parentNode.replaceChild(newHandle, handle);
+        
+        const targetId = newHandle.dataset.target;
         const panel = document.getElementById(targetId);
         if (!panel) return;
         
@@ -226,8 +185,9 @@ function initResizablePanels() {
         let startHeight = 0;
         let isResizing = false;
         
-        handle.addEventListener('mousedown', (e) => {
+        newHandle.addEventListener('mousedown', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             isResizing = true;
             startY = e.clientY;
             startHeight = content.offsetHeight;
@@ -235,22 +195,28 @@ function initResizablePanels() {
             document.body.style.userSelect = 'none';
         });
         
-        document.addEventListener('mousemove', (e) => {
+        const onMouseMove = (e) => {
             if (!isResizing) return;
+            e.preventDefault();
             const diff = e.clientY - startY;
             let newHeight = startHeight + diff;
-            newHeight = Math.max(150, Math.min(600, newHeight));
+            newHeight = Math.max(150, Math.min(500, newHeight));
             content.style.height = newHeight + 'px';
             content.style.maxHeight = newHeight + 'px';
-        });
+        };
         
-        document.addEventListener('mouseup', () => {
+        const onMouseUp = () => {
             if (isResizing) {
                 isResizing = false;
                 document.body.style.cursor = '';
                 document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
             }
-        });
+        };
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
     });
 }
 
@@ -393,7 +359,7 @@ export function exportAllProjectsReport() {
 }
 
 export function renderProjects() {
-    const result = resizableStyle + renderProjectSearchBar() + `<div class="card">
+    const result = `<div class="card">
         <div class="resizable-container" id="projects-resizable-container">
             <div class="resizable-panel" id="projects-list-panel">
                 <div class="panel-header">

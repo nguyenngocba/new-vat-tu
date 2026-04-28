@@ -4,58 +4,11 @@ import { debounce, formatMoneyVND } from './utils.js';
 let supplierFilters = { keyword: '', phone: '', minPurchase: '', maxPurchase: '' };
 let supplierListContainer = null;
 
-// Hàm định dạng ngày giờ
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
     const date = new Date(dateTimeStr);
     return date.toLocaleString('vi-VN');
 }
-
-const resizableStyle = `
-<style>
-.resizable-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-.resizable-panel {
-    border: 0.5px solid var(--border);
-    border-radius: var(--rl);
-    overflow: hidden;
-    background: var(--surface);
-}
-.panel-header {
-    background: var(--surface2);
-    padding: 12px 16px;
-    cursor: ns-resize;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 0.5px solid var(--border);
-}
-.panel-header .sec-title {
-    margin-bottom: 0;
-}
-.panel-content {
-    overflow: auto;
-    transition: height 0.1s ease;
-    padding: 16px;
-}
-.panel-resize-handle {
-    height: 6px;
-    background: var(--border2);
-    cursor: ns-resize;
-    transition: background 0.2s;
-}
-.panel-resize-handle:hover {
-    background: var(--accent);
-}
-.resize-icon {
-    font-size: 11px;
-    color: var(--muted);
-}
-</style>
-`;
 
 function getFilteredSuppliers() {
     let result = [...state.data.suppliers];
@@ -113,7 +66,7 @@ function renderSupplierHistory() {
             <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
             <td>${displayDateTime}</td>
             <td>${invoiceHtml}</td>
-        </tr>`;
+        </table>`;
     }).join('');
 }
 
@@ -132,7 +85,7 @@ function updateSupplierList() {
                 const purchaseTxns = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
                 const totalSpent = purchaseTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
                 const purchaseCount = purchaseTxns.length;
-                return `<div class="supplier-card project-card" data-supplier-id="${s.id}" style="cursor: pointer;" onclick="window.showSupplierDetail('${s.id}')">
+                return `<div class="supplier-card" data-supplier-id="${s.id}" style="cursor: pointer;" onclick="window.showSupplierDetail('${s.id}')">
                     <div style="display:flex;justify-content:space-between;align-items:center">
                         <strong style="font-size: 16px;">🏭 ${escapeHtml(s.name)}</strong> 
                         <span class="tag">${s.id}</span>
@@ -213,10 +166,16 @@ function bindSupplierSearchEvents() {
 }
 
 function initResizablePanels() {
-    const handles = document.querySelectorAll('.panel-resize-handle');
+    const container = document.getElementById('suppliers-resizable-container');
+    if (!container) return;
+    
+    const handles = container.querySelectorAll('.panel-resize-handle');
     
     handles.forEach(handle => {
-        const targetId = handle.dataset.target;
+        const newHandle = handle.cloneNode(true);
+        handle.parentNode.replaceChild(newHandle, handle);
+        
+        const targetId = newHandle.dataset.target;
         const panel = document.getElementById(targetId);
         if (!panel) return;
         
@@ -225,8 +184,9 @@ function initResizablePanels() {
         let startHeight = 0;
         let isResizing = false;
         
-        handle.addEventListener('mousedown', (e) => {
+        newHandle.addEventListener('mousedown', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             isResizing = true;
             startY = e.clientY;
             startHeight = content.offsetHeight;
@@ -234,22 +194,28 @@ function initResizablePanels() {
             document.body.style.userSelect = 'none';
         });
         
-        document.addEventListener('mousemove', (e) => {
+        const onMouseMove = (e) => {
             if (!isResizing) return;
+            e.preventDefault();
             const diff = e.clientY - startY;
             let newHeight = startHeight + diff;
-            newHeight = Math.max(150, Math.min(600, newHeight));
+            newHeight = Math.max(150, Math.min(500, newHeight));
             content.style.height = newHeight + 'px';
             content.style.maxHeight = newHeight + 'px';
-        });
+        };
         
-        document.addEventListener('mouseup', () => {
+        const onMouseUp = () => {
             if (isResizing) {
                 isResizing = false;
                 document.body.style.cursor = '';
                 document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
             }
-        });
+        };
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
     });
 }
 
@@ -403,7 +369,7 @@ export function exportSupplierDetail(supplierId) {
         { 'Thông tin': 'Địa chỉ', 'Giá trị': supplier.address || '' },
         { 'Thông tin': 'Tổng chi', 'Giá trị': formatMoneyVND(totalSpent) },
         { 'Thông tin': 'Số lần nhập hàng', 'Giá trị': transactions.length },
-        { 'Thông tin': 'Trung bình mỗi lần nhập', 'Giá trị': transactions.length > 0 ? formatMoneyVND(totalSpent / transactions.length) : '0 ₫' }
+		{ 'Thông tin': 'Trung bình mỗi lần nhập', 'Giá trị': transactions.length > 0 ? formatMoneyVND(totalSpent / transactions.length) : '0 ₫' }
     ];
     
     const detailData = transactions.map(t => {
@@ -449,8 +415,8 @@ export function exportAllSuppliersReport() {
 }
 
 export function renderSuppliers() {
-    const result = resizableStyle + renderSupplierSearchBar() + `<div class="card">
-        <div class="sec-title" style="display: flex; justify-content: space-between; align-items: center;">
+    const result = `<div class="card">
+        <div class="sec-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <span>🏭 DANH SÁCH NHÀ CUNG CẤP</span>
             <button class="sm" onclick="exportAllSuppliersReport()" style="font-size: 11px;">📎 Xuất tất cả báo cáo</button>
         </div>
@@ -577,7 +543,7 @@ export function viewSupplierHistory(sid) {
           <td>${escapeHtml(t.note || '—')}</td>
           <td>${invoiceHtml}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody></table></div>
+    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</tr>'}</tbody></table></div>
     </div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>`);
 }
 

@@ -1,10 +1,8 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission } from './state.js';
-// Trong materials.js, thêm setupNumberInput vào import nếu cần
 import { 
     handleIntegerInput, getNumberFromInput, formatMoneyVND,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
-    getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite,
-    setupNumberInput
+    getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
 } from './utils.js';
 
 let materialFilters = { keyword: '', category: '', minStock: '', maxStock: '', showFavoritesOnly: false };
@@ -67,10 +65,17 @@ function updateMaterialList() {
                                 <div class="resize-handle" data-col="${col.key}"></div>
                             </th>
                         `).join('')}
-                    </table>
+                    </tr>
                 </thead>
                 <tbody>
-                    ${sorted.map(m => `
+                    ${sorted.map(m => {
+                        // Đảm bảo số lượng hiển thị đúng
+                        const displayQty = typeof m.qty === 'number' ? m.qty.toLocaleString('vi-VN') : parseFloat(m.qty || 0).toLocaleString('vi-VN');
+                        const displayCost = formatMoneyVND(m.cost);
+                        const totalValue = (typeof m.qty === 'number' ? m.qty : parseFloat(m.qty || 0)) * (typeof m.cost === 'number' ? m.cost : parseFloat(m.cost || 0));
+                        const displayTotal = formatMoneyVND(totalValue);
+                        
+                        return `
                         <tr data-id="${m.id}">
                             ${visibleColumns.map(col => {
                                 if (col.key === 'actions') {
@@ -89,25 +94,26 @@ function updateMaterialList() {
                                     return `<td style="width: ${col.width}px;"><strong>${escapeHtml(m.name)}</strong></td>`;
                                 }
                                 if (col.key === 'qty') {
-                                    return `<td style="width: ${col.width}px;">${m.qty.toLocaleString('vi-VN')}<table>`;
+                                    return `<td style="width: ${col.width}px;">${displayQty} ${m.unit}</td>`;
                                 }
                                 if (col.key === 'cost') {
-                                    return `<td style="width: ${col.width}px;">${formatMoneyVND(m.cost)}</td>`;
+                                    return `<td style="width: ${col.width}px;">${displayCost}</td>`;
                                 }
                                 if (col.key === 'totalValue') {
-                                    const totalValue = m.qty * m.cost;
-                                    return `<td style="width: ${col.width}px; color: var(--accent); font-weight: 500;">${formatMoneyVND(totalValue)}</td>`;
+                                    return `<td style="width: ${col.width}px; color: var(--accent); font-weight: 500;">${displayTotal}</td>`;
                                 }
                                 if (col.key === 'status') {
-                                    return `<td style="width: ${col.width}px;"><span class="badge ${m.qty <= m.low ? 'b-low' : 'b-ok'}">${m.qty <= m.low ? '⚠️ Sắp hết' : '✅ OK'}</span></td>`;
+                                    const statusClass = m.qty <= m.low ? 'b-low' : 'b-ok';
+                                    const statusText = m.qty <= m.low ? '⚠️ Sắp hết' : '✅ OK';
+                                    return `<td style="width: ${col.width}px;"><span class="badge ${statusClass}">${statusText}</span></td>`;
                                 }
                                 if (col.key === 'note') {
                                     return `<td style="width: ${col.width}px; word-break: break-word;">${escapeHtml(m.note || '—')}</td>`;
                                 }
-                                return `<td style="width: ${col.width}px;">${m[col.key] || '—'}</td>`;
+                                return `<td style="width: ${col.width}px;">${m[col.key] !== undefined ? m[col.key] : '—'}</td>`;
                             }).join('')}
-                        </tr>
-                    `).join('')}
+                        </tr>`;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
