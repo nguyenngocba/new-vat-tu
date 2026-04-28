@@ -1,5 +1,5 @@
-import { state, saveState, addLog, formatMoneyVND, genMid, genPid, genSid } from './state.js';
-import { parseNumber } from './utils.js';
+import { state, saveState, addLog, genMid, genPid, genSid } from './state.js';
+import { parseNumber, formatMoneyVND } from './utils.js';
 
 // Hàm đọc file Excel và chuyển đổi dữ liệu
 export function readExcelFile(file) {
@@ -352,14 +352,16 @@ function downloadTemplate(type) {
         case 'materials':
             data = [
                 { 'Tên vật tư': 'Thép tấm 10mm', 'Loại': 'Tấm thép', 'Đơn vị': 'tấn', 'Số lượng': 10, 'Đơn giá': 8500000, 'Ngưỡng cảnh báo': 5, 'Ghi chú': 'Thép chất lượng cao' },
-                { 'Tên vật tư': 'Dầm H 200x200', 'Loại': 'Dầm thép', 'Đơn vị': 'cái', 'Số lượng': 20, 'Đơn giá': 1200000, 'Ngưỡng cảnh báo': 3, 'Ghi chú': 'Dầm chính' }
+                { 'Tên vật tư': 'Dầm H 200x200', 'Loại': 'Dầm thép', 'Đơn vị': 'cái', 'Số lượng': 20, 'Đơn giá': 1200000, 'Ngưỡng cảnh báo': 3, 'Ghi chú': 'Dầm chính' },
+                { 'Tên vật tư': 'Que hàn E7018', 'Loại': 'Vật tư tiêu hao', 'Đơn vị': 'thùng', 'Số lượng': 50, 'Đơn giá': 120000, 'Ngưỡng cảnh báo': 10, 'Ghi chú': 'Que hàn chất lượng' }
             ];
             filename = 'template_import_vat_tu.xlsx';
             break;
         case 'projects':
             data = [
                 { 'Tên công trình': 'Nhà kho A', 'Ngân sách': 50000000 },
-                { 'Tên công trình': 'Văn phòng B', 'Ngân sách': 35000000 }
+                { 'Tên công trình': 'Văn phòng B', 'Ngân sách': 35000000 },
+                { 'Tên công trình': 'Cầu vượt C', 'Ngân sách': 100000000 }
             ];
             filename = 'template_import_cong_trinh.xlsx';
             break;
