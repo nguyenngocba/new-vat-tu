@@ -90,7 +90,7 @@ tr:hover td{background:var(--surface2);}
 .pane.active{display:block;}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--rl);width:100%;max-width:650px;max-height:85vh;overflow:auto;}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--rl);width:100%;max-width:800px;max-height:85vh;overflow:auto;}
 .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:0.5px solid var(--border);}
 .modal-title{font-size:16px;font-weight:600;}
 .modal-bd{padding:20px;}
@@ -298,4 +298,28 @@ kbd {
 #request-notification:hover {
     background: var(--accent);
     color: #fff;
+}
+
+/* Project Card Styles */
+.project-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent);
+}
+
+.text-warning {
+    color: var(--warn-text);
+    font-weight: 500;
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 250px;
+    margin-bottom: 20px;
 }

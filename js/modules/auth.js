@@ -63,7 +63,7 @@ export function renderTopbar() {
   }
   if (state.currentPane === 'projects' && hasPermission('canCreateMaterial')) {
     btns = `<button class="sm primary" onclick="openProjectModal()">+ Công trình mới</button>
-            <button class="sm" onclick="exportToExcel('projects')">📎 Export Excel</button>`;
+            <button class="sm" onclick="exportAllProjectsReport()">📎 Xuất tất cả</button>`;
   }
   if (state.currentPane === 'suppliers' && hasPermission('canManageSupplier')) {
     btns = `<button class="sm primary" onclick="openSupplierModal()">+ Nhà cung cấp mới</button>

@@ -126,7 +126,6 @@ export function savePurchase() {
     const vatAmount = subtotal * vatRate / 100;
     const totalAmount = subtotal + vatAmount;
     
-    // Cập nhật tồn kho và giá trung bình
     const oldQty = mat.qty;
     const oldValue = oldQty * mat.cost;
     const newValue = totalAmount;
@@ -162,13 +161,13 @@ export function savePurchase() {
 }
 
 // ========== XUẤT KHO ==========
-export function openTxnModal(type) {
+export function openTxnModal(type, preselectedProjectId = null) {
     if (type === 'usage' && !hasPermission('canExport')) { alert('Bạn không có quyền xuất kho'); return; }
     if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (type === 'usage' && state.data.projects.length === 0) return alert('Chưa có công trình nào. Hãy thêm công trình trước.');
     
     const optsMat = state.data.materials.map(m => `<option value="${m.id}">${m.name} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
-    const optsProj = state.data.projects.map(p => `<option value="${p.id}">${p.name} (Ngân sách: ${formatMoneyVND(p.budget)})</option>`).join('');
+    const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${p.name} (Ngân sách: ${formatMoneyVND(p.budget)})</option>`).join('');
     
     showModal(`<div class="modal-hd"><span class="modal-title">📤 Xuất kho cho công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
@@ -229,10 +228,8 @@ export function saveExport() {
     
     const totalAmount = qty * mat.cost;
     
-    // Cập nhật tồn kho
     mat.qty -= qty;
     
-    // Cập nhật chi phí công trình
     const project = projectById(projectId);
     if (project) {
         project.spent = (project.spent || 0) + totalAmount;
@@ -259,7 +256,6 @@ export function saveExport() {
     alert('✅ Xuất kho thành công!');
 }
 
-// ========== EXPORTS ==========
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
 export const getTransactions = () => state.data.transactions;

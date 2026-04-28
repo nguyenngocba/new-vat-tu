@@ -1,7 +1,7 @@
 import { state, saveState, loadState, addLog } from './modules/state.js';
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, addMaterial, updateMaterial, deleteMaterial, getMaterials, openMatModal, editMaterial, saveMat } from './modules/materials.js';
-import { renderProjects, addProject, deleteProject, getProjects, openProjectModal, saveProject, filterProjects, clearProjectSearch } from './modules/projects.js';
+import { renderProjects, addProject, deleteProject, getProjects, openProjectModal, saveProject, filterProjects, clearProjectSearch, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
 import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory } from './modules/suppliers.js';
 import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
@@ -74,28 +74,6 @@ function render() {
             });
         }, 100);
     }
-    
-    if (state.currentPane === 'projects') {
-        setTimeout(() => {
-            const ctx = document.getElementById('ch-project-cost');
-            if (ctx && window.Chart) {
-                const filtered = state.data.projects.map(p => {
-                    const totalCost = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
-                    return { name: p.name, totalCost };
-                });
-                if (filtered.length > 0) {
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: filtered.map(p => p.name),
-                            datasets: [{ label: 'Chi phí đã sử dụng (VNĐ)', data: filtered.map(p => p.totalCost), backgroundColor: '#378ADD', borderRadius: 6 }]
-                        },
-                        options: { maintainAspectRatio: false, responsive: true }
-                    });
-                }
-            }
-        }, 50);
-    }
 }
 
 // ========== HÀM ĐĂNG NHẬP/ĐĂNG XUẤT ==========
@@ -135,6 +113,9 @@ window.saveProject = saveProject;
 window.deleteProject = deleteProject;
 window.filterProjects = filterProjects;
 window.clearProjectSearch = clearProjectSearch;
+window.showProjectDetail = showProjectDetail;
+window.exportProjectDetail = exportProjectDetail;
+window.exportAllProjectsReport = exportAllProjectsReport;
 
 // Supplier functions
 window.openSupplierModal = openSupplierModal;
@@ -148,7 +129,7 @@ window.viewSupplierHistory = viewSupplierHistory;
 // Transaction functions
 window.openPurchaseModal = openPurchaseModal;
 window.savePurchase = savePurchase;
-window.openTxnModal = openTxnModal;
+window.openTxnModal = (type, projectId = null) => openTxnModal(type, projectId);
 window.saveExport = saveExport;
 window.calculatePurchaseTotal = calculatePurchaseTotal;
 window.calculateExportTotal = calculateExportTotal;
