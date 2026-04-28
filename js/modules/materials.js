@@ -65,7 +65,7 @@ function updateMaterialList() {
                                 <div class="resize-handle" data-col="${col.key}"></div>
                             </th>
                         `).join('')}
-                    </tr>
+                    </table>
                 </thead>
                 <tbody>
                     ${sorted.map(m => `
@@ -87,10 +87,14 @@ function updateMaterialList() {
                                     return `<td style="width: ${col.width}px;"><strong>${escapeHtml(m.name)}</strong></td>`;
                                 }
                                 if (col.key === 'qty') {
-                                    return `<td style="width: ${col.width}px;">${m.qty.toLocaleString('vi-VN')}</td>`;
+                                    return `<td style="width: ${col.width}px;">${m.qty.toLocaleString('vi-VN')}<table>`;
                                 }
                                 if (col.key === 'cost') {
                                     return `<td style="width: ${col.width}px;">${formatMoneyVND(m.cost)}</td>`;
+                                }
+                                if (col.key === 'totalValue') {
+                                    const totalValue = m.qty * m.cost;
+                                    return `<td style="width: ${col.width}px; color: var(--accent); font-weight: 500;">${formatMoneyVND(totalValue)}</td>`;
                                 }
                                 if (col.key === 'status') {
                                     return `<td style="width: ${col.width}px;"><span class="badge ${m.qty <= m.low ? 'b-low' : 'b-ok'}">${m.qty <= m.low ? '⚠️ Sắp hết' : '✅ OK'}</span></td>`;

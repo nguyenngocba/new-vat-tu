@@ -4,6 +4,52 @@ import { handleIntegerInput, formatMoneyVND } from './utils.js';
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
 let projectListContainer = null;
 
+const resizableStyle = `
+<style>
+.resizable-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.resizable-panel {
+    border: 0.5px solid var(--border);
+    border-radius: var(--rl);
+    overflow: hidden;
+    background: var(--surface);
+}
+.panel-header {
+    background: var(--surface2);
+    padding: 12px 16px;
+    cursor: ns-resize;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.5px solid var(--border);
+}
+.panel-header .sec-title {
+    margin-bottom: 0;
+}
+.panel-content {
+    overflow: auto;
+    transition: height 0.1s ease;
+    padding: 16px;
+}
+.panel-resize-handle {
+    height: 6px;
+    background: var(--border2);
+    cursor: ns-resize;
+    transition: background 0.2s;
+}
+.panel-resize-handle:hover {
+    background: var(--accent);
+}
+.resize-icon {
+    font-size: 11px;
+    color: var(--muted);
+}
+</style>
+`;
+
 function getFilteredProjects() {
     let result = [...state.data.projects];
     const f = projectFilters;
@@ -33,10 +79,33 @@ function getFilteredProjects() {
     return result;
 }
 
-function updateProjectList() {
+function renderProjectHistory() {
+    const transactions = state.data.transactions
+        .filter(t => t.type === 'usage' && t.projectId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 50);
+    
+    if (transactions.length === 0) {
+        return '<tr><td colspan="6" style="text-align: center;">📭 Chưa có dữ liệu xuất kho cho công trình nào</td></tr>';
+    }
+    
+    return transactions.map(t => {
+        const mat = state.data.materials.find(m => m.id === t.mid);
+        const proj = projectById(t.projectId);
+        return `<tr>
+            <td><strong>${proj?.name || 'N/A'}</strong></td>
+            <td>${mat?.name || 'N/A'}</td>
+            <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
+            <td>${formatMoneyVND(t.unitPrice || mat?.cost || 0)}</td>
+            <td class="text-warning">${formatMoneyVND(t.totalAmount || 0)}</td>
+            <td>${t.date}</td>
+        </tr>`;
+    }).join('');
+}
+
+function updateProjectListDisplay() {
     if (!projectListContainer) return;
     const filtered = getFilteredProjects();
-    
     const projectStats = filtered.map(p => {
         const txnList = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage');
         const totalCost = txnList.reduce((s, t) => s + (t.totalAmount || 0), 0);
@@ -63,6 +132,13 @@ function updateProjectList() {
             </div>`).join('')}
         </div>
     `;
+}
+
+function updateProjectHistoryDisplay() {
+    const historyContainer = document.getElementById('project-history-tbody');
+    if (historyContainer) {
+        historyContainer.innerHTML = renderProjectHistory();
+    }
 }
 
 function renderProjectSearchBar() {
@@ -104,7 +180,8 @@ function bindProjectSearchEvents() {
         projectFilters.budgetMin = budgetMinInput?.value.replace(/[^0-9]/g, '') || '';
         projectFilters.budgetMax = budgetMaxInput?.value.replace(/[^0-9]/g, '') || '';
         projectFilters.status = statusSelect?.value || '';
-        updateProjectList();
+        updateProjectListDisplay();
+        updateProjectHistoryDisplay();
     };
     
     if (keywordInput) keywordInput.oninput = updateFilters;
@@ -123,8 +200,50 @@ function bindProjectSearchEvents() {
         if (budgetMinInput) budgetMinInput.value = '';
         if (budgetMaxInput) budgetMaxInput.value = '';
         if (statusSelect) statusSelect.value = '';
-        updateProjectList();
+        updateProjectListDisplay();
+        updateProjectHistoryDisplay();
     };
+}
+
+function initResizablePanels() {
+    const handles = document.querySelectorAll('.panel-resize-handle');
+    
+    handles.forEach(handle => {
+        const targetId = handle.dataset.target;
+        const panel = document.getElementById(targetId);
+        if (!panel) return;
+        
+        const content = panel.querySelector('.panel-content');
+        let startY = 0;
+        let startHeight = 0;
+        let isResizing = false;
+        
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isResizing = true;
+            startY = e.clientY;
+            startHeight = content.offsetHeight;
+            document.body.style.cursor = 'ns-resize';
+            document.body.style.userSelect = 'none';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const diff = e.clientY - startY;
+            let newHeight = startHeight + diff;
+            newHeight = Math.max(150, Math.min(600, newHeight));
+            content.style.height = newHeight + 'px';
+            content.style.maxHeight = newHeight + 'px';
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+    });
 }
 
 export function showProjectDetail(projectId) {
@@ -169,14 +288,27 @@ export function showProjectDetail(projectId) {
                 <div class="tbl-wrap"><table style="min-width: 500px;"><thead><tr><th>Vật tư</th><th>Số lượng</th><th>Đơn vị</th><th>Thành tiền</th><th>Tỷ lệ</th></tr></thead>
                 <tbody>${materialStatsArray.map(stat => {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
-                    return `<tr><td><strong>${escapeHtml(stat.name)}</strong></td><td>${stat.qty.toLocaleString('vi-VN')}</td><td>${stat.unit}</td><td class="text-warning">${formatMoneyVND(stat.totalAmount)}</td><td><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td></tr>`;
+                    return `<tr>
+                        <td><strong>${escapeHtml(stat.name)}</strong></td>
+                        <td>${stat.qty.toLocaleString('vi-VN')}</td>
+                        <td>${stat.unit}</td>
+                        <td class="text-warning">${formatMoneyVND(stat.totalAmount)}</td>
+                        <td><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
+                    </tr>`;
                 }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có vật tư nào được xuất</div></div>'}
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT KHO CHI TIẾT</div>
             <div class="tbl-wrap"><table style="min-width: 600px;"><thead><tr><th>Ngày</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
             <tbody>${transactions.map(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
-                return `<tr><td>${t.date}</td><td><strong>${mat?.name || 'N/A'}</strong></td><td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td><td>${formatMoneyVND(t.unitPrice)}</td><td class="text-warning">${formatMoneyVND(t.totalAmount)}</td><td>${escapeHtml(t.note || '—')}</td></tr>`;
+                return `<tr>
+                    <td>${t.date}</td>
+                    <td><strong>${mat?.name || 'N/A'}</strong></td>
+                    <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
+                    <td>${formatMoneyVND(t.unitPrice)}</td>
+                    <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
+                    <td>${escapeHtml(t.note || '—')}</td>
+                </tr>`;
             }).join('') || '<tr><td colspan="6" style="text-align: center;">📭 Chưa có giao dịch xuất kho nào</td></tr>'}</tbody></table></div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="sm" onclick="closeModal(); window.exportProjectDetail('${projectId}')">📎 Xuất báo cáo Excel</button>
@@ -239,9 +371,45 @@ export function exportAllProjectsReport() {
 }
 
 export function renderProjects() {
-  const result = renderProjectSearchBar() + `<div class="card"><div class="sec-title">🏗️ DANH SÁCH CÔNG TRÌNH</div><div id="project-list-container"></div></div>`;
-  setTimeout(() => { bindProjectSearchEvents(); projectListContainer = document.getElementById('project-list-container'); updateProjectList(); }, 50);
-  return result;
+    const result = resizableStyle + renderProjectSearchBar() + `<div class="card">
+        <div class="resizable-container" id="projects-resizable-container">
+            <div class="resizable-panel" id="projects-list-panel">
+                <div class="panel-header">
+                    <div class="sec-title">🏗️ DANH SÁCH CÔNG TRÌNH</div>
+                    <span class="resize-icon">⤥ Kéo để điều chỉnh</span>
+                </div>
+                <div class="panel-content" id="project-list-container" style="max-height: 400px; overflow-y: auto;"></div>
+                <div class="panel-resize-handle" data-target="projects-list-panel"></div>
+            </div>
+            <div class="resizable-panel" id="projects-history-panel">
+                <div class="panel-header">
+                    <div class="sec-title">📜 LỊCH SỬ XUẤT KHO CHI TIẾT</div>
+                    <span class="resize-icon">⤥ Kéo để điều chỉnh</span>
+                </div>
+                <div class="panel-content" style="max-height: 300px; overflow-y: auto;">
+                    <div class="tbl-wrap">
+                        <table style="min-width: 700px">
+                            <thead><tr><th>Công trình</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Tổng giá trị</th><th>Ngày xuất</th></tr></thead>
+                            <tbody id="project-history-tbody">
+                                ${renderProjectHistory()}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-resize-handle" data-target="projects-history-panel"></div>
+            </div>
+        </div>
+    </div>`;
+    
+    setTimeout(() => {
+        bindProjectSearchEvents();
+        projectListContainer = document.getElementById('project-list-container');
+        if (projectListContainer) {
+            updateProjectListDisplay();
+        }
+        initResizablePanels();
+    }, 50);
+    return result;
 }
 
 export function openProjectModal() {

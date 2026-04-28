@@ -5,7 +5,7 @@ import { renderProjects, addProject, deleteProject, getProjects, openProjectModa
 import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory, showSupplierDetail, exportSupplierDetail, exportAllSuppliersReport } from './modules/suppliers.js';
 import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal, openPurchaseModalWithSupplier } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
-import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNotification, requestNotificationPermission } from './modules/charts.js';
+import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNotification, requestNotificationPermission, bindDashboardSearchEvents } from './modules/charts.js';
 import { exportToExcel } from './modules/export.js';
 import { initShortcuts } from './modules/shortcuts.js';
 import { renderSettings, addCategory, addUnit, toggleTheme, addUser, deleteUser, changePassword, toggleUserPermission } from './modules/settings.js';
@@ -54,7 +54,10 @@ function render() {
     `;
     
     if (state.currentPane === 'dashboard') {
-        setTimeout(() => renderDashboardChart(), 100);
+        setTimeout(() => {
+            renderDashboardChart();
+            bindDashboardSearchEvents();
+        }, 100);
     }
     if (state.currentPane === 'settings') {
         setTimeout(() => {

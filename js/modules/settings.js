@@ -2,7 +2,7 @@ import { state, saveState, addLog, escapeHtml, applyTheme, hasPermission, isAdmi
 import { showModal, closeModal } from './auth.js';
 
 const UI_CONFIG_KEY = 'steeltrack_ui_config_simple';
-let uiConfig = { appName: 'STEEL/TRACK', logoType: 'text', logoEmoji: '🏭', logoImage: null };
+let uiConfig = { appName: 'TRIVIETSTEEL', logoType: 'text', logoEmoji: '🏭', logoImage: null };
 
 function ensureDefaultData() {
     if (!state.data.categories || state.data.categories.length === 0) {

@@ -1,5 +1,7 @@
 import { state, addLog, escapeHtml } from './state.js';
 
+// ========== CÁC HÀM XỬ LÝ SỐ - THEO CHUẨN VIỆT NAM ==========
+
 export function parseNumber(str) {
     if (!str || str === '') return 0;
     let cleaned = str.toString().replace(/\./g, '').replace(/,/g, '.');
@@ -27,7 +29,7 @@ export function setInputValue(inputElement, value) {
 export function formatMoneyVND(value) {
     let num = typeof value === 'string' ? parseNumber(value) : value;
     if (isNaN(num)) num = 0;
-    return num.toLocaleString('vi-VN', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' ₫';
+    return num.toLocaleString('vi-VN') + ' ₫';
 }
 
 export function formatNumberVN(value, decimalPlaces = 0) {
@@ -69,6 +71,7 @@ export const setMoneyValue = setInputValue;
 export const setQuantityValue = setInputValue;
 export const handleMoneyInput = handleIntegerInput;
 
+// ========== COLUMN CONFIGURATION ==========
 const COLUMN_CONFIG_KEY = 'steeltrack_column_config';
 
 export const DEFAULT_COLUMNS = [
@@ -78,6 +81,7 @@ export const DEFAULT_COLUMNS = [
     { key: 'unit', label: 'ĐVT', visible: true, width: 80, sortable: true },
     { key: 'qty', label: 'Tồn kho', visible: true, width: 120, sortable: true },
     { key: 'cost', label: 'Đơn giá gốc', visible: true, width: 130, sortable: true },
+    { key: 'totalValue', label: 'Tổng giá trị', visible: true, width: 130, sortable: true },
     { key: 'status', label: 'TT', visible: true, width: 60, sortable: true },
     { key: 'note', label: 'Ghi chú', visible: true, width: 150, sortable: false },
     { key: 'actions', label: 'Thao tác', visible: true, width: 100, sortable: false }
@@ -135,9 +139,14 @@ export function getSortedData(data, sortColumn, sortDirection) {
         let valA = a[sortColumn];
         let valB = b[sortColumn];
         
-        if (sortColumn === 'qty' || sortColumn === 'cost') {
-            valA = parseFloat(valA) || 0;
-            valB = parseFloat(valB) || 0;
+        if (sortColumn === 'qty' || sortColumn === 'cost' || sortColumn === 'totalValue') {
+            if (sortColumn === 'totalValue') {
+                valA = (a.qty || 0) * (a.cost || 0);
+                valB = (b.qty || 0) * (b.cost || 0);
+            } else {
+                valA = parseFloat(valA) || 0;
+                valB = parseFloat(valB) || 0;
+            }
         } else {
             valA = (valA || '').toString().toLowerCase();
             valB = (valB || '').toString().toLowerCase();
@@ -149,6 +158,7 @@ export function getSortedData(data, sortColumn, sortDirection) {
     });
 }
 
+// ========== FAVORITES ==========
 const FAVORITES_KEY = 'steeltrack_favorites';
 
 export function getFavorites() {
@@ -173,6 +183,7 @@ export function isFavorite(itemId) {
     return getFavorites().includes(itemId);
 }
 
+// ========== DEBOUNCE ==========
 export function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
