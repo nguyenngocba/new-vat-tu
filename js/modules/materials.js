@@ -1,8 +1,10 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission } from './state.js';
+// Trong materials.js, thêm setupNumberInput vào import nếu cần
 import { 
     handleIntegerInput, getNumberFromInput, formatMoneyVND,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
-    getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
+    getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite,
+    setupNumberInput
 } from './utils.js';
 
 let materialFilters = { keyword: '', category: '', minStock: '', maxStock: '', showFavoritesOnly: false };

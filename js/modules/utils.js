@@ -63,6 +63,53 @@ export function handleQuantityInput(event) {
     input.dispatchEvent(changeEvent);
 }
 
+// Hàm setupNumberInput - cho phép nhập số và format khi blur
+export function setupNumberInput(inputElement, options = {}) {
+    if (!inputElement) return;
+    
+    const { isInteger = false, decimals = null } = options;
+    
+    // Xử lý khi blur (mất focus)
+    inputElement.addEventListener('blur', function() {
+        let num = parseNumber(this.value);
+        if (isNaN(num)) num = 0;
+        if (isInteger) num = Math.floor(num);
+        
+        let formattedValue;
+        if (decimals !== null) {
+            formattedValue = num.toLocaleString('vi-VN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        } else if (num % 1 !== 0) {
+            let decimalPlaces = 0;
+            const val = this.value;
+            if (val.includes(',')) {
+                decimalPlaces = val.split(',')[1].length;
+            } else if (val.includes('.')) {
+                decimalPlaces = val.split('.')[1].length;
+            }
+            decimalPlaces = Math.min(decimalPlaces, 2);
+            formattedValue = num.toLocaleString('vi-VN', {
+                minimumFractionDigits: decimalPlaces,
+                maximumFractionDigits: decimalPlaces
+            });
+        } else {
+            formattedValue = num.toLocaleString('vi-VN');
+        }
+        
+        this.value = formattedValue;
+        const changeEvent = new Event('change', { bubbles: true });
+        this.dispatchEvent(changeEvent);
+    });
+    
+    // Xử lý khi focus (chọn toàn bộ để dễ nhập)
+    inputElement.addEventListener('focus', function() {
+        this.select();
+    });
+}
+
+// ========== ALIAS ==========
 export const getRawInteger = getIntegerFromInput;
 export const getRawMoney = getIntegerFromInput;
 export const getRawQuantity = getNumberFromInput;
