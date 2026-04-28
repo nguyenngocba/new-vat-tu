@@ -28,13 +28,8 @@ export function switchPane(pane) {
   if (window.render) window.render();
 }
 
-export function setCurrentUser(user) { 
-  state.currentUser = user; 
-}
-
-export function getCurrentUser() { 
-  return state.currentUser; 
-}
+export function setCurrentUser(user) { state.currentUser = user; }
+export function getCurrentUser() { return state.currentUser; }
 
 export function renderSidebar() {
   const hasAccessSettings = state.currentUser?.permissions?.canAccessSettings || state.currentUser?.role === 'admin';
@@ -57,7 +52,7 @@ export function renderTopbar() {
   
   if (state.currentPane === 'entry') {
     btns = `${hasPermission('canCreateMaterial') ? `<button class="sm" onclick="openMatModal()">+ Thêm vật tư</button>` : ''}
-            ${hasPermission('canImport') ? `<button class="sm" onclick="openPurchaseModal()">📥 Nhập kho</button>` : ''}
+            ${hasPermission('canImport') ? `<button class="sm primary" onclick="openPurchaseModal()">📥 Nhập kho</button>` : ''}
             ${hasPermission('canExport') ? `<button class="sm" onclick="openTxnModal('usage')">📤 Xuất kho</button>` : ''}
             <button class="sm" onclick="showImportModal('materials', () => window.render())">📂 Import Excel</button>
             <button class="sm" onclick="exportToExcel('materials')">📎 Export Excel</button>`;
@@ -70,7 +65,7 @@ export function renderTopbar() {
   if (state.currentPane === 'suppliers') {
     btns = `${hasPermission('canManageSupplier') ? `<button class="sm primary" onclick="openSupplierModal()">+ Nhà cung cấp mới</button>` : ''}
             <button class="sm" onclick="showImportModal('suppliers', () => window.render())">📂 Import Excel</button>
-            <button class="sm" onclick="exportToExcel('suppliers')">📎 Export Excel</button>`;
+            <button class="sm" onclick="exportAllSuppliersReport()">📎 Export Excel</button>`;
   }
   return `<div class="topbar"><span class="topbar-title">${getPaneTitle()}</span>${btns}</div>`;
 }
@@ -81,7 +76,6 @@ export function getPaneTitle() {
 }
 
 let currentModalCallback = null;
-
 export function showModal(html, callback) {
   currentModalCallback = callback;
   const modalArea = document.getElementById('modal-area');
@@ -89,7 +83,6 @@ export function showModal(html, callback) {
     modalArea.innerHTML = `<div class="modal-overlay"><div class="modal">${html}</div></div>`;
   }
 }
-
 export function closeModal() {
   const modalArea = document.getElementById('modal-area');
   if (modalArea) modalArea.innerHTML = '';

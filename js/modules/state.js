@@ -1,4 +1,4 @@
-export const STORAGE_KEY = 'steel_pro_v11';
+export const STORAGE_KEY = 'steel_pro_v12';
 
 export let state = {
   theme: 'dark',
@@ -64,7 +64,6 @@ export function loadState() {
       if (!state.data.transactions) state.data.transactions = [];
       if (!state.data.materials) state.data.materials = [];
     }
-    // Seed data nếu chưa có
     if (state.data.projects.length === 0) {
       state.data.projects = [
         { id: 'P001', name: 'Nhà kho A', budget: 50000000, spent: 0 },

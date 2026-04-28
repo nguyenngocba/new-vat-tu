@@ -14,13 +14,7 @@ export function exportBackup() {
                 logs: state.data.logs,
                 categories: state.data.categories,
                 units: state.data.units,
-                nextId: {
-                    nextMid: state.data.nextMid,
-                    nextTid: state.data.nextTid,
-                    nextPid: state.data.nextPid,
-                    nextSid: state.data.nextSid,
-                    nextLogId: state.data.nextLogId
-                }
+                nextId: { nextMid: state.data.nextMid, nextTid: state.data.nextTid, nextPid: state.data.nextPid, nextSid: state.data.nextSid, nextLogId: state.data.nextLogId }
             }
         };
         const jsonStr = JSON.stringify(backupData, null, 2);
@@ -48,10 +42,7 @@ export function importBackup(file) {
             try {
                 const backupData = JSON.parse(e.target.result);
                 if (!backupData.data) throw new Error('File backup không hợp lệ');
-                if (!confirm('⚠️ Import sẽ thay thế toàn bộ dữ liệu hiện tại! Tiếp tục?')) {
-                    resolve(false);
-                    return;
-                }
+                if (!confirm('⚠️ Import sẽ thay thế toàn bộ dữ liệu hiện tại! Tiếp tục?')) { resolve(false); return; }
                 if (backupData.data.materials) state.data.materials = backupData.data.materials;
                 if (backupData.data.transactions) state.data.transactions = backupData.data.transactions;
                 if (backupData.data.projects) state.data.projects = backupData.data.projects;
@@ -84,13 +75,8 @@ export function showImportBackupModal() {
     showModal(`
         <div class="modal-hd"><span class="modal-title">📥 Khôi phục dữ liệu</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
-            <div class="form-group">
-                <label class="form-label">Chọn file backup (.json)</label>
-                <input type="file" id="backup-file-input" accept=".json">
-            </div>
-            <div class="metric-card" style="margin-top: 12px; background: var(--warn-bg);">
-                <div class="metric-sub">⚠️ CẢNH BÁO: Việc khôi phục sẽ THAY THẾ toàn bộ dữ liệu hiện tại!</div>
-            </div>
+            <div class="form-group"><label class="form-label">Chọn file backup (.json)</label><input type="file" id="backup-file-input" accept=".json"></div>
+            <div class="metric-card" style="margin-top: 12px; background: var(--warn-bg);"><div class="metric-sub">⚠️ CẢNH BÁO: Việc khôi phục sẽ THAY THẾ toàn bộ dữ liệu hiện tại!</div></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="confirm-import">Khôi phục</button></div>
     `, null);
@@ -101,14 +87,8 @@ export function showImportBackupModal() {
             confirmBtn.onclick = () => {
                 const fileInput = document.getElementById('backup-file-input');
                 const file = fileInput?.files[0];
-                if (!file) {
-                    alert('Vui lòng chọn file backup');
-                    return;
-                }
-                importBackup(file).then(() => {
-                    closeModal();
-                    setTimeout(() => window.location.reload(), 500);
-                });
+                if (!file) { alert('Vui lòng chọn file backup'); return; }
+                importBackup(file).then(() => { closeModal(); setTimeout(() => window.location.reload(), 500); });
             };
         }
     }, 100);

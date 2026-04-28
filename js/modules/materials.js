@@ -5,7 +5,6 @@ import {
     getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
 } from './utils.js';
 
-// ========== FILTER VẬT TƯ ==========
 let materialFilters = { keyword: '', category: '', minStock: '', maxStock: '', showFavoritesOnly: false };
 let materialListContainer = null;
 
@@ -131,9 +130,7 @@ function attachResizeEvents() {
     };
     
     const onMouseUp = () => {
-        if (currentHandle) {
-            currentHandle.classList.remove('active');
-        }
+        if (currentHandle) currentHandle.classList.remove('active');
         currentHandle = null;
         currentTh = null;
         document.removeEventListener('mousemove', onMouseMove);
@@ -190,9 +187,7 @@ function renderMaterialSearchBar() {
                         <span style="font-size: 12px;">Yêu thích (${favoritesCount})</span>
                     </div>
                     <div class="column-toggle-panel">
-                        <button class="column-toggle-btn" onclick="toggleColumnPanel()">
-                            📋 Ẩn/hiện cột
-                        </button>
+                        <button class="column-toggle-btn" onclick="toggleColumnPanel()">📋 Ẩn/hiện cột</button>
                         <div id="column-toggle-dropdown" class="column-toggle-dropdown">
                             <div class="dropdown-header">Chọn cột hiển thị</div>
                             ${DEFAULT_COLUMNS.map(col => `
@@ -297,11 +292,8 @@ window.toggleFavoriteFilter = function() {
     materialFilters.showFavoritesOnly = !materialFilters.showFavoritesOnly;
     const starIcon = document.querySelector('.favorite-filter .star-icon');
     if (starIcon) {
-        if (materialFilters.showFavoritesOnly) {
-            starIcon.classList.add('active');
-        } else {
-            starIcon.classList.remove('active');
-        }
+        if (materialFilters.showFavoritesOnly) starIcon.classList.add('active');
+        else starIcon.classList.remove('active');
     }
     updateMaterialList();
 };
@@ -331,9 +323,7 @@ window.resetColumnConfig = function() {
     saveColumnConfig(config);
     updateMaterialList();
     document.querySelectorAll('.dropdown-item input').forEach((input, idx) => {
-        if (DEFAULT_COLUMNS[idx]) {
-            input.checked = DEFAULT_COLUMNS[idx].visible;
-        }
+        if (DEFAULT_COLUMNS[idx]) input.checked = DEFAULT_COLUMNS[idx].visible;
     });
 };
 
@@ -396,7 +386,7 @@ export function editMaterial(mid) {
   
   showModal(`<div class="modal-hd"><span class="modal-title">✏️ Sửa vật tư</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="form-grid2">
-      <div class="form-group form-full"><label class="form-label">Tên vật tư *</label><input id="mn-name" value="${escapeHtml(mat.name)}" placeholder="VD: Thép tấm 12mm"></div>
+      <div class="form-group form-full"><label class="form-label">Tên vật tư *</label><input id="mn-name" value="${escapeHtml(mat.name)}"></div>
       <div class="form-group"><label class="form-label">Danh mục</label><select id="mn-cat">${state.data.categories.map(c => `<option ${mat.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn vị tính</label><select id="mn-unit">${state.data.units.map(u => `<option ${mat.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="${mat.cost.toLocaleString('vi-VN')}" style="text-align: right;"></div>
@@ -444,16 +434,7 @@ export function deleteMaterial(mid) {
 
 export const addMaterial = (data) => {
     const newId = genMid();
-    const newMat = {
-        id: newId,
-        name: data.name,
-        cat: data.cat || data.category,
-        unit: data.unit,
-        qty: data.qty || 0,
-        cost: data.cost || 0,
-        low: data.low || 5,
-        note: data.note || ''
-    };
+    const newMat = { id: newId, name: data.name, cat: data.cat || data.category, unit: data.unit, qty: data.qty || 0, cost: data.cost || 0, low: data.low || 5, note: data.note || '' };
     state.data.materials.push(newMat);
     addLog('Thêm vật tư', `Đã thêm vật tư: ${newMat.name} (${newMat.id})`);
     saveState();

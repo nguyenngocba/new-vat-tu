@@ -1,7 +1,5 @@
 import { state, addLog, escapeHtml } from './state.js';
 
-// ========== CÁC HÀM XỬ LÝ SỐ - THEO CHUẨN VIỆT NAM ==========
-
 export function parseNumber(str) {
     if (!str || str === '') return 0;
     let cleaned = str.toString().replace(/\./g, '').replace(/,/g, '.');
@@ -63,7 +61,6 @@ export function handleQuantityInput(event) {
     input.dispatchEvent(changeEvent);
 }
 
-// ========== ALIAS ==========
 export const getRawInteger = getIntegerFromInput;
 export const getRawMoney = getIntegerFromInput;
 export const getRawQuantity = getNumberFromInput;
@@ -72,7 +69,6 @@ export const setMoneyValue = setInputValue;
 export const setQuantityValue = setInputValue;
 export const handleMoneyInput = handleIntegerInput;
 
-// ========== COLUMN CONFIGURATION ==========
 const COLUMN_CONFIG_KEY = 'steeltrack_column_config';
 
 export const DEFAULT_COLUMNS = [
@@ -153,7 +149,6 @@ export function getSortedData(data, sortColumn, sortDirection) {
     });
 }
 
-// ========== FAVORITES ==========
 const FAVORITES_KEY = 'steeltrack_favorites';
 
 export function getFavorites() {
@@ -178,7 +173,6 @@ export function isFavorite(itemId) {
     return getFavorites().includes(itemId);
 }
 
-// ========== DEBOUNCE ==========
 export function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {

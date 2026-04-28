@@ -2,8 +2,8 @@ import { state, saveState, loadState, addLog } from './modules/state.js';
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, addMaterial, updateMaterial, deleteMaterial, getMaterials, openMatModal, editMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, addProject, deleteProject, getProjects, openProjectModal, saveProject, filterProjects, clearProjectSearch, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
-import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory } from './modules/suppliers.js';
-import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal } from './modules/transactions.js';
+import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory, showSupplierDetail, exportSupplierDetail, exportAllSuppliersReport } from './modules/suppliers.js';
+import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal, openPurchaseModalWithSupplier } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
 import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNotification, requestNotificationPermission } from './modules/charts.js';
 import { exportToExcel } from './modules/export.js';
@@ -13,28 +13,19 @@ import { showImportModal, importMaterialsFromExcel, importProjectsFromExcel, imp
 
 // Initialize
 loadState();
-
-// Kiểm tra backup tự động
 checkAutoBackup();
-
-// Khởi tạo phím tắt
 initShortcuts();
 
-// Kiểm tra XLSX sau khi load
 setTimeout(() => {
     if (typeof XLSX !== 'undefined') {
         console.log('✅ Thư viện XLSX đã sẵn sàng');
     } else {
-        console.warn('⚠️ Thư viện XLSX chưa được tải, export Excel sẽ không hoạt động');
+        console.warn('⚠️ Thư viện XLSX chưa được tải');
     }
 }, 1000);
 
-// Global function để bật thông báo
-window.requestNotification = () => {
-    requestNotificationPermission();
-};
+window.requestNotification = () => requestNotificationPermission();
 
-// ========== RENDER FUNCTION ==========
 function render() {
     const root = document.getElementById('root');
     const currentUser = getCurrentUser();
@@ -63,11 +54,8 @@ function render() {
     `;
     
     if (state.currentPane === 'dashboard') {
-        setTimeout(() => {
-            renderDashboardChart();
-        }, 100);
+        setTimeout(() => renderDashboardChart(), 100);
     }
-    
     if (state.currentPane === 'settings') {
         setTimeout(() => {
             import('./modules/settings.js').then(m => {
@@ -77,10 +65,8 @@ function render() {
     }
 }
 
-// ========== HÀM ĐĂNG NHẬP/ĐĂNG XUẤT ==========
 function login(userId) {
-    const users = state.data.users;
-    const user = users.find(u => u.id === userId);
+    const user = state.data.users.find(u => u.id === userId);
     if (user) {
         setCurrentUser(user);
         addLog('Đăng nhập', `${user.name}`);
@@ -94,21 +80,21 @@ function logout() {
     render();
 }
 
-// ========== GLOBAL FUNCTIONS ==========
+// Global functions
 window.login = login;
 window.logout = logout;
 window.switchPane = switchPane;
 window.closeModal = closeModal;
 window.showModal = showModal;
 
-// Material functions
+// Material
 window.openMatModal = openMatModal;
 window.editMaterial = editMaterial;
 window.updateMaterial = updateMaterial;
 window.deleteMaterial = deleteMaterial;
 window.saveMat = saveMat;
 
-// Project functions
+// Project
 window.openProjectModal = openProjectModal;
 window.saveProject = saveProject;
 window.deleteProject = deleteProject;
@@ -118,7 +104,7 @@ window.showProjectDetail = showProjectDetail;
 window.exportProjectDetail = exportProjectDetail;
 window.exportAllProjectsReport = exportAllProjectsReport;
 
-// Supplier functions
+// Supplier
 window.openSupplierModal = openSupplierModal;
 window.saveSupplier = saveSupplier;
 window.updateSupplier = updateSupplier;
@@ -126,16 +112,20 @@ window.deleteSupplier = deleteSupplier;
 window.filterSuppliers = filterSuppliers;
 window.clearSupplierSearch = clearSupplierSearch;
 window.viewSupplierHistory = viewSupplierHistory;
+window.showSupplierDetail = showSupplierDetail;
+window.exportSupplierDetail = exportSupplierDetail;
+window.exportAllSuppliersReport = exportAllSuppliersReport;
 
-// Transaction functions
+// Transaction
 window.openPurchaseModal = openPurchaseModal;
 window.savePurchase = savePurchase;
 window.openTxnModal = (type, projectId = null) => openTxnModal(type, projectId);
 window.saveExport = saveExport;
 window.calculatePurchaseTotal = calculatePurchaseTotal;
 window.calculateExportTotal = calculateExportTotal;
+window.openPurchaseModalWithSupplier = openPurchaseModalWithSupplier;
 
-// Settings functions
+// Settings
 window.addCategory = addCategory;
 window.addUnit = addUnit;
 window.toggleTheme = toggleTheme;
@@ -144,10 +134,8 @@ window.deleteUser = deleteUser;
 window.changePassword = changePassword;
 window.toggleUserPermission = toggleUserPermission;
 
-// Export function
+// Export/Import
 window.exportToExcel = exportToExcel;
-
-// Import functions
 window.showImportModal = showImportModal;
 window.importMaterialsFromExcel = importMaterialsFromExcel;
 window.importProjectsFromExcel = importProjectsFromExcel;
@@ -176,12 +164,8 @@ window.clearInvoiceImage = function() {
     if (fileInput) fileInput.value = '';
 };
 
-// Expose state and utils for debugging
 window.debug = { state, saveState, addLog };
-
-// Gán render toàn cục
 window.renderApp = render;
 window.render = render;
 
-// Khởi chạy
 render();
