@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteelTrack Pro - Quản lý kho & Công trình & Nhà cung cấp</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <!-- SheetJS XLSX - nhiều CDN dự phòng -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script>
+        // Kiểm tra XLSX đã load chưa, nếu chưa thì thử CDN khác
+        window.addEventListener('load', function() {
+            if (typeof XLSX === 'undefined') {
+                console.log('Đang tải XLSX từ CDN dự phòng...');
+                var script = document.createElement('script');
+                script.src = 'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js';
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
