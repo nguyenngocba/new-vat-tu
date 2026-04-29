@@ -1,4 +1,4 @@
-export const STORAGE_KEY = 'steel_pro_v14';
+export const STORAGE_KEY = 'steel_pro_v15';
 
 export let state = {
   theme: 'dark',
@@ -18,6 +18,7 @@ export let state = {
     nextSid: 1,
     nextLogId: 1,
     projectMaterialUsage: [],
+    projectSchedules: [], // Lưu trữ tiến độ công trình
     users: [
       { id: 'u1', name: 'Admin System', username: 'admin', password: 'admin123', role: 'admin', permissions: { canCreateMaterial: true, canDeleteMaterial: true, canEditMaterial: true, canImport: true, canExport: true, canDeleteProject: true, canAccessSettings: true, canManageSupplier: true } },
       { id: 'u2', name: 'Nhân viên kho', username: 'staff', password: 'staff123', role: 'user', permissions: { canCreateMaterial: false, canDeleteMaterial: false, canEditMaterial: false, canImport: true, canExport: true, canDeleteProject: false, canAccessSettings: false, canManageSupplier: false } },
@@ -42,10 +43,11 @@ export function saveState() {
       nextSid: state.data.nextSid,
       nextLogId: state.data.nextLogId,
       projectMaterialUsage: state.data.projectMaterialUsage,
+      projectSchedules: state.data.projectSchedules,
       users: state.data.users
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-    console.log('✅ Đã lưu dữ liệu, projectMaterialUsage:', state.data.projectMaterialUsage.length);
+    console.log('✅ Đã lưu dữ liệu');
   } catch(e) { console.error('Lỗi lưu state:', e); }
 }
 
@@ -59,6 +61,7 @@ export function loadState() {
       if (!state.data.suppliers) state.data.suppliers = [];
       if (!state.data.logs) state.data.logs = [];
       if (!state.data.projectMaterialUsage) state.data.projectMaterialUsage = [];
+      if (!state.data.projectSchedules) state.data.projectSchedules = [];
       if (!state.data.categories || state.data.categories.length === 0) {
         state.data.categories = ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'];
       }
@@ -67,7 +70,7 @@ export function loadState() {
       }
       if (!state.data.transactions) state.data.transactions = [];
       if (!state.data.materials) state.data.materials = [];
-      console.log('✅ Đã tải dữ liệu, projectMaterialUsage:', state.data.projectMaterialUsage.length);
+      console.log('✅ Đã tải dữ liệu');
     }
     // Seed data nếu chưa có
     if (state.data.projects.length === 0) {

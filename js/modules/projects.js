@@ -1,10 +1,10 @@
-// Thay thế toàn bộ nội dung file projects.js với thuật ngữ đúng
-
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genPid, projectById, hasPermission } from './state.js';
 import { handleIntegerInput, formatMoneyVND, setupNumberInput } from './utils.js';
+import { getProjectSchedule, renderScheduleView, updateScheduleInfo, saveScheduleInfo, addTask, updateTask, deleteTask, assignMaterialToTask, removeMaterialFromTask, openTaskDetailModal } from './schedule.js';
 
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
 let projectListContainer = null;
+let currentScheduleProjectId = null;
 
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
@@ -57,7 +57,6 @@ function getFilteredProjects() {
     return result;
 }
 
-// Tổng giá trị đã nhận từ kho (sau khi đã trừ trả hàng)
 function getProjectTotalReceived(projectId) {
     const receivedTotal = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
     const returnTotal = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
@@ -556,6 +555,9 @@ export function showProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
     
+    currentScheduleProjectId = projectId;
+    window.currentScheduleProjectId = projectId;
+    
     const receiveTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const returnTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     
@@ -567,6 +569,8 @@ export function showProjectDetail(projectId) {
     
     const allTransactions = [...receiveTransactions, ...returnTransactions].sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const materialUsageDetails = getMaterialUsageDetails(projectId);
+    const schedule = getProjectSchedule(projectId);
+    const scheduleProgress = schedule?.progress || 0;
     
     const modalContent = `
         <div class="modal-hd" style="background: var(--accent-bg);">
@@ -574,92 +578,115 @@ export function showProjectDetail(projectId) {
             <button class="xbtn" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
-            <div class="grid2" style="margin-bottom: 20px;">
-                <div class="metric-card"><div class="metric-label">📋 MÃ CÔNG TRÌNH</div><div class="metric-val" style="font-size: 18px;">${project.id}</div></div>
-                <div class="metric-card"><div class="metric-label">💰 NGÂN SÁCH</div><div class="metric-val" style="font-size: 18px; color: var(--accent);">${formatMoneyVND(project.budget)}</div></div>
-                <div class="metric-card"><div class="metric-label">📥 ĐÃ NHẬN TỪ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--warn-text);">${formatMoneyVND(totalReceived)}</div></div>
-                <div class="metric-card"><div class="metric-label">🔄 ĐÃ TRẢ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(totalReturn)}</div></div>
-                <div class="metric-card"><div class="metric-label">💸 GIÁ TRỊ ĐÃ SỬ DỤNG</div><div class="metric-val" style="font-size: 18px;">${formatMoneyVND(totalSpent)}</div></div>
-                <div class="metric-card"><div class="metric-label">📊 CÒN LẠI</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(remaining)}</div></div>
-            </div>
-            <div class="metric-card" style="margin-bottom: 20px;">
-                <div class="metric-label">📈 TIẾN ĐỘ SỬ DỤNG NGÂN SÁCH</div>
-                <div class="progress-bar" style="height: 12px;"><div class="progress-fill" style="width: ${Math.min(100, percentUsed)}%; background: ${percentUsed > 90 ? '#A32D2D' : percentUsed > 70 ? '#BA7517' : '#378ADD'};"></div></div>
-                <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${percentUsed.toFixed(1)}% đã sử dụng (${receiveTransactions.length} lượt nhận, ${returnTransactions.length} lượt trả)</div>
+            <div style="display: flex; gap: 4px; border-bottom: 0.5px solid var(--border); margin-bottom: 20px;">
+                <button class="sm tab-btn active" data-tab="overview" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">📊 Tổng quan</button>
+                <button class="sm tab-btn" data-tab="materials" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">📦 Vật tư</button>
+                <button class="sm tab-btn" data-tab="schedule" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">📅 Tiến độ (${scheduleProgress.toFixed(0)}%)</button>
+                <button class="sm tab-btn" data-tab="history" style="border-bottom-left-radius: 0; border-bottom-right-radius: 0;">📜 Lịch sử</button>
             </div>
             
-            <div class="sec-title">📦 THỐNG KÊ VẬT TƯ - NHẬN/SỬ DỤNG/TRẢ</div>
-            <div class="tbl-wrap">
-                <table style="min-width: 800px;">
-                    <thead>
-                        <tr>
-                            <th>Vật tư</th>
-                            <th>Đã nhận từ kho</th>
-                            <th>Đã sử dụng</th>
-                            <th>Đã trả kho</th>
-                            <th>Tồn tại CT</th>
-                            <th>% sử dụng</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${materialUsageDetails.map(item => {
-                            const percentClass = item.usagePercentage > 90 ? 'text-danger' : item.usagePercentage > 70 ? 'text-warning' : 'text-success';
-                            return `<tr>
-                                <td><strong>${escapeHtml(item.name)}</strong></td>
-                                <td style="text-align: right;">${item.totalReceived.toLocaleString('vi-VN')} ${item.unit}</td>
-                                <td style="text-align: right; font-weight: bold;">${item.totalUsed.toLocaleString('vi-VN')} ${item.unit}</td>
-                                <td style="text-align: right; color: var(--success-text);">${item.totalReturned.toLocaleString('vi-VN')} ${item.unit}</td>
-                                <td style="text-align: right; color: var(--accent);">${item.remainingAtSite.toLocaleString('vi-VN')} ${item.unit}</td>
-                                <td style="text-align: center;"><span class="badge ${percentClass}">${item.usagePercentage.toFixed(1)}%</span></td>
-                                <td style="text-align: center;">
-                                    <button class="sm" onclick="event.stopPropagation(); window.openMaterialUsageModal('${projectId}', '${item.id}')">✏️ Cập nhật sử dụng</button>
-                                </td>
-                            </tr>`;
-                        }).join('')}
-                        ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được nhận cho công trình}' : ''}
-                    </tbody>
-                </table>
+            <div id="tab-overview" class="tab-content active">
+                <div class="grid2" style="margin-bottom: 20px;">
+                    <div class="metric-card"><div class="metric-label">📋 MÃ CÔNG TRÌNH</div><div class="metric-val" style="font-size: 18px;">${project.id}</div></div>
+                    <div class="metric-card"><div class="metric-label">💰 NGÂN SÁCH</div><div class="metric-val" style="font-size: 18px; color: var(--accent);">${formatMoneyVND(project.budget)}</div></div>
+                    <div class="metric-card"><div class="metric-label">📥 ĐÃ NHẬN TỪ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--warn-text);">${formatMoneyVND(totalReceived)}</div></div>
+                    <div class="metric-card"><div class="metric-label">🔄 ĐÃ TRẢ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(totalReturn)}</div></div>
+                    <div class="metric-card"><div class="metric-label">💸 GIÁ TRỊ ĐÃ SỬ DỤNG</div><div class="metric-val" style="font-size: 18px;">${formatMoneyVND(totalSpent)}</div></div>
+                    <div class="metric-card"><div class="metric-label">📊 CÒN LẠI</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(remaining)}</div></div>
+                </div>
+                <div class="metric-card" style="margin-bottom: 20px;">
+                    <div class="metric-label">📈 TIẾN ĐỘ SỬ DỤNG NGÂN SÁCH</div>
+                    <div class="progress-bar" style="height: 12px;"><div class="progress-fill" style="width: ${Math.min(100, percentUsed)}%; background: ${percentUsed > 90 ? '#A32D2D' : percentUsed > 70 ? '#BA7517' : '#378ADD'};"></div></div>
+                    <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${percentUsed.toFixed(1)}% đã sử dụng (${receiveTransactions.length} lượt nhận, ${returnTransactions.length} lượt trả)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📅 TIẾN ĐỘ THỰC HIỆN CÔNG TRÌNH</div>
+                    <div class="progress-bar" style="height: 12px;"><div class="progress-fill" style="width: ${scheduleProgress}%; background: ${scheduleProgress > 90 ? '#A32D2D' : '#378ADD'};"></div></div>
+                    <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${scheduleProgress.toFixed(1)}% hoàn thành</div>
+                    <div style="margin-top: 12px; text-align: center;">
+                        <button class="sm" onclick="document.querySelector('.tab-btn[data-tab=\'schedule\']').click();">📅 Xem chi tiết tiến độ</button>
+                    </div>
+                </div>
             </div>
             
-            <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ NHẬN/TRẢ CHI TIẾT</div>
-            <div class="tbl-wrap">
-                <table style="min-width: 900px;">
-                    <thead>
-                        <tr>
-                            <th>Thời gian</th>
-                            <th>Loại</th>
-                            <th>Vật tư</th>
-                            <th>Số lượng</th>
-                            <th>Đơn giá</th>
-                            <th>Thành tiền</th>
-                            <th>Ghi chú</th>
-                            <th>Tệp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${allTransactions.map(t => {
-                            const mat = state.data.materials.find(m => m.id === t.mid);
-                            const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
-                            const isReturn = t.type === 'return';
-                            const typeIcon = isReturn ? '🔄 Trả kho' : '📥 Nhận từ kho';
-                            const typeColor = isReturn ? 'var(--success-text)' : 'var(--accent)';
-                            const attachmentHtml = t.attachment ? `<a href="${t.attachment}" target="_blank" style="color: var(--accent);">📎 Xem</a>` : (t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—');
-                            const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
-                            return `<tr>
-                                <td style="white-space: nowrap;">${displayDateTime}</td>
-                                <td style="text-align: center; color: ${typeColor}; white-space: nowrap;">${typeIcon}</td>
-                                <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
-                                <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
-                                <td style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.unitPrice)}</td>
-                                <td class="text-warning" style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.totalAmount)}</td>
-                                <td style="white-space: nowrap;">${escapeHtml(t.note || '—')}</td>
-                                <td style="text-align: center; white-space: nowrap;">${attachmentHtml}</td>
-                            </tr>`;
-                        }).join('')}
-                        ${allTransactions.length === 0 ? '<tr><td colspan="8" style="text-align: center;">📭 Chưa có giao dịch nào</td>' : ''}
-                    </tbody>
-                </table>
+            <div id="tab-materials" class="tab-content" style="display: none;">
+                <div class="tbl-wrap">
+                    <table style="min-width: 800px;">
+                        <thead>
+                            <tr>
+                                <th>Vật tư</th>
+                                <th>Đã nhận từ kho</th>
+                                <th>Đã sử dụng</th>
+                                <th>Đã trả kho</th>
+                                <th>Tồn tại CT</th>
+                                <th>% sử dụng</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${materialUsageDetails.map(item => {
+                                const percentClass = item.usagePercentage > 90 ? 'text-danger' : item.usagePercentage > 70 ? 'text-warning' : 'text-success';
+                                return `<tr>
+                                    <td><strong>${escapeHtml(item.name)}</strong></td>
+                                    <td style="text-align: right;">${item.totalReceived.toLocaleString('vi-VN')} ${item.unit}</td>
+                                    <td style="text-align: right; font-weight: bold;">${item.totalUsed.toLocaleString('vi-VN')} ${item.unit}</td>
+                                    <td style="text-align: right; color: var(--success-text);">${item.totalReturned.toLocaleString('vi-VN')} ${item.unit}</td>
+                                    <td style="text-align: right; color: var(--accent);">${item.remainingAtSite.toLocaleString('vi-VN')} ${item.unit}</td>
+                                    <td style="text-align: center;"><span class="badge ${percentClass}">${item.usagePercentage.toFixed(1)}%</span></td>
+                                    <td style="text-align: center;">
+                                        <button class="sm" onclick="event.stopPropagation(); window.openMaterialUsageModal('${projectId}', '${item.id}')">✏️ Cập nhật sử dụng</button>
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                            ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được nhận cho công trình</td>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="tab-schedule" class="tab-content" style="display: none;">
+                <div id="schedule-view-container"></div>
+            </div>
+            
+            <div id="tab-history" class="tab-content" style="display: none;">
+                <div class="tbl-wrap">
+                    <table style="min-width: 900px;">
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Loại</th>
+                                <th>Vật tư</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Ghi chú</th>
+                                <th>Tệp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allTransactions.map(t => {
+                                const mat = state.data.materials.find(m => m.id === t.mid);
+                                const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
+                                const isReturn = t.type === 'return';
+                                const typeIcon = isReturn ? '🔄 Trả kho' : '📥 Nhận từ kho';
+                                const typeColor = isReturn ? 'var(--success-text)' : 'var(--accent)';
+                                const attachmentHtml = t.attachment ? `<a href="${t.attachment}" target="_blank" style="color: var(--accent);">📎 Xem</a>` : (t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—');
+                                const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+                                return `<tr>
+                                    <td style="white-space: nowrap;">${displayDateTime}</td>
+                                    <td style="text-align: center; color: ${typeColor}; white-space: nowrap;">${typeIcon}</td>
+                                    <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
+                                    <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
+                                    <td style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.unitPrice)}</td>
+                                    <td class="text-warning" style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.totalAmount)}</td>
+                                    <td style="white-space: nowrap;">${escapeHtml(t.note || '—')}</td>
+                                    <td style="text-align: center; white-space: nowrap;">${attachmentHtml}</td>
+                                </tr>`;
+                            }).join('')}
+                            ${allTransactions.length === 0 ? '<tr><td colspan="8" style="text-align: center;">📭 Chưa có giao dịch nào</td>' : ''}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
@@ -673,6 +700,25 @@ export function showProjectDetail(projectId) {
         </div>
     `;
     showModal(modalContent, null);
+    
+    setTimeout(() => {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            btn.onclick = () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`tab-${tabId}`).style.display = 'block';
+                btn.classList.add('active');
+                
+                if (tabId === 'schedule') {
+                    renderScheduleView(projectId);
+                }
+            };
+        });
+        
+        renderScheduleView(projectId);
+    }, 100);
 }
 
 export function exportProjectDetail(projectId) {
