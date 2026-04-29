@@ -26,6 +26,24 @@ setTimeout(() => {
 
 window.requestNotification = () => requestNotificationPermission();
 
+// ===== SIDEBAR TOGGLE =====
+let sidebarCollapsed = false;
+const savedSidebarState = localStorage.getItem('steeltrack_sidebar_collapsed');
+if (savedSidebarState === 'true') sidebarCollapsed = true;
+
+window.toggleSidebar = function() {
+    sidebarCollapsed = !sidebarCollapsed;
+    localStorage.setItem('steeltrack_sidebar_collapsed', sidebarCollapsed);
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        if (sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+        } else {
+            sidebar.classList.remove('collapsed');
+        }
+    }
+};
+
 function render() {
     const root = document.getElementById('root');
     const currentUser = getCurrentUser();
@@ -36,10 +54,13 @@ function render() {
     }
     
     const currentPane = state.currentPane;
+    const sidebarClass = sidebarCollapsed ? 'sidebar collapsed' : 'sidebar';
     
     root.innerHTML = `
-        <div style="display:flex">
-            ${renderSidebar()}
+        <div id="app-layout">
+            <div class="${sidebarClass}">
+                ${renderSidebarContent()}
+            </div>
             <div class="main-content">
                 ${renderTopbar()}
                 <div id="pane-entry" class="pane ${currentPane === 'entry' ? 'active' : ''}">${renderMaterials()}</div>
@@ -68,6 +89,32 @@ function render() {
     }
 }
 
+// Render sidebar content (tách riêng để dùng trong app.js)
+function renderSidebarContent() {
+    const hasAccessSettings = state.currentUser?.permissions?.canAccessSettings || state.currentUser?.role === 'admin';
+    // Import escapeHtml từ state
+    const escapeHtml = (str) => { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); };
+    
+    return `
+        <div class="sidebar-logo" onclick="if(document.querySelector('.sidebar').classList.contains('collapsed')) toggleSidebar()">
+            🏭 TRIVIETSTEEL
+            <button class="sidebar-toggle-btn" onclick="event.stopPropagation();toggleSidebar()" title="Ẩn/Hiện menu">
+                ${sidebarCollapsed ? '▶' : '◀'}
+            </button>
+        </div>
+        <div class="sidebar-user"><div class="uname">${escapeHtml(state.currentUser.name)}</div><div class="urole">${state.currentUser.role === 'admin' ? 'Quản trị viên' : 'Nhân viên kho'}</div></div>
+        <div class="sidebar-nav">
+            <div class="nav-item ${state.currentPane === 'entry' ? 'active' : ''}" onclick="switchPane('entry')">📦 <span>Quản lý kho</span></div>
+            <div class="nav-item ${state.currentPane === 'dashboard' ? 'active' : ''}" onclick="switchPane('dashboard')">📊 <span>Thống kê</span></div>
+            <div class="nav-item ${state.currentPane === 'projects' ? 'active' : ''}" onclick="switchPane('projects')">🏗️ <span>Công trình</span></div>
+            <div class="nav-item ${state.currentPane === 'suppliers' ? 'active' : ''}" onclick="switchPane('suppliers')">🏭 <span>Nhà cung cấp</span></div>
+            <div class="nav-item ${state.currentPane === 'logs' ? 'active' : ''}" onclick="switchPane('logs')">📋 <span>Nhật ký</span></div>
+            ${hasAccessSettings ? `<div class="nav-item ${state.currentPane === 'settings' ? 'active' : ''}" onclick="switchPane('settings')">⚙️ <span>Cài đặt</span></div>` : ''}
+        </div>
+        <div class="sidebar-bottom"><button onclick="logout()" style="width:100%">🚪 <span>Đăng xuất</span></button></div>
+    `;
+}
+
 function login(userId) {
     const user = state.data.users.find(u => u.id === userId);
     if (user) {
@@ -89,6 +136,7 @@ window.logout = logout;
 window.switchPane = switchPane;
 window.closeModal = closeModal;
 window.showModal = showModal;
+window.toggleSidebar = window.toggleSidebar;
 
 // Material
 window.openMatModal = openMatModal;
@@ -128,7 +176,7 @@ window.calculatePurchaseTotal = calculatePurchaseTotal;
 window.calculateExportTotal = calculateExportTotal;
 window.openPurchaseModalWithSupplier = openPurchaseModalWithSupplier;
 
-// Return transaction (Trả hàng từ công trình)
+// Return transaction
 window.openReturnModal = openReturnModal;
 window.saveReturn = saveReturn;
 window.clearReturnAttachment = clearReturnAttachment;
