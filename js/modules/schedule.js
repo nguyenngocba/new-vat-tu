@@ -1,7 +1,51 @@
 import { state, saveState, addLog, escapeHtml, showModal, closeModal } from './state.js';
-import { formatMoneyVND, setupNumberInput } from './utils.js';
+import { formatMoneyVND, setupNumberInput, parseNumber } from './utils.js';
 
-// Lấy tiến độ của công trình
+// ========== HELPER: LẤY VẬT TƯ ĐÃ XUẤT CHO CÔNG TRÌNH ==========
+
+function getMaterialsExportedToProject(projectId) {
+    // Lấy tất cả giao dịch xuất kho (usage) cho công trình này
+    const usageTransactions = state.data.transactions.filter(
+        t => t.projectId === projectId && t.type === 'usage'
+    );
+    
+    // Lấy tất cả giao dịch trả hàng (return) cho công trình này
+    const returnTransactions = state.data.transactions.filter(
+        t => t.projectId === projectId && t.type === 'return'
+    );
+    
+    // Lấy danh sách vật tư duy nhất đã xuất
+    const materialIds = [...new Set(usageTransactions.map(t => t.mid))];
+    
+    // Trả về thông tin vật tư kèm số lượng đã xuất (đã trừ trả hàng)
+    return materialIds.map(mid => {
+        const mat = state.data.materials.find(m => m.id === mid);
+        if (!mat) return null;
+        
+        const totalExported = usageTransactions
+            .filter(t => t.mid === mid)
+            .reduce((sum, t) => sum + (t.qty || 0), 0);
+        
+        const totalReturned = returnTransactions
+            .filter(t => t.mid === mid)
+            .reduce((sum, t) => sum + (t.qty || 0), 0);
+        
+        const netAvailable = totalExported - totalReturned;
+        
+        return {
+            id: mat.id,
+            name: mat.name,
+            unit: mat.unit,
+            cost: mat.cost,
+            totalExported: totalExported,
+            totalReturned: totalReturned,
+            netAvailable: netAvailable
+        };
+    }).filter(item => item !== null && item.netAvailable > 0);
+}
+
+// ========== LẤY TIẾN ĐỘ CỦA CÔNG TRÌNH ==========
+
 export function getProjectSchedule(projectId) {
     const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
     if (!schedule) {
@@ -23,7 +67,8 @@ export function getProjectSchedule(projectId) {
     return schedule;
 }
 
-// Cập nhật tiến độ tổng thể
+// ========== CẬP NHẬT TIẾN ĐỘ TỔNG THỂ ==========
+
 function updateScheduleProgress(projectId) {
     const schedule = getProjectSchedule(projectId);
     if (!schedule) return;
@@ -35,7 +80,7 @@ function updateScheduleProgress(projectId) {
         for (const task of tasks) {
             if (task.subTasks && task.subTasks.length > 0) {
                 const subResult = calculateTaskProgress(task.subTasks);
-                task.completed = subResult.completed;
+                task.completed = subResult.progress >= 100;
                 task.progress = subResult.progress;
                 totalWeight += task.weight || 1;
                 completedWeight += (task.weight || 1) * (task.progress / 100);
@@ -45,21 +90,39 @@ function updateScheduleProgress(projectId) {
             }
         }
         
+        const progress = totalWeight > 0 ? (completedWeight / totalWeight) * 100 : 0;
+        
         return {
-            progress: totalWeight > 0 ? (completedWeight / totalWeight) * 100 : 0,
-            completed: totalWeight > 0 ? completedWeight / totalWeight * 100 === 100 : false
+            progress: progress,
+            completed: progress >= 100
         };
     }
     
     const result = calculateTaskProgress(schedule.tasks);
     schedule.progress = result.progress;
-    schedule.completedDays = Math.floor((schedule.progress / 100) * schedule.totalDays);
+    
+    // Tự động tính completedDays dựa trên progress và totalDays
+    if (schedule.totalDays > 0) {
+        schedule.completedDays = Math.floor((schedule.progress / 100) * schedule.totalDays);
+    }
+    
+    // Tự động tính totalDays từ startDate và endDate nếu có
+    if (schedule.startDate && schedule.endDate) {
+        const start = new Date(schedule.startDate);
+        const end = new Date(schedule.endDate);
+        const diffTime = end.getTime() - start.getTime();
+        const calculatedDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        if (calculatedDays > 0) {
+            schedule.totalDays = calculatedDays;
+        }
+    }
     
     saveState();
     return schedule;
 }
 
-// Thêm công việc mới
+// ========== THÊM CÔNG VIỆC MỚI ==========
+
 export function addTask(projectId, parentTaskId = null) {
     const schedule = getProjectSchedule(projectId);
     
@@ -94,12 +157,14 @@ export function addTask(projectId, parentTaskId = null) {
         schedule.tasks.push(newTask);
     }
     
+    updateScheduleProgress(projectId);
     saveState();
     addLog('Thêm công việc', `Đã thêm công việc mới vào tiến độ công trình`);
     return newTask;
 }
 
-// Cập nhật công việc
+// ========== CẬP NHẬT CÔNG VIỆC ==========
+
 export function updateTask(projectId, taskId, updates) {
     const schedule = getProjectSchedule(projectId);
     
@@ -125,7 +190,8 @@ export function updateTask(projectId, taskId, updates) {
     return schedule;
 }
 
-// Xóa công việc
+// ========== XÓA CÔNG VIỆC ==========
+
 export function deleteTask(projectId, taskId) {
     const schedule = getProjectSchedule(projectId);
     
@@ -147,16 +213,51 @@ export function deleteTask(projectId, taskId) {
     return schedule;
 }
 
-// Gán vật tư cho công việc
+// ========== GÁN VẬT TƯ CHO CÔNG VIỆC ==========
+
 export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
     const schedule = getProjectSchedule(projectId);
+    
+    // Lấy vật tư từ danh sách đã xuất cho công trình
+    const exportedMaterials = getMaterialsExportedToProject(projectId);
+    const exportedMat = exportedMaterials.find(m => m.id === materialId);
+    
+    if (!exportedMat) {
+        alert('Vật tư này chưa được xuất cho công trình. Vui lòng xuất kho trước!');
+        return null;
+    }
+    
     const material = state.data.materials.find(m => m.id === materialId);
     if (!material) return null;
+    
+    // Kiểm tra tổng số lượng đã gán cho tất cả công việc
+    const allTasks = getAllTasksFlat(schedule.tasks);
+    let totalAssigned = 0;
+    for (const t of allTasks) {
+        if (t.id !== taskId) {
+            const matAssignment = t.materials.find(m => m.materialId === materialId);
+            if (matAssignment) {
+                totalAssigned += matAssignment.quantity;
+            }
+        }
+    }
     
     const findTask = (tasks) => {
         for (const task of tasks) {
             if (task.id === taskId) {
                 const existing = task.materials.find(m => m.materialId === materialId);
+                const currentTaskQty = existing ? existing.quantity : 0;
+                const newTotalAssigned = totalAssigned + quantity;
+                
+                // Kiểm tra không vượt quá số lượng đã xuất
+                if (newTotalAssigned > exportedMat.netAvailable) {
+                    alert(`Không thể gán ${quantity} ${material.unit} ${material.name}.\n` +
+                          `Đã gán cho các công việc khác: ${totalAssigned.toLocaleString('vi-VN')} ${material.unit}\n` +
+                          `Có sẵn từ xuất kho: ${exportedMat.netAvailable.toLocaleString('vi-VN')} ${material.unit}\n` +
+                          `Còn có thể gán: ${(exportedMat.netAvailable - totalAssigned).toLocaleString('vi-VN')} ${material.unit}`);
+                    return null;
+                }
+                
                 if (existing) {
                     existing.quantity += quantity;
                     existing.totalAmount = existing.quantity * existing.unitPrice;
@@ -168,14 +269,17 @@ export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
                         quantity: quantity,
                         unitPrice: material.cost,
                         totalAmount: quantity * material.cost,
-                        assignedFromStock: false
+                        assignedFromStock: true
                     });
                 }
                 saveState();
                 addLog('Gán vật tư', `Đã gán ${quantity} ${material.unit} ${material.name} cho công việc ${task.name}`);
                 return task;
             }
-            if (task.subTasks && findTask(task.subTasks)) return true;
+            if (task.subTasks) {
+                const result = findTask(task.subTasks);
+                if (result) return result;
+            }
         }
         return null;
     };
@@ -183,7 +287,20 @@ export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
     return findTask(schedule.tasks);
 }
 
-// Xóa vật tư khỏi công việc
+// Hàm helper lấy tất cả công việc (làm phẳng cây)
+function getAllTasksFlat(tasks) {
+    let result = [];
+    for (const task of tasks) {
+        result.push(task);
+        if (task.subTasks && task.subTasks.length > 0) {
+            result = result.concat(getAllTasksFlat(task.subTasks));
+        }
+    }
+    return result;
+}
+
+// ========== XÓA VẬT TƯ KHỎI CÔNG VIỆC ==========
+
 export function removeMaterialFromTask(projectId, taskId, materialId) {
     const schedule = getProjectSchedule(projectId);
     
@@ -207,7 +324,8 @@ export function removeMaterialFromTask(projectId, taskId, materialId) {
     return schedule;
 }
 
-// Render tree view cho công việc
+// ========== RENDER TREE VIEW CHO CÔNG VIỆC ==========
+
 export function renderTaskTree(tasks, projectId, level = 0) {
     if (!tasks || tasks.length === 0) return '';
     
@@ -219,12 +337,14 @@ export function renderTaskTree(tasks, projectId, level = 0) {
         return `
             <div class="task-item" style="margin-left: ${indent}px; border-left: 2px solid var(--border); margin-bottom: 8px;">
                 <div class="task-header" style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--surface2); border-radius: var(--r);">
-                    <button class="sm" onclick="window.toggleTaskExpand('${task.id}')" style="padding: 2px 6px;">
-                        ${task.expanded ? '📂' : '📁'}
-                    </button>
+                    ${task.subTasks && task.subTasks.length > 0 ? `
+                        <button class="sm" onclick="window.toggleTaskExpand('${task.id}')" style="padding: 2px 6px;">
+                            ${task.expanded ? '📂' : '📁'}
+                        </button>
+                    ` : '<span style="width: 28px; display: inline-block;"></span>'}
                     <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="window.toggleTaskComplete('${projectId}', '${task.id}', this.checked)">
                     <strong style="flex: 1;">${escapeHtml(task.name)}</strong>
-                    <span class="badge ${progressClass}" style="min-width: 60px;">${task.progress}%</span>
+                    <span class="badge ${progressClass}" style="min-width: 60px;">${task.progress.toFixed(0)}%</span>
                     <span class="metric-sub">📅 ${task.duration} ngày</span>
                     <span class="metric-sub">💰 ${formatMoneyVND(materialValue)}</span>
                     <button class="sm" onclick="window.openTaskDetailModal('${projectId}', '${task.id}')">✏️ Chi tiết</button>
@@ -242,7 +362,8 @@ export function renderTaskTree(tasks, projectId, level = 0) {
     }).join('');
 }
 
-// Modal chi tiết công việc
+// ========== MODAL CHI TIẾT CÔNG VIỆC ==========
+
 export function openTaskDetailModal(projectId, taskId) {
     const schedule = getProjectSchedule(projectId);
     
@@ -260,6 +381,9 @@ export function openTaskDetailModal(projectId, taskId) {
     const task = findTask(schedule.tasks);
     if (!task) return;
     
+    // Lấy vật tư đã xuất cho công trình
+    const exportedMaterials = getMaterialsExportedToProject(projectId);
+    
     const materialList = task.materials.map(m => `
         <div class="material-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 0.5px solid var(--border);">
             <div>
@@ -272,6 +396,13 @@ export function openTaskDetailModal(projectId, taskId) {
             </div>
         </div>
     `).join('');
+    
+    // Tạo dropdown từ vật tư đã xuất
+    const materialOptions = exportedMaterials.length > 0 
+        ? exportedMaterials.map(m => 
+            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN')} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
+          ).join('')
+        : '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
     
     const modalContent = `
         <div class="modal-hd" style="background: var(--accent-bg);">
@@ -314,17 +445,18 @@ export function openTaskDetailModal(projectId, taskId) {
                 </div>
             </div>
             
-            <div class="sec-title" style="margin-top: 16px;">📦 Vật tư đã gán</div>
+            <div class="sec-title" style="margin-top: 16px;">📦 Vật tư đã gán (từ vật tư đã xuất cho công trình)</div>
             <div id="task-materials-list" style="max-height: 200px; overflow-y: auto; border: 0.5px solid var(--border); border-radius: var(--r); margin-bottom: 12px;">
                 ${materialList || '<div class="metric-sub" style="padding: 12px; text-align: center;">Chưa có vật tư nào được gán</div>'}
             </div>
             
-            <div class="sec-title">➕ Gán thêm vật tư</div>
+            ${exportedMaterials.length > 0 ? `
+            <div class="sec-title">➕ Gán thêm vật tư (từ vật tư đã xuất cho công trình)</div>
             <div class="form-grid2">
                 <div class="form-group">
                     <label class="form-label">Chọn vật tư</label>
                     <select id="assign-material-id">
-                        ${state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (${m.unit}) - ${formatMoneyVND(m.cost)}</option>`).join('')}
+                        ${materialOptions}
                     </select>
                 </div>
                 <div class="form-group">
@@ -333,6 +465,11 @@ export function openTaskDetailModal(projectId, taskId) {
                 </div>
             </div>
             <button class="sm primary" onclick="window.assignMaterialToTaskFromModal('${projectId}', '${taskId}')" style="width: 100%;">📦 Gán vật tư</button>
+            ` : '<div class="metric-card" style="background: var(--warn-bg); margin-top: 12px;"><div class="metric-sub">⚠️ Vui lòng xuất kho vật tư cho công trình này trước khi gán vào công việc!</div></div>'}
+            
+            <div class="metric-card" style="margin-top: 12px; background: var(--accent-bg);">
+                <div class="metric-sub">📌 Lưu ý: Chỉ có thể gán vật tư đã được xuất kho cho công trình này.</div>
+            </div>
         </div>
         <div class="modal-ft">
             <button onclick="closeModal()">Đóng</button>
@@ -348,7 +485,8 @@ export function openTaskDetailModal(projectId, taskId) {
     }, 100);
 }
 
-// Lưu chi tiết công việc
+// ========== LƯU CHI TIẾT CÔNG VIỆC ==========
+
 export function saveTaskDetail(projectId, taskId) {
     const name = document.getElementById('task-name')?.value;
     const description = document.getElementById('task-desc')?.value;
@@ -377,31 +515,44 @@ export function saveTaskDetail(projectId, taskId) {
     alert('✅ Đã cập nhật công việc!');
 }
 
-// Modal gán vật tư
+// ========== MODAL GÁN VẬT TƯ ==========
+
 export function openAssignMaterialModal(projectId, taskId) {
+    // Lấy vật tư đã xuất cho công trình
+    const exportedMaterials = getMaterialsExportedToProject(projectId);
+    
+    const materialOptions = exportedMaterials.length > 0 
+        ? exportedMaterials.map(m => 
+            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN')} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
+          ).join('')
+        : '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
+    
     const modalContent = `
         <div class="modal-hd" style="background: var(--accent-bg);">
             <span class="modal-title">📦 Gán vật tư cho công việc</span>
             <button class="xbtn" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-bd">
+            ${exportedMaterials.length > 0 ? `
             <div class="form-group">
-                <label class="form-label">Chọn vật tư</label>
+                <label class="form-label">Chọn vật tư (đã xuất cho công trình)</label>
                 <select id="assign-material-id">
-                    ${state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (${m.unit}) - ${formatMoneyVND(m.cost)}</option>`).join('')}
+                    ${materialOptions}
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label">Số lượng</label>
                 <input type="text" id="assign-material-qty" value="1">
             </div>
-            <div class="metric-card" style="margin-top: 12px; background: var(--warn-bg);">
-                <div class="metric-sub">⚠️ Lưu ý: Vật tư được gán ở đây chỉ để theo dõi kế hoạch. Để xuất kho thực tế, bạn cần vào mục "Nhận hàng từ kho".</div>
+            ` : '<div class="metric-card" style="background: var(--warn-bg);"><div class="metric-sub">⚠️ Chưa có vật tư nào được xuất cho công trình này. Vui lòng xuất kho trước!</div></div>'}
+            
+            <div class="metric-card" style="margin-top: 12px; background: var(--accent-bg);">
+                <div class="metric-sub">📌 Lưu ý: Chỉ có thể gán vật tư đã được xuất kho cho công trình này.</div>
             </div>
         </div>
         <div class="modal-ft">
             <button onclick="closeModal()">Hủy</button>
-            <button class="primary" onclick="window.assignMaterialToTaskFromModal('${projectId}', '${taskId}')">📦 Gán vật tư</button>
+            ${exportedMaterials.length > 0 ? `<button class="primary" onclick="window.assignMaterialToTaskFromModal('${projectId}', '${taskId}')">📦 Gán vật tư</button>` : ''}
         </div>
     `;
     
@@ -413,10 +564,12 @@ export function openAssignMaterialModal(projectId, taskId) {
     }, 100);
 }
 
-// Gán vật tư từ modal
+// ========== GÁN VẬT TƯ TỪ MODAL ==========
+
 export function assignMaterialToTaskFromModal(projectId, taskId) {
     const materialId = document.getElementById('assign-material-id')?.value;
-    const qty = parseFloat(document.getElementById('assign-material-qty')?.value.replace(/\./g, '').replace(/,/g, '.')) || 1;
+    const qtyInput = document.getElementById('assign-material-qty');
+    const qty = parseNumber(qtyInput?.value) || 1;
     
     if (!materialId || qty <= 0) {
         alert('Vui lòng chọn vật tư và nhập số lượng hợp lệ');
@@ -429,11 +582,15 @@ export function assignMaterialToTaskFromModal(projectId, taskId) {
     alert('✅ Đã gán vật tư!');
 }
 
-// Render toàn bộ view tiến độ
+// ========== RENDER TOÀN BỘ VIEW TIẾN ĐỘ ==========
+
 export function renderScheduleView(projectId) {
     const schedule = getProjectSchedule(projectId);
     const container = document.getElementById('schedule-view-container');
     if (!container) return;
+    
+    // Cập nhật tiến độ trước khi render
+    updateScheduleProgress(projectId);
     
     const progressPercent = schedule.progress || 0;
     const progressClass = progressPercent >= 100 ? 'b-ok' : (progressPercent > 0 ? 'b-low' : '');
@@ -451,8 +608,9 @@ export function renderScheduleView(projectId) {
                     <div class="metric-val" style="font-size: 16px;">${schedule.endDate || 'Chưa thiết lập'}</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">⏱️ Tổng thời gian (ngày)</div>
+                    <div class="metric-label">⏱️ Tổng thời gian (ngày) - Tự động tính</div>
                     <div class="metric-val" style="font-size: 20px;">${schedule.totalDays || 0}</div>
+                    <div class="metric-sub">Tự động tính từ ngày bắt đầu đến ngày kết thúc</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">✅ Tiến độ hoàn thành</div>
@@ -473,7 +631,8 @@ export function renderScheduleView(projectId) {
     `;
 }
 
-// Cập nhật thông tin tiến độ tổng thể
+// ========== CẬP NHẬT THÔNG TIN TIẾN ĐỘ TỔNG THỂ ==========
+
 export function updateScheduleInfo(projectId) {
     const schedule = getProjectSchedule(projectId);
     
@@ -482,15 +641,18 @@ export function updateScheduleInfo(projectId) {
         <div class="modal-bd">
             <div class="form-group">
                 <label class="form-label">Ngày bắt đầu</label>
-                <input type="date" id="schedule-start-date" value="${schedule.startDate || ''}">
+                <input type="date" id="schedule-start-date" value="${schedule.startDate || ''}" onchange="window.calculateScheduleDays()">
             </div>
             <div class="form-group">
                 <label class="form-label">Ngày kết thúc dự kiến</label>
-                <input type="date" id="schedule-end-date" value="${schedule.endDate || ''}">
+                <input type="date" id="schedule-end-date" value="${schedule.endDate || ''}" onchange="window.calculateScheduleDays()">
             </div>
             <div class="form-group">
-                <label class="form-label">Tổng thời gian (ngày)</label>
-                <input type="number" id="schedule-total-days" value="${schedule.totalDays || 0}" step="0.5">
+                <label class="form-label">⏱️ Tổng thời gian (ngày) - Tự động tính</label>
+                <input type="number" id="schedule-total-days" value="${schedule.totalDays || 0}" step="1" readonly style="background: var(--surface3); font-weight: bold; font-size: 16px;">
+            </div>
+            <div class="metric-sub" style="margin-top: 8px; color: var(--accent-text);">
+                ℹ️ Tổng thời gian được tự động tính từ ngày bắt đầu đến ngày kết thúc (bao gồm cả ngày bắt đầu).
             </div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveScheduleInfo('${projectId}')">Lưu</button></div>
@@ -499,15 +661,50 @@ export function updateScheduleInfo(projectId) {
     showModal(modalContent, null);
 }
 
+// Hàm tính toán số ngày
+window.calculateScheduleDays = function() {
+    const startDateInput = document.getElementById('schedule-start-date');
+    const endDateInput = document.getElementById('schedule-end-date');
+    const totalDaysInput = document.getElementById('schedule-total-days');
+    
+    if (startDateInput && endDateInput && totalDaysInput) {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            // Tính số ngày chênh lệch (bao gồm cả ngày bắt đầu và kết thúc)
+            const diffTime = end.getTime() - start.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 để bao gồm cả ngày bắt đầu
+            
+            if (diffDays > 0) {
+                totalDaysInput.value = diffDays;
+            } else {
+                totalDaysInput.value = 0;
+            }
+        }
+    }
+};
+
 export function saveScheduleInfo(projectId) {
     const startDate = document.getElementById('schedule-start-date')?.value;
     const endDate = document.getElementById('schedule-end-date')?.value;
-    const totalDays = parseFloat(document.getElementById('schedule-total-days')?.value) || 0;
+    let totalDays = parseFloat(document.getElementById('schedule-total-days')?.value) || 0;
+    
+    // Nếu chưa có totalDays, tự động tính
+    if (totalDays === 0 && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = end.getTime() - start.getTime();
+        totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    }
     
     const schedule = getProjectSchedule(projectId);
     schedule.startDate = startDate;
     schedule.endDate = endDate;
-    schedule.totalDays = totalDays;
+    schedule.totalDays = Math.max(0, totalDays);
     
     saveState();
     closeModal();
@@ -515,7 +712,8 @@ export function saveScheduleInfo(projectId) {
     alert('✅ Đã cập nhật thông tin tiến độ!');
 }
 
-// Các hàm global
+// ========== CÁC HÀM GLOBAL ==========
+
 window.addRootTask = (projectId) => {
     addTask(projectId);
     renderScheduleView(projectId);
@@ -527,6 +725,13 @@ window.addSubTask = (projectId, parentTaskId) => {
 };
 
 window.toggleTaskExpand = (taskId) => {
+    // Tìm projectId từ biến global
+    const projectId = window.currentScheduleProjectId;
+    if (!projectId) return;
+    
+    const schedule = getProjectSchedule(projectId);
+    if (!schedule) return;
+    
     const findAndToggle = (tasks) => {
         for (const task of tasks) {
             if (task.id === taskId) {
@@ -538,20 +743,20 @@ window.toggleTaskExpand = (taskId) => {
         }
         return false;
     };
-    const schedule = getProjectSchedule(window.currentScheduleProjectId);
-    if (schedule) findAndToggle(schedule.tasks);
-    if (window.renderScheduleView) window.renderScheduleView(window.currentScheduleProjectId);
+    
+    findAndToggle(schedule.tasks);
+    renderScheduleView(projectId);
 };
 
 window.toggleTaskComplete = (projectId, taskId, isComplete) => {
     updateTask(projectId, taskId, { completed: isComplete, progress: isComplete ? 100 : 0 });
-    if (window.renderScheduleView) window.renderScheduleView(projectId);
+    renderScheduleView(projectId);
 };
 
 window.deleteTaskHandler = (projectId, taskId) => {
     if (confirm('Bạn có chắc chắn muốn xóa công việc này và tất cả công việc con?')) {
         deleteTask(projectId, taskId);
-        if (window.renderScheduleView) window.renderScheduleView(projectId);
+        renderScheduleView(projectId);
     }
 };
 
@@ -562,9 +767,10 @@ window.assignMaterialToTaskFromModal = assignMaterialToTaskFromModal;
 window.removeMaterialFromTask = (projectId, taskId, materialId) => {
     if (confirm('Xóa vật tư này khỏi công việc?')) {
         removeMaterialFromTask(projectId, taskId, materialId);
-        if (window.openTaskDetailModal) window.openTaskDetailModal(projectId, taskId);
+        openTaskDetailModal(projectId, taskId);
     }
 };
 window.updateScheduleInfo = updateScheduleInfo;
 window.saveScheduleInfo = saveScheduleInfo;
 window.renderScheduleView = renderScheduleView;
+window.calculateScheduleDays = window.calculateScheduleDays;

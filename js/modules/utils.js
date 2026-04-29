@@ -4,7 +4,13 @@ import { state, addLog, escapeHtml } from './state.js';
 
 export function parseNumber(str) {
     if (!str || str === '') return 0;
-    let cleaned = str.toString().replace(/\./g, '').replace(/,/g, '.');
+    
+    let cleaned = str.toString().trim();
+    
+    // Xóa dấu chấm (phân cách hàng nghìn)
+    // Thay dấu phẩy bằng dấu chấm (thập phân)
+    cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
+    
     let num = parseFloat(cleaned);
     return isNaN(num) ? 0 : num;
 }
@@ -63,49 +69,212 @@ export function handleQuantityInput(event) {
     input.dispatchEvent(changeEvent);
 }
 
-// Hàm setupNumberInput - cho phép nhập số và format khi blur
+// ========== HÀM SETUP INPUT SỐ - FORMAT REAL-TIME ==========
+
 export function setupNumberInput(inputElement, options = {}) {
     if (!inputElement) return;
     
-    const { isInteger = false, decimals = null } = options;
+    const { isInteger = false, decimals = 2 } = options;
     
-    // Xử lý khi blur (mất focus)
-    inputElement.addEventListener('blur', function() {
-        let num = parseNumber(this.value);
-        if (isNaN(num)) num = 0;
-        if (isInteger) num = Math.floor(num);
+    // Hàm format số real-time (có dấu chấm phân cách hàng nghìn)
+    function formatNumberRealTime(rawValue) {
+        if (!rawValue || rawValue === '') return '';
         
-        let formattedValue;
-        if (decimals !== null) {
-            formattedValue = num.toLocaleString('vi-VN', {
-                minimumFractionDigits: decimals,
-                maximumFractionDigits: decimals
-            });
-        } else if (num % 1 !== 0) {
-            let decimalPlaces = 0;
-            const val = this.value;
-            if (val.includes(',')) {
-                decimalPlaces = val.split(',')[1].length;
-            } else if (val.includes('.')) {
-                decimalPlaces = val.split('.')[1].length;
-            }
-            decimalPlaces = Math.min(decimalPlaces, 2);
-            formattedValue = num.toLocaleString('vi-VN', {
-                minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces
-            });
-        } else {
-            formattedValue = num.toLocaleString('vi-VN');
+        // Lưu dấu âm nếu có
+        let isNegative = false;
+        if (rawValue.startsWith('-')) {
+            isNegative = true;
+            rawValue = rawValue.substring(1);
         }
         
+        // Tách phần nguyên và phần thập phân
+        // Tìm vị trí dấu phẩy hoặc dấu chấm CUỐI CÙNG làm dấu thập phân
+        let decimalSeparatorIndex = -1;
+        let lastComma = rawValue.lastIndexOf(',');
+        let lastDot = rawValue.lastIndexOf('.');
+        
+        if (lastComma > lastDot) {
+            decimalSeparatorIndex = lastComma;
+        } else if (lastDot > lastComma) {
+            decimalSeparatorIndex = lastDot;
+        }
+        
+        let integerPart = '';
+        let decimalPart = '';
+        
+        if (decimalSeparatorIndex >= 0) {
+            integerPart = rawValue.substring(0, decimalSeparatorIndex);
+            decimalPart = rawValue.substring(decimalSeparatorIndex + 1);
+        } else {
+            integerPart = rawValue;
+            decimalPart = '';
+        }
+        
+        // Xóa tất cả dấu chấm và dấu phẩy còn lại trong phần nguyên
+        integerPart = integerPart.replace(/[.,]/g, '');
+        
+        // Nếu là số nguyên, bỏ phần thập phân
+        if (isInteger) {
+            decimalPart = '';
+        } else if (decimals !== null && decimalPart.length > decimals) {
+            // Giới hạn số chữ số thập phân
+            decimalPart = decimalPart.substring(0, decimals);
+        }
+        
+        // Format phần nguyên: thêm dấu chấm mỗi 3 chữ số
+        let formattedInteger = '';
+        let count = 0;
+        for (let i = integerPart.length - 1; i >= 0; i--) {
+            formattedInteger = integerPart[i] + formattedInteger;
+            count++;
+            if (count % 3 === 0 && i > 0) {
+                formattedInteger = '.' + formattedInteger;
+            }
+        }
+        
+        if (formattedInteger === '') formattedInteger = '0';
+        
+        // Ghép lại
+        let result = formattedInteger;
+        if (decimalPart.length > 0 && !isInteger) {
+            result += ',' + decimalPart;
+        }
+        
+        if (isNegative) {
+            result = '-' + result;
+        }
+        
+        return result;
+    }
+    
+    // Hàm tính vị trí con trỏ mới sau khi format
+    function calculateNewCursorPosition(oldValue, newValue, oldCursorPos) {
+        if (oldValue === newValue) return oldCursorPos;
+        
+        // Đếm số dấu chấm trong giá trị cũ trước vị trí con trỏ
+        let oldDotsBefore = 0;
+        for (let i = 0; i < Math.min(oldCursorPos, oldValue.length); i++) {
+            if (oldValue[i] === '.') oldDotsBefore++;
+        }
+        
+        // Đếm số dấu chấm trong giá trị mới trước vị trí con trỏ
+        let newDotsBefore = 0;
+        for (let i = 0; i < Math.min(oldCursorPos, newValue.length); i++) {
+            if (newValue[i] === '.') newDotsBefore++;
+        }
+        
+        let newPos = oldCursorPos + (newDotsBefore - oldDotsBefore);
+        
+        // Đảm bảo con trỏ không vượt quá độ dài chuỗi
+        newPos = Math.min(newPos, newValue.length);
+        newPos = Math.max(0, newPos);
+        
+        return newPos;
+    }
+    
+    // Xử lý khi người dùng gõ (input event) - Format real-time
+    inputElement.addEventListener('input', function(e) {
+        const oldValue = this.value;
+        const oldCursorPos = this.selectionStart;
+        
+        // Lấy giá trị raw (chỉ giữ số, dấu trừ, dấu phẩy, dấu chấm)
+        let rawValue = this.value.replace(/[^\d\-,.]/g, '');
+        
+        // Đảm bảo chỉ có MỘT dấu thập phân (dấu phẩy hoặc dấu chấm)
+        let commaCount = (rawValue.match(/,/g) || []).length;
+        let dotCount = (rawValue.match(/\./g) || []).length;
+        
+        // Nếu có nhiều hơn 1 dấu phẩy hoặc dấu chấm, giữ lại dấu cuối cùng làm thập phân
+        if (commaCount + dotCount > 1) {
+            let lastComma = rawValue.lastIndexOf(',');
+            let lastDot = rawValue.lastIndexOf('.');
+            let lastSeparator = Math.max(lastComma, lastDot);
+            
+            if (lastSeparator >= 0) {
+                let before = rawValue.substring(0, lastSeparator).replace(/[,.]/g, '');
+                let separator = rawValue[lastSeparator];
+                let after = rawValue.substring(lastSeparator + 1).replace(/[,.]/g, '');
+                rawValue = before + separator + after;
+            }
+        }
+        
+        // Format lại
+        const formattedValue = formatNumberRealTime(rawValue);
+        
+        // Tính toán vị trí con trỏ mới
+        const newCursorPos = calculateNewCursorPosition(oldValue, formattedValue, oldCursorPos);
+        
+        // Cập nhật giá trị
         this.value = formattedValue;
+        
+        // Đặt lại vị trí con trỏ
+        this.setSelectionRange(newCursorPos, newCursorPos);
+        
+        // Kích hoạt sự kiện change để cập nhật preview
         const changeEvent = new Event('change', { bubbles: true });
         this.dispatchEvent(changeEvent);
     });
     
-    // Xử lý khi focus (chọn toàn bộ để dễ nhập)
+    // Xử lý khi blur - Đảm bảo format đúng
+    inputElement.addEventListener('blur', function() {
+        let rawValue = this.value.replace(/[^\d\-,.]/g, '');
+        const formattedValue = formatNumberRealTime(rawValue);
+        this.value = formattedValue;
+        
+        const changeEvent = new Event('change', { bubbles: true });
+        this.dispatchEvent(changeEvent);
+    });
+    
+    // Xử lý khi focus - Select all để dễ nhập lại
     inputElement.addEventListener('focus', function() {
         this.select();
+    });
+    
+    // Ngăn người dùng nhập ký tự không hợp lệ
+    inputElement.addEventListener('keydown', function(e) {
+        // Cho phép: số, backspace, delete, mũi tên, tab, home, end, dấu trừ, dấu chấm, dấu phẩy
+        const allowedKeys = [
+            'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+            'Tab', 'Home', 'End', 'Enter', 'Escape',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '.', ',', '-', 'Minus', 'NumpadDecimal', 'NumpadSubtract',
+            'Numpad0', 'Numpad1', 'Numpad2', 'Numpad3', 'Numpad4',
+            'Numpad5', 'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9'
+        ];
+        
+        // Cho phép Ctrl+C, Ctrl+V, Ctrl+A, Ctrl+X
+        if (e.ctrlKey || e.metaKey) {
+            return;
+        }
+        
+        if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    
+    // Xử lý paste - Format sau khi paste
+    inputElement.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+        let rawValue = pastedText.replace(/[^\d\-,.]/g, '');
+        
+        // Lấy vị trí con trỏ hiện tại
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        const currentValue = this.value;
+        
+        // Tạo giá trị mới sau khi paste
+        const newRawValue = currentValue.substring(0, start) + rawValue + currentValue.substring(end);
+        const formattedValue = formatNumberRealTime(newRawValue);
+        
+        this.value = formattedValue;
+        
+        // Đặt con trỏ ở cuối phần được paste
+        const newCursorPos = Math.min(start + formattedValue.length, formattedValue.length);
+        this.setSelectionRange(newCursorPos, newCursorPos);
+        
+        const changeEvent = new Event('change', { bubbles: true });
+        this.dispatchEvent(changeEvent);
     });
 }
 

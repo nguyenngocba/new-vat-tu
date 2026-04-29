@@ -39,7 +39,7 @@ export function openPurchaseModal() {
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
                 <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="number" id="purchase-vat" value="10" step="0.1" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -60,16 +60,16 @@ export function openPurchaseModal() {
         const fileInput = document.getElementById('purchase-invoice');
         
         if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         if (priceInput) {
-            setupNumberInput(priceInput, { isInteger: true, decimals: 0 });
+            setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
             priceInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         if (vatInput) {
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('input', () => window.calculatePurchaseTotal());
+            vatInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         
         if (fileInput) {
@@ -89,7 +89,9 @@ export function openPurchaseModal() {
         const updateDefaultPrice = () => {
             const mid = midSelect?.value;
             const mat = matById(mid);
-            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) priceInput.value = mat.cost.toLocaleString('vi-VN');
+            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
+                priceInput.value = mat.cost.toLocaleString('vi-VN');
+            }
             window.calculatePurchaseTotal();
         };
         if (midSelect) { midSelect.addEventListener('change', updateDefaultPrice); updateDefaultPrice(); }
@@ -114,7 +116,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
                 <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="number" id="purchase-vat" value="10" step="0.1" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -135,16 +137,16 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const fileInput = document.getElementById('purchase-invoice');
         
         if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         if (priceInput) {
-            setupNumberInput(priceInput, { isInteger: true, decimals: 0 });
+            setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
             priceInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         if (vatInput) {
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('input', () => window.calculatePurchaseTotal());
+            vatInput.addEventListener('change', () => window.calculatePurchaseTotal());
         }
         
         if (fileInput) {
@@ -164,7 +166,9 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const updateDefaultPrice = () => {
             const mid = midSelect?.value;
             const mat = matById(mid);
-            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) priceInput.value = mat.cost.toLocaleString('vi-VN');
+            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
+                priceInput.value = mat.cost.toLocaleString('vi-VN');
+            }
             window.calculatePurchaseTotal();
         };
         if (midSelect) { midSelect.addEventListener('change', updateDefaultPrice); updateDefaultPrice(); }
@@ -175,7 +179,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
 export function calculatePurchaseTotal() {
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const price = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat(document.getElementById('purchase-vat')?.value) || 0;
+    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
     const subtotal = qty * price;
     const vatAmount = subtotal * vatRate / 100;
     const total = subtotal + vatAmount;
@@ -195,7 +199,7 @@ export function savePurchase() {
     
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat(document.getElementById('purchase-vat')?.value) || 0;
+    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
     const note = document.getElementById('purchase-note')?.value || '';
     
     if (!supplierId) return alert('Chọn nhà cung cấp');
@@ -249,7 +253,7 @@ export function savePurchaseWithSupplier(supplierId) {
     
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat(document.getElementById('purchase-vat')?.value) || 0;
+    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
     const note = document.getElementById('purchase-note')?.value || '';
     
     if (!mid) return alert('Chọn vật tư');
@@ -365,7 +369,7 @@ export function openTxnModal(type, preselectedProjectId = null) {
         };
         
         if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', updatePreview);
         }
         if (midSelect) midSelect.addEventListener('change', updatePreview);
@@ -565,7 +569,9 @@ export function openReturnModal(preselectedProjectId = null) {
             if (selectedOption && selectedOption.value) {
                 unitPrice = parseFloat(selectedOption.dataset.unitPrice) || 0;
                 maxQty = parseFloat(selectedOption.dataset.maxQty) || 0;
-                if (priceInput) priceInput.value = unitPrice.toLocaleString('vi-VN');
+                if (priceInput) {
+                    priceInput.value = unitPrice.toLocaleString('vi-VN');
+                }
             }
             
             const total = unitPrice * qty;
@@ -605,8 +611,7 @@ export function openReturnModal(preselectedProjectId = null) {
         }
         
         if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
-            qtyInput.addEventListener('input', updateReturnPreview);
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', updateReturnPreview);
         }
         
@@ -685,18 +690,16 @@ export function saveReturn() {
     
     const totalAmount = qty * unitPrice;
     
-    // 1. Cộng lại số lượng vào kho
+    // Cộng lại số lượng vào kho
     mat.qty += qty;
     
-    // 2. Cập nhật lại chi phí công trình (trừ đi giá trị hàng trả)
+    // Cập nhật lại chi phí công trình (trừ đi giá trị hàng trả)
     const project = projectById(projectId);
     if (project) {
-        const oldSpent = project.spent || 0;
-        const newSpent = Math.max(0, oldSpent - totalAmount);
-        project.spent = newSpent;
+        project.spent = Math.max(0, (project.spent || 0) - totalAmount);
     }
     
-    // 3. Tạo giao dịch trả hàng
+    // Tạo giao dịch trả hàng
     const transaction = { 
         id: genTid(), 
         mid: mid, 

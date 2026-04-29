@@ -1,6 +1,6 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission } from './state.js';
 import { 
-    handleIntegerInput, getNumberFromInput, formatMoneyVND,
+    handleIntegerInput, getNumberFromInput, formatMoneyVND, setupNumberInput,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
     getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
 } from './utils.js';
@@ -69,7 +69,6 @@ function updateMaterialList() {
                 </thead>
                 <tbody>
                     ${sorted.map(m => {
-                        // Đảm bảo số lượng hiển thị đúng
                         const displayQty = typeof m.qty === 'number' ? m.qty.toLocaleString('vi-VN') : parseFloat(m.qty || 0).toLocaleString('vi-VN');
                         const displayCost = formatMoneyVND(m.cost);
                         const totalValue = (typeof m.qty === 'number' ? m.qty : parseFloat(m.qty || 0)) * (typeof m.cost === 'number' ? m.cost : parseFloat(m.cost || 0));
@@ -357,9 +356,9 @@ export function openMatModal() {
       const qtyInput = document.getElementById('mn-qty');
       const costInput = document.getElementById('mn-cost');
       const lowInput = document.getElementById('mn-low');
-      if (qtyInput) qtyInput.addEventListener('input', handleIntegerInput);
-      if (costInput) costInput.addEventListener('input', handleIntegerInput);
-      if (lowInput) lowInput.addEventListener('input', handleIntegerInput);
+      if (qtyInput) setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
+      if (costInput) setupNumberInput(costInput, { isInteger: false, decimals: 2 });
+      if (lowInput) setupNumberInput(lowInput, { isInteger: true, decimals: 0 });
   }, 100);
 }
 
@@ -381,8 +380,8 @@ export function saveMat() {
     cat: document.getElementById('mn-cat').value,
     unit: document.getElementById('mn-unit').value,
     qty: qty,
-    cost: Math.floor(cost),
-    low: Math.floor(low) || 5,
+    cost: Math.round(cost),
+    low: Math.round(low) || 5,
     note: document.getElementById('mn-note')?.value || ''
   };
   
@@ -405,13 +404,13 @@ export function editMaterial(mid) {
       <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="${mat.low.toLocaleString('vi-VN')}" style="text-align: right;"></div>
       <div class="form-group form-full"><label class="form-label">Ghi chú</label><textarea id="mn-note" rows="2">${escapeHtml(mat.note || '')}</textarea></div>
     </div></div>
-    <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="updateMaterial(mid)">Cập nhật</button></div>`);
+    <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="updateMaterial('${mid}')">Cập nhật</button></div>`);
   
   setTimeout(() => {
       const costInput = document.getElementById('mn-cost');
       const lowInput = document.getElementById('mn-low');
-      if (costInput) costInput.addEventListener('input', handleIntegerInput);
-      if (lowInput) lowInput.addEventListener('input', handleIntegerInput);
+      if (costInput) setupNumberInput(costInput, { isInteger: false, decimals: 2 });
+      if (lowInput) setupNumberInput(lowInput, { isInteger: true, decimals: 0 });
   }, 100);
 }
 
