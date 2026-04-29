@@ -49,7 +49,7 @@ function renderSupplierHistory() {
         .slice(0, 50);
     
     if (transactions.length === 0) {
-        return '<tr><td colspan="8" style="text-align: center;">📭 Chưa có dữ liệu nhập hàng nào</td>'
+        return '<tr><td colspan="8" style="text-align: center;">📭 Chưa có dữ liệu nhập hàng nào</td>' + '</tr>';
     }
     
     return transactions.map(t => {
@@ -294,13 +294,13 @@ export function showSupplierDetail(supplierId) {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
                     return `<tr>
                         <td><strong>${escapeHtml(stat.name)}</strong></td>
-                        <td>${stat.qty.toLocaleString('vi-VN')}</td>
-                        <td>${stat.unit}</td>
-                        <td>${formatMoneyVND(stat.lastPrice)}/đv</td>
-                        <td class="text-warning">${formatMoneyVND(stat.totalAmount)}</td>
-                        <td><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
+                        <td style="text-align: right;">${stat.qty.toLocaleString('vi-VN')}</td>
+                        <td style="text-align: right;">${stat.unit}</td>
+                        <td style="text-align: right;">${formatMoneyVND(stat.lastPrice)}/đv</td>
+                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(stat.totalAmount)}</td>
+                        <td style="text-align: center;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
-                }).join('')}</tbody>追赶</div>
+                }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có giao dịch nhập hàng nào</div></div>'}
             
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ NHẬP HÀNG CHI TIẾT</div>
@@ -308,13 +308,13 @@ export function showSupplierDetail(supplierId) {
                 <table style="min-width: 900px; width: 100%;">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">Nhà cung cấp</th>
-                            <th style="width: 15%;">Vật tư</th>
+                            <th style="width: 12%;">Nhà cung cấp</th>
+                            <th style="width: 12%;">Vật tư</th>
                             <th style="width: 10%;">Số lượng</th>
                             <th style="width: 12%;">Đơn giá</th>
-                            <th style="width: 5%;">VAT</th>
+                            <th style="width: 8%;">VAT</th>
                             <th style="width: 15%;">Thành tiền</th>
-                            <th style="width: 15%;">Ngày giờ nhập</th>
+                            <th style="width: 18%;">Ngày giờ nhập</th>
                             <th style="width: 8%;">Hóa đơn</th>
                         </tr>
                     </thead>
@@ -427,7 +427,15 @@ export function exportAllSuppliersReport() {
     const suppliers = state.data.suppliers.map(s => {
         const transactions = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
         const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-        return { 'Mã nhà cung cấp': s.id, 'Tên nhà cung cấp': s.name, 'Số điện thoại': s.phone || '', 'Email': s.email || '', 'Địa chỉ': s.address || '', 'Tổng chi (VNĐ)': totalSpent, 'Số lần nhập': transactions.length };
+        return { 
+            'Mã nhà cung cấp': s.id, 
+            'Tên nhà cung cấp': s.name, 
+            'Số điện thoại': s.phone || '', 
+            'Email': s.email || '', 
+            'Địa chỉ': s.address || '', 
+            'Tổng chi (VNĐ)': totalSpent, 
+            'Số lần nhập': transactions.length 
+        };
     });
     if (typeof XLSX !== 'undefined') {
         const wb = XLSX.utils.book_new();
@@ -464,14 +472,14 @@ export function renderSuppliers() {
                         <table style="min-width: 1000px; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th style="width: 15%;">Nhà cung cấp</th>
-                                    <th style="width: 15%;">Vật tư</th>
-                                    <th style="width: 10%;">Số lượng</th>
-                                    <th style="width: 12%;">Đơn giá</th>
-                                    <th style="width: 5%;">VAT</th>
-                                    <th style="width: 15%;">Thành tiền</th>
-                                    <th style="width: 15%;">Ngày giờ nhập</th>
-                                    <th style="width: 8%;">Hóa đơn</th>
+                                    <th>Nhà cung cấp</th>
+                                    <th>Vật tư</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>VAT</th>
+                                    <th>Thành tiền</th>
+                                    <th>Ngày giờ nhập</th>
+                                    <th>Hóa đơn</th>
                                 </tr>
                             </thead>
                             <tbody id="supplier-history-tbody">
@@ -511,7 +519,13 @@ export function openSupplierModal(supplier = null) {
 export function saveSupplier() {
   const name = document.getElementById('sup-name')?.value.trim();
   if (!name) return alert('Vui lòng nhập tên nhà cung cấp');
-  const newSupplier = { id: genSid(), name: name, phone: document.getElementById('sup-phone')?.value || '', email: document.getElementById('sup-email')?.value || '', address: document.getElementById('sup-address')?.value || '' };
+  const newSupplier = { 
+    id: genSid(), 
+    name: name, 
+    phone: document.getElementById('sup-phone')?.value || '', 
+    email: document.getElementById('sup-email')?.value || '', 
+    address: document.getElementById('sup-address')?.value || '' 
+  };
   state.data.suppliers.push(newSupplier);
   addLog('Thêm nhà cung cấp', `Đã thêm nhà cung cấp: ${name} (${newSupplier.id})`);
   saveState(); closeModal(); if(window.render) window.render();
@@ -568,9 +582,24 @@ export function viewSupplierHistory(sid) {
           <td>${escapeHtml(t.note || '—')}</td>
           <td>${invoiceHtml}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody>追赶</div>
+    }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody></table></div>
     </div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>`);
 }
 
-export const addSupplier = (data) => { const newId = genSid(); const newSupplier = { id: newId, name: data.name, phone: data.phone || '', email: data.email || '', address: data.address || '' }; state.data.suppliers.push(newSupplier); addLog('Thêm nhà cung cấp', `Đã thêm nhà cung cấp: ${newSupplier.name} (${newSupplier.id})`); saveState(); if(window.render) window.render(); return newSupplier; };
+export const addSupplier = (data) => { 
+    const newId = genSid(); 
+    const newSupplier = { 
+        id: newId, 
+        name: data.name, 
+        phone: data.phone || '', 
+        email: data.email || '', 
+        address: data.address || '' 
+    }; 
+    state.data.suppliers.push(newSupplier); 
+    addLog('Thêm nhà cung cấp', `Đã thêm nhà cung cấp: ${newSupplier.name} (${newSupplier.id})`); 
+    saveState(); 
+    if(window.render) window.render(); 
+    return newSupplier; 
+};
+
 export const getSuppliers = () => state.data.suppliers;
