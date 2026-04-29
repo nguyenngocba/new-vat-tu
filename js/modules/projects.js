@@ -1,5 +1,5 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genPid, projectById, hasPermission } from './state.js';
-import { handleIntegerInput, formatMoneyVND, setupNumberInput } from './utils.js';
+import { handleIntegerInput, formatMoneyVND, setupNumberInput, parseNumber } from './utils.js';
 import { getProjectSchedule, renderScheduleView, updateScheduleInfo, saveScheduleInfo, addTask, updateTask, deleteTask, assignMaterialToTask, removeMaterialFromTask, openTaskDetailModal } from './schedule.js';
 
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
@@ -20,12 +20,6 @@ function getCurrentDateTime() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function parseNumber(str) {
-    if (!str || str === '') return 0;
-    let cleaned = str.toString().replace(/\./g, '').replace(/,/g, '.');
-    return parseFloat(cleaned) || 0;
 }
 
 function getFilteredProjects() {
@@ -63,13 +57,58 @@ function getProjectTotalReceived(projectId) {
     return receivedTotal - returnTotal;
 }
 
+// ========== HÀM LẤY CHI TIẾT SỬ DỤNG VẬT TƯ (ĐÃ SỬA) ==========
+
 function getMaterialUsageDetails(projectId) {
     const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
     const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId) || [];
     
+    // ===== LẤY THÔNG TIN TỪ SCHEDULE TASKS =====
+    const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
+    const scheduleMaterialUsage = {};
+    
+    if (schedule && schedule.tasks && schedule.tasks.length > 0) {
+        // Hàm đệ quy lấy tất cả tasks (bao gồm tasks con)
+        function getAllTasksFlat(tasks) {
+            let result = [];
+            for (const task of tasks) {
+                result.push(task);
+                if (task.subTasks && task.subTasks.length > 0) {
+                    result = result.concat(getAllTasksFlat(task.subTasks));
+                }
+            }
+            return result;
+        }
+        
+        const allTasks = getAllTasksFlat(schedule.tasks);
+        
+        // Tổng hợp vật tư từ tất cả tasks
+        for (const task of allTasks) {
+            if (task.materials && task.materials.length > 0) {
+                for (const mat of task.materials) {
+                    if (!scheduleMaterialUsage[mat.materialId]) {
+                        scheduleMaterialUsage[mat.materialId] = {
+                            quantity: 0,
+                            totalAmount: 0,
+                            tasks: []
+                        };
+                    }
+                    scheduleMaterialUsage[mat.materialId].quantity += mat.quantity || 0;
+                    scheduleMaterialUsage[mat.materialId].totalAmount += mat.totalAmount || 0;
+                    scheduleMaterialUsage[mat.materialId].tasks.push({
+                        taskId: task.id,
+                        taskName: task.name,
+                        quantity: mat.quantity || 0
+                    });
+                }
+            }
+        }
+    }
+    
     const materialMap = new Map();
     
+    // Tổng hợp từ giao dịch nhận (usage)
     receiveTxns.forEach(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         if (mat) {
@@ -81,7 +120,10 @@ function getMaterialUsageDetails(projectId) {
                     totalReceived: 0,
                     totalUsed: 0,
                     totalReturned: 0,
+                    fromSchedule: 0,       // Số lượng từ kế hoạch schedule
+                    fromManualUpdate: 0,   // Số lượng từ cập nhật thủ công
                     usageRecords: [],
+                    scheduleTasks: [],     // Danh sách tasks đã gán
                     lastUnitPrice: t.unitPrice,
                     lastTransactionDate: t.datetime || t.date
                 });
@@ -95,6 +137,7 @@ function getMaterialUsageDetails(projectId) {
         }
     });
     
+    // Tổng hợp từ giao dịch trả (return)
     returnTxns.forEach(t => {
         if (materialMap.has(t.mid)) {
             const item = materialMap.get(t.mid);
@@ -102,15 +145,48 @@ function getMaterialUsageDetails(projectId) {
         }
     });
     
+    // Tổng hợp từ usage records (cập nhật sử dụng thủ công)
     usageRecords.forEach(record => {
         if (materialMap.has(record.materialId)) {
             const item = materialMap.get(record.materialId);
-            item.totalUsed = record.usedQty || 0;
+            item.fromManualUpdate = Math.max(item.fromManualUpdate, record.usedQty || 0);
             item.usageRecords = record.history || [];
         }
     });
     
+    // Tổng hợp từ schedule (vật tư đã gán cho công việc)
+    for (const [matId, data] of Object.entries(scheduleMaterialUsage)) {
+        if (materialMap.has(matId)) {
+            const item = materialMap.get(matId);
+            item.fromSchedule = data.quantity;
+            item.scheduleTasks = data.tasks;
+        } else {
+            // Vật tư được gán trong schedule nhưng chưa có giao dịch nhận
+            const mat = state.data.materials.find(m => m.id === matId);
+            if (mat) {
+                materialMap.set(matId, {
+                    id: matId,
+                    name: mat.name,
+                    unit: mat.unit,
+                    totalReceived: 0,
+                    totalUsed: 0,
+                    totalReturned: 0,
+                    fromSchedule: data.quantity,
+                    fromManualUpdate: 0,
+                    usageRecords: [],
+                    scheduleTasks: data.tasks,
+                    lastUnitPrice: mat.cost,
+                    lastTransactionDate: null
+                });
+            }
+        }
+    }
+    
+    // Tính toán tổng số đã sử dụng và remaining
     materialMap.forEach(item => {
+        // Tổng đã sử dụng = max(từ schedule, từ cập nhật thủ công)
+        item.totalUsed = Math.max(item.fromSchedule, item.fromManualUpdate);
+        
         item.remainingAtSite = item.totalReceived - item.totalUsed - item.totalReturned;
         if (item.remainingAtSite < 0) item.remainingAtSite = 0;
         item.usagePercentage = item.totalReceived > 0 ? (item.totalUsed / item.totalReceived) * 100 : 0;
@@ -118,6 +194,8 @@ function getMaterialUsageDetails(projectId) {
     
     return Array.from(materialMap.values());
 }
+
+// ========== MODAL QUẢN LÝ SỬ DỤNG VẬT TƯ ==========
 
 export function openMaterialUsageModal(projectId, materialId) {
     const project = projectById(projectId);
@@ -128,9 +206,37 @@ export function openMaterialUsageModal(projectId, materialId) {
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === materialId);
     const usageRecord = state.data.projectMaterialUsage?.find(u => u.projectId === projectId && u.materialId === materialId);
     
+    // Lấy thông tin từ schedule
+    const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
+    let scheduleTasks = [];
+    let scheduledQty = 0;
+    
+    if (schedule && schedule.tasks) {
+        function findMaterialInTasks(tasks) {
+            for (const task of tasks) {
+                if (task.materials) {
+                    const found = task.materials.find(m => m.materialId === materialId);
+                    if (found) {
+                        scheduleTasks.push({
+                            taskId: task.id,
+                            taskName: task.name,
+                            quantity: found.quantity || 0
+                        });
+                        scheduledQty += found.quantity || 0;
+                    }
+                }
+                if (task.subTasks && task.subTasks.length > 0) {
+                    findMaterialInTasks(task.subTasks);
+                }
+            }
+        }
+        findMaterialInTasks(schedule.tasks);
+    }
+    
     const totalReceived = receiveTxns.reduce((s, t) => s + t.qty, 0);
     const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
-    const totalUsed = usageRecord?.usedQty || 0;
+    const manualUsed = usageRecord?.usedQty || 0;
+    const totalUsed = Math.max(scheduledQty, manualUsed);
     const remainingAtSite = totalReceived - totalUsed - totalReturned;
     const usagePercent = totalReceived > 0 ? (totalUsed / totalReceived) * 100 : 0;
     
@@ -139,7 +245,7 @@ export function openMaterialUsageModal(projectId, materialId) {
             <span class="modal-title">📦 Quản lý sử dụng: ${escapeHtml(material.name)}</span>
             <button class="xbtn" onclick="closeModal()">✕</button>
         </div>
-        <div class="modal-bd">
+        <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
             <div class="grid2" style="margin-bottom: 20px;">
                 <div class="metric-card">
                     <div class="metric-label">🏗️ Công trình</div>
@@ -157,7 +263,7 @@ export function openMaterialUsageModal(projectId, materialId) {
                 <div class="metric-card">
                     <div class="metric-label">✅ Đã sử dụng thực tế</div>
                     <div class="metric-val" style="font-size: 20px;">${totalUsed.toLocaleString('vi-VN')} ${material.unit}</div>
-                    <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${usagePercent}%; background: ${usagePercent > 90 ? '#A32D2D' : usagePercent > 70 ? '#BA7517' : '#378ADD'};"></div></div>
+                    <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${Math.min(100, usagePercent)}%; background: ${usagePercent > 90 ? '#A32D2D' : usagePercent > 70 ? '#BA7517' : '#378ADD'};"></div></div>
                     <div class="metric-sub">${usagePercent.toFixed(1)}% đã sử dụng</div>
                 </div>
                 <div class="metric-card">
@@ -171,11 +277,38 @@ export function openMaterialUsageModal(projectId, materialId) {
                 </div>
             </div>
             
-            <div class="sec-title">✏️ CẬP NHẬT SỬ DỤNG</div>
+            ${scheduleTasks.length > 0 ? `
+            <div class="sec-title">📅 ĐÃ GÁN CHO CÔNG VIỆC (TỪ TIẾN ĐỘ)</div>
+            <div class="tbl-wrap" style="margin-bottom: 16px;">
+                <table style="min-width: 400px;">
+                    <thead><tr><th>Công việc</th><th>Số lượng đã gán</th></tr></thead>
+                    <tbody>
+                        ${scheduleTasks.map(st => `
+                            <tr>
+                                <td>${escapeHtml(st.taskName)}</td>
+                                <td style="text-align: right; font-weight: bold;">${st.quantity.toLocaleString('vi-VN')} ${material.unit}</td>
+                            </tr>
+                        `).join('')}
+                        <tr style="background: var(--accent-bg);">
+                            <td><strong>TỔNG TỪ KẾ HOẠCH</strong></td>
+                            <td style="text-align: right; font-weight: bold; color: var(--accent);">${scheduledQty.toLocaleString('vi-VN')} ${material.unit}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            ` : ''}
+            
+            ${manualUsed > 0 && manualUsed !== scheduledQty ? `
+            <div class="metric-card" style="margin-bottom: 16px; background: var(--warn-bg);">
+                <div class="metric-sub">⚠️ Đã cập nhật thủ công: ${manualUsed.toLocaleString('vi-VN')} ${material.unit} (khác với kế hoạch: ${scheduledQty.toLocaleString('vi-VN')})</div>
+            </div>
+            ` : ''}
+            
+            <div class="sec-title">✏️ CẬP NHẬT SỬ DỤNG THỦ CÔNG</div>
             <div class="form-grid2">
                 <div class="form-group">
                     <label class="form-label">🔢 Số lượng đã sử dụng</label>
-                    <input type="text" id="usage-qty" value="${totalUsed.toLocaleString('vi-VN')}" style="text-align: right;">
+                    <input type="text" id="usage-qty" value="${manualUsed.toLocaleString('vi-VN')}" style="text-align: right;">
                     <div class="metric-sub">Tối đa: ${totalReceived.toLocaleString('vi-VN')} ${material.unit}</div>
                 </div>
                 <div class="form-group">
@@ -188,10 +321,11 @@ export function openMaterialUsageModal(projectId, materialId) {
                 </div>
             </div>
             
-            <div class="metric-card" style="margin-top: 16px; background: var(--warn-bg);">
-                <div class="metric-sub">⚠️ Lưu ý: 
+            <div class="metric-card" style="margin-top: 16px; background: var(--accent-bg);">
+                <div class="metric-sub">💡 Lưu ý: 
+                    <br>- Số lượng sử dụng từ kế hoạch (schedule) sẽ tự động được tính
+                    <br>- Bạn có thể cập nhật thủ công nếu số thực tế khác với kế hoạch
                     <br>- Số lượng sử dụng không được vượt quá số đã nhận (${totalReceived.toLocaleString('vi-VN')} ${material.unit})
-                    <br>- Nếu giảm số lượng sử dụng, hệ thống sẽ đề xuất tạo phiếu trả hàng
                 </div>
             </div>
             
@@ -202,28 +336,28 @@ export function openMaterialUsageModal(projectId, materialId) {
                         <tr><th>Thời gian</th><th>Loại</th><th>Số lượng</th><th>Ghi chú</th></tr>
                     </thead>
                     <tbody>
-                        ${[...receiveTxns, ...returnTxns, ...(usageRecord?.history || [])].sort((a, b) => new Date(b.datetime || b.date || b.lastUpdated) - new Date(a.datetime || a.date || a.lastUpdated)).slice(0, 20).map(t => {
+                        ${[...receiveTxns, ...returnTxns, ...(usageRecord?.history || [])].sort((a, b) => new Date(b.datetime || b.date || b.lastUpdated || 0) - new Date(a.datetime || a.date || a.lastUpdated || 0)).slice(0, 20).map(t => {
                             if (t.type === 'usage') {
                                 return `<tr>
                                     <td>${formatDateTime(t.datetime || t.date)}</td>
                                     <td>📥 Nhận từ kho</td>
-                                    <td>${t.qty.toLocaleString('vi-VN')} ${material.unit}</td>
+                                    <td>${(t.qty || 0).toLocaleString('vi-VN')} ${material.unit}</td>
                                     <td>${escapeHtml(t.note || '—')}</td>
                                 </tr>`;
                             } else if (t.type === 'return') {
                                 return `<tr>
                                     <td>${formatDateTime(t.datetime || t.date)}</td>
                                     <td>🔄 Trả kho</td>
-                                    <td>${t.qty.toLocaleString('vi-VN')} ${material.unit}</td>
+                                    <td>${(t.qty || 0).toLocaleString('vi-VN')} ${material.unit}</td>
                                     <td>${escapeHtml(t.note || '—')}</td>
                                 </tr>`;
                             } else {
-                                const changeText = t.change > 0 ? `+${t.change.toLocaleString('vi-VN')}` : t.change.toLocaleString('vi-VN');
+                                const changeText = t.change > 0 ? `+${t.change.toLocaleString('vi-VN')}` : (t.change || 0).toLocaleString('vi-VN');
                                 return `<tr>
                                     <td>${formatDateTime(t.date)}</td>
                                     <td>✏️ Cập nhật sử dụng</td>
-                                    <td>${t.oldQty.toLocaleString('vi-VN')} → ${t.newQty.toLocaleString('vi-VN')} (${changeText})</td>
-                                    <td>${escapeHtml(t.note || '—')} (NV: ${t.operator})</td>
+                                    <td>${(t.oldQty || 0).toLocaleString('vi-VN')} → ${(t.newQty || 0).toLocaleString('vi-VN')} (${changeText})</td>
+                                    <td>${escapeHtml(t.note || '—')} (NV: ${t.operator || 'System'})</td>
                                 </tr>`;
                             }
                         }).join('')}
@@ -234,7 +368,7 @@ export function openMaterialUsageModal(projectId, materialId) {
         </div>
         <div class="modal-ft">
             <button onclick="closeModal()">Đóng</button>
-            <button class="primary" onclick="saveMaterialUsage('${projectId}', '${materialId}', ${totalReceived})">💾 Lưu cập nhật</button>
+            <button class="primary" onclick="window.saveMaterialUsage('${projectId}', '${materialId}', ${totalReceived})">💾 Lưu cập nhật</button>
         </div>
     `;
     
@@ -265,10 +399,6 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
         alert(`Số lượng sử dụng (${newUsedQty.toLocaleString('vi-VN')}) vượt quá số đã nhận (${totalReceived.toLocaleString('vi-VN')})`);
         return;
     }
-    
-    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === materialId);
-    const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === materialId);
-    const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
     
     if (!state.data.projectMaterialUsage) state.data.projectMaterialUsage = [];
     
@@ -350,6 +480,8 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
     }, 500);
 }
 
+// ========== RENDER LỊCH SỬ NHẬN/TRẢ ==========
+
 function renderProjectHistory() {
     const transactions = state.data.transactions
         .filter(t => (t.type === 'usage' || t.type === 'return') && t.projectId)
@@ -357,7 +489,7 @@ function renderProjectHistory() {
         .slice(0, 50);
     
     if (transactions.length === 0) {
-        return '<tr><td colspan="7" style="text-align: center;">📭 Chưa có dữ liệu nhận/trả cho công trình nào</td>' + '</tr>';
+        return '<tr><td colspan="7" style="text-align: center;">📭 Chưa có dữ liệu nhận/trả cho công trình nào</td></tr>';
     }
     
     return transactions.map(t => {
@@ -382,6 +514,8 @@ function renderProjectHistory() {
         </tr>`;
     }).join('');
 }
+
+// ========== UPDATE DISPLAY ==========
 
 function updateProjectListDisplay() {
     if (!projectListContainer) return;
@@ -432,6 +566,8 @@ function updateProjectHistoryDisplay() {
         historyContainer.innerHTML = renderProjectHistory();
     }
 }
+
+// ========== RENDER SEARCH BAR ==========
 
 function renderProjectSearchBar() {
     const statusOptions = [
@@ -497,6 +633,8 @@ function bindProjectSearchEvents() {
     };
 }
 
+// ========== RESIZABLE PANELS ==========
+
 function initResizablePanels() {
     const container = document.getElementById('projects-resizable-container');
     if (!container) return;
@@ -551,6 +689,8 @@ function initResizablePanels() {
     });
 }
 
+// ========== SHOW PROJECT DETAIL (MODAL) ==========
+
 export function showProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
@@ -604,7 +744,7 @@ export function showProjectDetail(projectId) {
                     <div class="progress-bar" style="height: 12px;"><div class="progress-fill" style="width: ${scheduleProgress}%; background: ${scheduleProgress > 90 ? '#A32D2D' : '#378ADD'};"></div></div>
                     <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${scheduleProgress.toFixed(1)}% hoàn thành</div>
                     <div style="margin-top: 12px; text-align: center;">
-                        <button class="sm" onclick="document.querySelector('.tab-btn[data-tab=\'schedule\']').click();">📅 Xem chi tiết tiến độ</button>
+                        <button class="sm" onclick="document.querySelector('.tab-btn[data-tab=\\'schedule\\']').click();">📅 Xem chi tiết tiến độ</button>
                     </div>
                 </div>
             </div>
@@ -620,12 +760,24 @@ export function showProjectDetail(projectId) {
                                 <th>Đã trả kho</th>
                                 <th>Tồn tại CT</th>
                                 <th>% sử dụng</th>
+                                <th>Nguồn</th>
                                 <th>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${materialUsageDetails.map(item => {
                                 const percentClass = item.usagePercentage > 90 ? 'text-danger' : item.usagePercentage > 70 ? 'text-warning' : 'text-success';
+                                let sourceLabel = '';
+                                if (item.fromSchedule > 0 && item.fromManualUpdate > 0 && item.fromSchedule !== item.fromManualUpdate) {
+                                    sourceLabel = `📅 KH: ${item.fromSchedule.toLocaleString('vi-VN')} | ✏️ TT: ${item.fromManualUpdate.toLocaleString('vi-VN')}`;
+                                } else if (item.fromSchedule > 0) {
+                                    sourceLabel = '📅 Từ kế hoạch';
+                                } else if (item.fromManualUpdate > 0) {
+                                    sourceLabel = '✏️ Cập nhật thủ công';
+                                } else {
+                                    sourceLabel = '—';
+                                }
+                                
                                 return `<tr>
                                     <td><strong>${escapeHtml(item.name)}</strong></td>
                                     <td style="text-align: right;">${item.totalReceived.toLocaleString('vi-VN')} ${item.unit}</td>
@@ -633,12 +785,13 @@ export function showProjectDetail(projectId) {
                                     <td style="text-align: right; color: var(--success-text);">${item.totalReturned.toLocaleString('vi-VN')} ${item.unit}</td>
                                     <td style="text-align: right; color: var(--accent);">${item.remainingAtSite.toLocaleString('vi-VN')} ${item.unit}</td>
                                     <td style="text-align: center;"><span class="badge ${percentClass}">${item.usagePercentage.toFixed(1)}%</span></td>
+                                    <td style="font-size: 11px;">${sourceLabel}</td>
                                     <td style="text-align: center;">
-                                        <button class="sm" onclick="event.stopPropagation(); window.openMaterialUsageModal('${projectId}', '${item.id}')">✏️ Cập nhật sử dụng</button>
+                                        <button class="sm" onclick="event.stopPropagation(); window.openMaterialUsageModal('${projectId}', '${item.id}')">✏️ Cập nhật</button>
                                     </td>
                                 </tr>`;
                             }).join('')}
-                            ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được nhận cho công trình</td>' : ''}
+                            ${materialUsageDetails.length === 0 ? '<tr><td colspan="8" style="text-align: center;">📭 Chưa có vật tư nào được nhận cho công trình</td>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -708,7 +861,8 @@ export function showProjectDetail(projectId) {
                 const tabId = btn.dataset.tab;
                 document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.getElementById(`tab-${tabId}`).style.display = 'block';
+                const tabElement = document.getElementById(`tab-${tabId}`);
+                if (tabElement) tabElement.style.display = 'block';
                 btn.classList.add('active');
                 
                 if (tabId === 'schedule') {
@@ -720,6 +874,8 @@ export function showProjectDetail(projectId) {
         renderScheduleView(projectId);
     }, 100);
 }
+
+// ========== EXPORT FUNCTIONS ==========
 
 export function exportProjectDetail(projectId) {
     const project = projectById(projectId);
@@ -750,7 +906,9 @@ export function exportProjectDetail(projectId) {
         'Đã sử dụng': item.totalUsed,
         'Đã trả kho': item.totalReturned,
         'Tồn tại công trình': item.remainingAtSite,
-        'Tỷ lệ sử dụng': `${item.usagePercentage.toFixed(1)}%`
+        'Tỷ lệ sử dụng': `${item.usagePercentage.toFixed(1)}%`,
+        'Từ kế hoạch': item.fromSchedule || 0,
+        'Cập nhật thủ công': item.fromManualUpdate || 0
     }));
     
     const detailData = [...receiveTransactions, ...returnTransactions].map(t => {
@@ -807,6 +965,8 @@ export function exportAllProjectsReport() {
     } else alert('Đang tải thư viện Excel, vui lòng thử lại sau.');
 }
 
+// ========== RENDER PROJECTS ==========
+
 export function renderProjects() {
     const result = renderProjectSearchBar() + `
     <div class="card">
@@ -860,13 +1020,15 @@ export function renderProjects() {
     return result;
 }
 
+// ========== CRUD FUNCTIONS ==========
+
 export function openProjectModal() {
   if (!hasPermission('canCreateMaterial')) { alert('Bạn không có quyền thêm công trình'); return; }
   showModal(`<div class="modal-hd"><span class="modal-title">🏗️ Thêm công trình mới</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="form-group"><label class="form-label">Tên công trình</label><input id="proj-name" placeholder="VD: Cầu vượt X"></div>
     <div class="form-group"><label class="form-label">Ngân sách dự kiến (VNĐ)</label><input type="text" id="proj-budget" value="0" style="text-align: right;"></div></div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="saveProject()">Tạo công trình</button></div>`);
-  setTimeout(() => { const budgetInput = document.getElementById('proj-budget'); if (budgetInput) budgetInput.addEventListener('input', handleIntegerInput); }, 100);
+  setTimeout(() => { const budgetInput = document.getElementById('proj-budget'); if (budgetInput) setupNumberInput(budgetInput, { isInteger: false, decimals: 2 }); }, 100);
 }
 
 export function saveProject() {
@@ -887,9 +1049,18 @@ export function deleteProject(pid) {
   if (!confirm(relatedTxns.length > 0 ? `⚠️ Công trình "${project.name}" đã có ${relatedTxns.length} giao dịch.\nXóa sẽ XÓA LUÔN các giao dịch này.\nTiếp tục?` : `Xóa công trình "${project.name}"?`)) return;
   state.data.projects = state.data.projects.filter(p => p.id !== pid);
   state.data.transactions = state.data.transactions.filter(t => t.projectId !== pid);
+  // Xóa cả schedule và material usage
+  if (state.data.projectSchedules) {
+    state.data.projectSchedules = state.data.projectSchedules.filter(s => s.projectId !== pid);
+  }
+  if (state.data.projectMaterialUsage) {
+    state.data.projectMaterialUsage = state.data.projectMaterialUsage.filter(u => u.projectId !== pid);
+  }
   addLog('Xóa công trình', `Đã xóa công trình: ${project.name} (${pid})`);
   saveState(); if(window.render) window.render();
 }
+
+// ========== GLOBAL HANDLERS ==========
 
 window.deleteProjectHandler = (pid) => { deleteProject(pid); };
 window.openMaterialUsageModal = openMaterialUsageModal;
@@ -897,5 +1068,13 @@ window.saveMaterialUsage = saveMaterialUsage;
 
 export function filterProjects() {}
 export function clearProjectSearch() {}
-export const addProject = (data) => { const newId = genPid(); const newProj = { id: newId, name: data.name, budget: Number(data.budget) || 0, spent: 0 }; state.data.projects.push(newProj); addLog('Thêm công trình', `Đã thêm công trình: ${newProj.name} (${newProj.id}) - Ngân sách: ${formatMoneyVND(newProj.budget)}`); saveState(); if(window.render) window.render(); return newProj; };
+export const addProject = (data) => { 
+    const newId = genPid(); 
+    const newProj = { id: newId, name: data.name, budget: Number(data.budget) || 0, spent: 0 }; 
+    state.data.projects.push(newProj); 
+    addLog('Thêm công trình', `Đã thêm công trình: ${newProj.name} (${newProj.id}) - Ngân sách: ${formatMoneyVND(newProj.budget)}`); 
+    saveState(); 
+    if(window.render) window.render(); 
+    return newProj; 
+};
 export const getProjects = () => state.data.projects;
