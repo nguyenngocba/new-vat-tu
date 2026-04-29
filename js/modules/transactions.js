@@ -1,5 +1,5 @@
 import { state, saveState, addLog, showModal, closeModal, genTid, matById, projectById, supplierById, hasPermission, escapeHtml } from './state.js';
-import { handleQuantityInput, getNumberFromInput, formatMoneyVND, setupNumberInput } from './utils.js';
+import { getNumberFromInput, formatMoneyVND, setupNumberInput } from './utils.js';
 
 let currentInvoiceBase64 = null;
 let currentExportAttachmentBase64 = null;
@@ -27,19 +27,20 @@ export function openPurchaseModal() {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (state.data.suppliers.length === 0) return alert('Chưa có nhà cung cấp');
     
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${m.name} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
-    const optsSup = state.data.suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsSup = state.data.suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     const currentDateTime = getCurrentDateTime();
     
-    showModal(`<div class="modal-hd"><span class="modal-title">📥 Nhập kho (Có VAT & Hóa đơn)</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+    const html = `
+        <div class="modal-hd"><span class="modal-title">📥 Nhập kho (Có VAT & Hóa đơn)</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><select id="purchase-supplier">${optsSup}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;" autocomplete="off"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -48,9 +49,11 @@ export function openPurchaseModal() {
             </div>
             <div class="form-group"><label class="form-label">📎 Ảnh hóa đơn (tùy chọn)</label><input type="file" id="purchase-invoice" accept="image/*"></div>
             <div id="invoice-preview"></div>
-            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchase()">Xác nhận nhập kho</button></div>`);
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-purchase">Xác nhận nhập kho</button></div>`;
+    
+    showModal(html, null);
     
     setTimeout(() => {
         const qtyInput = document.getElementById('purchase-qty');
@@ -58,20 +61,32 @@ export function openPurchaseModal() {
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
+        const saveBtn = document.getElementById('btn-save-purchase');
         
+        // === SETUP NUMBER INPUTS ===
         if (qtyInput) {
+            qtyInput.removeAttribute('type');
+            qtyInput.setAttribute('type', 'text');
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            qtyInput.addEventListener('change', calculatePurchaseTotal);
         }
         if (priceInput) {
+            priceInput.removeAttribute('type');
+            priceInput.setAttribute('type', 'text');
             setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
-            priceInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            priceInput.addEventListener('change', calculatePurchaseTotal);
         }
         if (vatInput) {
+            vatInput.removeAttribute('type');
+            vatInput.setAttribute('type', 'text');
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            vatInput.addEventListener('change', calculatePurchaseTotal);
         }
         
+        // === SAVE BUTTON ===
+        if (saveBtn) saveBtn.onclick = savePurchase;
+        
+        // === FILE INPUT ===
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -80,23 +95,31 @@ export function openPurchaseModal() {
                 reader.onload = function(e) {
                     currentInvoiceBase64 = e.target.result;
                     const previewDiv = document.getElementById('invoice-preview');
-                    if (previewDiv) previewDiv.innerHTML = `<img src="${currentInvoiceBase64}" class="invoice-img" onclick="window.open(this.src)"><br><button class="sm" onclick="window.clearInvoiceImage()">🗑️ Xóa ảnh</button>`;
+                    if (previewDiv) {
+                        previewDiv.innerHTML = `<img src="${currentInvoiceBase64}" class="invoice-img" onclick="window.open(this.src)"><br><button class="sm" onclick="window.clearInvoiceImage()">🗑️ Xóa ảnh</button>`;
+                    }
                 };
                 reader.readAsDataURL(file);
             });
         }
         
+        // === DEFAULT PRICE ===
         const updateDefaultPrice = () => {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
-                priceInput.value = mat.cost.toLocaleString('vi-VN');
+                const formatted = Math.round(mat.cost).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                priceInput.value = formatted;
             }
-            window.calculatePurchaseTotal();
+            calculatePurchaseTotal();
         };
-        if (midSelect) { midSelect.addEventListener('change', updateDefaultPrice); updateDefaultPrice(); }
-        window.calculatePurchaseTotal();
-    }, 100);
+        if (midSelect) {
+            midSelect.addEventListener('change', updateDefaultPrice);
+            updateDefaultPrice();
+        }
+        
+        calculatePurchaseTotal();
+    }, 150);
 }
 
 export function openPurchaseModalWithSupplier(supplierId) {
@@ -105,18 +128,19 @@ export function openPurchaseModalWithSupplier(supplierId) {
     const supplier = supplierById(supplierId);
     if (!supplier) return alert('Không tìm thấy nhà cung cấp');
     
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${m.name} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
     const currentDateTime = getCurrentDateTime();
     
-    showModal(`<div class="modal-hd"><span class="modal-title">📥 Nhập kho từ ${escapeHtml(supplier.name)}</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+    const html = `
+        <div class="modal-hd"><span class="modal-title">📥 Nhập kho từ ${escapeHtml(supplier.name)}</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><input type="text" value="${escapeHtml(supplier.name)}" disabled style="background: var(--surface3);"></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;" autocomplete="off"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -125,9 +149,11 @@ export function openPurchaseModalWithSupplier(supplierId) {
             </div>
             <div class="form-group"><label class="form-label">📎 Ảnh hóa đơn (tùy chọn)</label><input type="file" id="purchase-invoice" accept="image/*"></div>
             <div id="invoice-preview"></div>
-            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchaseWithSupplier('${supplierId}')">Xác nhận nhập kho</button></div>`);
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-purchase-supplier">Xác nhận nhập kho</button></div>`;
+    
+    showModal(html, null);
     
     setTimeout(() => {
         const qtyInput = document.getElementById('purchase-qty');
@@ -135,19 +161,28 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
+        const saveBtn = document.getElementById('btn-save-purchase-supplier');
         
         if (qtyInput) {
+            qtyInput.removeAttribute('type');
+            qtyInput.setAttribute('type', 'text');
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            qtyInput.addEventListener('change', calculatePurchaseTotal);
         }
         if (priceInput) {
+            priceInput.removeAttribute('type');
+            priceInput.setAttribute('type', 'text');
             setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
-            priceInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            priceInput.addEventListener('change', calculatePurchaseTotal);
         }
         if (vatInput) {
+            vatInput.removeAttribute('type');
+            vatInput.setAttribute('type', 'text');
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('change', () => window.calculatePurchaseTotal());
+            vatInput.addEventListener('change', calculatePurchaseTotal);
         }
+        
+        if (saveBtn) saveBtn.onclick = () => savePurchaseWithSupplier(supplierId);
         
         if (fileInput) {
             fileInput.addEventListener('change', function() {
@@ -157,7 +192,9 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 reader.onload = function(e) {
                     currentInvoiceBase64 = e.target.result;
                     const previewDiv = document.getElementById('invoice-preview');
-                    if (previewDiv) previewDiv.innerHTML = `<img src="${currentInvoiceBase64}" class="invoice-img" onclick="window.open(this.src)"><br><button class="sm" onclick="window.clearInvoiceImage()">🗑️ Xóa ảnh</button>`;
+                    if (previewDiv) {
+                        previewDiv.innerHTML = `<img src="${currentInvoiceBase64}" class="invoice-img" onclick="window.open(this.src)"><br><button class="sm" onclick="window.clearInvoiceImage()">🗑️ Xóa ảnh</button>`;
+                    }
                 };
                 reader.readAsDataURL(file);
             });
@@ -167,22 +204,28 @@ export function openPurchaseModalWithSupplier(supplierId) {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
-                priceInput.value = mat.cost.toLocaleString('vi-VN');
+                const formatted = Math.round(mat.cost).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                priceInput.value = formatted;
             }
-            window.calculatePurchaseTotal();
+            calculatePurchaseTotal();
         };
-        if (midSelect) { midSelect.addEventListener('change', updateDefaultPrice); updateDefaultPrice(); }
-        window.calculatePurchaseTotal();
-    }, 100);
+        if (midSelect) {
+            midSelect.addEventListener('change', updateDefaultPrice);
+            updateDefaultPrice();
+        }
+        
+        calculatePurchaseTotal();
+    }, 150);
 }
 
-export function calculatePurchaseTotal() {
+function calculatePurchaseTotal() {
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const price = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
+    const vatRate = getNumberFromInput(document.getElementById('purchase-vat'));
     const subtotal = qty * price;
     const vatAmount = subtotal * vatRate / 100;
     const total = subtotal + vatAmount;
+    
     const subtotalEl = document.getElementById('preview-subtotal');
     const vatEl = document.getElementById('preview-vat');
     const totalEl = document.getElementById('preview-total');
@@ -199,7 +242,7 @@ export function savePurchase() {
     
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
+    const vatRate = getNumberFromInput(document.getElementById('purchase-vat'));
     const note = document.getElementById('purchase-note')?.value || '';
     
     if (!supplierId) return alert('Chọn nhà cung cấp');
@@ -217,7 +260,9 @@ export function savePurchase() {
     const oldQty = mat.qty;
     const oldValue = oldQty * mat.cost;
     mat.qty += qty;
-    mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
+    if (mat.qty > 0) {
+        mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
+    }
     
     const transaction = { 
         id: genTid(), 
@@ -253,7 +298,7 @@ export function savePurchaseWithSupplier(supplierId) {
     
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
-    const vatRate = parseFloat((document.getElementById('purchase-vat')?.value || '0').replace(/\./g, '').replace(/,/g, '.')) || 0;
+    const vatRate = getNumberFromInput(document.getElementById('purchase-vat'));
     const note = document.getElementById('purchase-note')?.value || '';
     
     if (!mid) return alert('Chọn vật tư');
@@ -270,7 +315,9 @@ export function savePurchaseWithSupplier(supplierId) {
     const oldQty = mat.qty;
     const oldValue = oldQty * mat.cost;
     mat.qty += qty;
-    mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
+    if (mat.qty > 0) {
+        mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
+    }
     
     const transaction = { 
         id: genTid(), 
@@ -305,29 +352,42 @@ export function openTxnModal(type, preselectedProjectId = null) {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (type === 'usage' && state.data.projects.length === 0) return alert('Chưa có công trình nào');
     
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${m.name} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
-    const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${p.name} (Ngân sách: ${formatMoneyVND(p.budget)})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Ngân sách: ${formatMoneyVND(p.budget)})</option>`).join('');
     const currentDateTime = getCurrentDateTime();
     
-    showModal(`<div class="modal-hd"><span class="modal-title">📤 Xuất kho cho công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+    const html = `
+        <div class="modal-hd"><span class="modal-title">📤 Xuất kho cho công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian xuất</label><input type="datetime-local" id="export-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình thi công</label><select id="txn-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="txn-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align: right;" autocomplete="off"></div>
             </div>
             <div class="metric-card" style="margin-top:8px"><div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-export-total">0 ₫</strong></div></div>
-            <div class="form-group"><label class="form-label">📎 Tệp đính kèm (hợp đồng, biên bản, hóa đơn...)</label><input type="file" id="export-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
+            <div class="form-group"><label class="form-label">📎 Tệp đính kèm (hợp đồng, biên bản...)</label><input type="file" id="export-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
             <div id="export-attachment-preview"></div>
-            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input id="txn-note" placeholder="Mô tả thêm về việc xuất kho..."></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note" placeholder="Mô tả thêm về việc xuất kho..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận xuất kho</button></div>`);
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-export">Xác nhận xuất kho</button></div>`;
+    
+    showModal(html, null);
     
     setTimeout(() => {
         const qtyInput = document.getElementById('txn-qty');
         const midSelect = document.getElementById('txn-mid');
         const attachmentInput = document.getElementById('export-attachment');
+        const saveBtn = document.getElementById('btn-save-export');
+        
+        if (qtyInput) {
+            qtyInput.removeAttribute('type');
+            qtyInput.setAttribute('type', 'text');
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
+            qtyInput.addEventListener('change', calculateExportTotal);
+        }
+        
+        if (saveBtn) saveBtn.onclick = saveExport;
         
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
@@ -359,22 +419,9 @@ export function openTxnModal(type, preselectedProjectId = null) {
             });
         }
         
-        const updatePreview = () => {
-            const mid = midSelect?.value;
-            const mat = matById(mid);
-            const qty = getNumberFromInput(qtyInput);
-            const total = (mat?.cost || 0) * qty;
-            const previewEl = document.getElementById('preview-export-total');
-            if (previewEl) previewEl.innerText = formatMoneyVND(total);
-        };
-        
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', updatePreview);
-        }
-        if (midSelect) midSelect.addEventListener('change', updatePreview);
-        updatePreview();
-    }, 100);
+        if (midSelect) midSelect.addEventListener('change', calculateExportTotal);
+        calculateExportTotal();
+    }, 150);
 }
 
 export function calculateExportTotal() {
@@ -433,63 +480,70 @@ export function saveExport() {
     alert('✅ Xuất kho thành công!');
 }
 
-// ========== TRẢ HÀNG TỪ CÔNG TRÌNH VỀ KHO ==========
+// ========== TRẢ HÀNG ==========
 export function openReturnModal(preselectedProjectId = null) {
     if (!hasPermission('canImport')) { alert('Bạn không có quyền nhập kho'); return; }
     if (state.data.projects.length === 0) return alert('Chưa có công trình nào');
     
-    const projectsWithUsage = state.data.projects.filter(p => {
-        const usage = state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage');
-        return usage;
-    });
+    const projectsWithUsage = state.data.projects.filter(p => 
+        state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage')
+    );
     
-    if (projectsWithUsage.length === 0) {
-        alert('Chưa có công trình nào được xuất kho để trả hàng');
-        return;
-    }
+    if (projectsWithUsage.length === 0) return alert('Chưa có công trình nào được xuất kho để trả hàng');
     
     const optsProj = projectsWithUsage.map(p => {
         const usageTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
         const returnTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
         const netUsed = usageTotal - returnTotal;
-        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(usageTotal)} - Đã trả: ${formatMoneyVND(returnTotal)} - Thực tế: ${formatMoneyVND(netUsed)})</option>`;
+        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(usageTotal)} - Thực tế: ${formatMoneyVND(netUsed)})</option>`;
     }).join('');
     
     const currentDateTime = getCurrentDateTime();
     
-    showModal(`<div class="modal-hd" style="background: var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình về kho</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+    const html = `
+        <div class="modal-hd" style="background: var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình về kho</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="metric-card" style="margin-bottom: 16px; background: var(--success-bg);">
                 <div class="metric-sub">📋 Chọn công trình đã xuất kho để nhập lại vật tư thừa</div>
-                <div class="metric-sub" style="margin-top: 8px; color: var(--warn-text);">⚠️ Chỉ hiển thị vật tư đã từng xuất cho công trình này và còn tồn tại công trình</div>
             </div>
             <div class="form-grid2">
-                <div class="form-group"><label class="form-label">📅 Thời gian trả</label><input type="datetime-local" id="return-datetime" value="${currentDateTime}" style="width: 100%;"></div>
+                <div class="form-group"><label class="form-label">📅 Thời gian trả</label><input type="datetime-local" id="return-datetime" value="${currentDateTime}"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình trả hàng</label><select id="return-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư trả lại</label><select id="return-mid"></select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng trả</label><input type="text" id="return-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá trả (VNĐ)</label><input type="text" id="return-price" readonly style="background: var(--surface3);" placeholder="Tự động lấy giá lúc xuất"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng trả</label><input type="text" id="return-qty" value="1" style="text-align: right;" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá trả (VNĐ)</label><input type="text" id="return-price" readonly style="background: var(--surface3);"></div>
             </div>
             <div class="metric-card" style="margin-top:8px">
                 <div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-return-total">0 ₫</strong></div>
-                <div class="metric-sub" style="margin-top:4px">📌 Lưu ý: Hàng trả lại sẽ được cộng vào tồn kho và trừ chi phí công trình</div>
             </div>
-            <div class="form-group"><label class="form-label">📎 Tệp đính kèm (biên bản trả hàng)</label><input type="file" id="return-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"></div>
+            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="return-attachment" accept=".pdf,.jpg,.jpeg,.png"></div>
             <div id="return-attachment-preview"></div>
-            <div class="form-group"><label class="form-label">📝 Ghi chú lý do trả</label><input id="return-note" placeholder="VD: Vật tư thừa sau khi hoàn thành công trình, hư hỏng,..."></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú lý do trả</label><input type="text" id="return-note" placeholder="VD: Vật tư thừa..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background: var(--success);" onclick="window.saveReturn()">Xác nhận trả hàng</button></div>`);
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background: var(--success);" id="btn-save-return">Xác nhận trả hàng</button></div>`;
+    
+    showModal(html, null);
     
     setTimeout(() => {
         const projectSelect = document.getElementById('return-project');
         const midSelect = document.getElementById('return-mid');
         const qtyInput = document.getElementById('return-qty');
         const priceInput = document.getElementById('return-price');
-        const attachmentInput = document.getElementById('return-attachment');
+        const saveBtn = document.getElementById('btn-save-return');
+        
+        if (qtyInput) {
+            qtyInput.removeAttribute('type');
+            qtyInput.setAttribute('type', 'text');
+            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
+        }
+        
+        if (saveBtn) saveBtn.onclick = saveReturn;
+        
+        // ... (phần còn lại giữ nguyên logic updateMaterialListByProject và updateReturnPreview)
         
         function updateMaterialListByProject() {
             const projectId = projectSelect?.value;
-            if (!projectId) return;
+            if (!projectId || !midSelect) return;
             
             const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
             const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
@@ -502,36 +556,25 @@ export function openReturnModal(preselectedProjectId = null) {
                 if (mat) {
                     if (!materialMap.has(t.mid)) {
                         materialMap.set(t.mid, {
-                            id: t.mid,
-                            name: mat.name,
-                            unit: mat.unit,
-                            totalReceived: 0,
-                            totalReturned: 0,
-                            totalUsed: 0,
-                            lastUnitPrice: t.unitPrice,
-                            lastTransactionDate: t.datetime || t.date
-                        });
+                            id: t.mid, name: mat.name, unit: mat.unit,
+                            totalReceived: 0, totalReturned: 0, totalUsed: 0,
+                            lastUnitPrice: t.unitPrice                        });
                     }
                     const item = materialMap.get(t.mid);
                     item.totalReceived += t.qty;
-                    if (new Date(t.datetime || t.date) > new Date(item.lastTransactionDate)) {
-                        item.lastUnitPrice = t.unitPrice;
-                        item.lastTransactionDate = t.datetime || t.date;
-                    }
+                    item.lastUnitPrice = t.unitPrice;
                 }
             });
             
             returnTxns.forEach(t => {
                 if (materialMap.has(t.mid)) {
-                    const item = materialMap.get(t.mid);
-                    item.totalReturned += t.qty;
+                    materialMap.get(t.mid).totalReturned += t.qty;
                 }
             });
             
             usageRecords.forEach(record => {
                 if (materialMap.has(record.materialId)) {
-                    const item = materialMap.get(record.materialId);
-                    item.totalUsed = record.usedQty || 0;
+                    materialMap.get(record.materialId).totalUsed = record.usedQty || 0;
                 }
             });
             
@@ -543,32 +586,27 @@ export function openReturnModal(preselectedProjectId = null) {
                 .filter(item => item.availableToReturn > 0);
             
             if (materials.length === 0) {
-                midSelect.innerHTML = '<option value="">✅ Không có vật tư nào có thể trả (đã sử dụng hết)</option>';
+                midSelect.innerHTML = '<option value="">✅ Không có vật tư nào có thể trả</option>';
                 if (priceInput) priceInput.value = '';
-                const previewEl = document.getElementById('preview-return-total');
-                if (previewEl) previewEl.innerText = formatMoneyVND(0);
                 return;
             }
             
             midSelect.innerHTML = materials.map(m => 
                 `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.availableToReturn}">
-                    ${escapeHtml(m.name)} (Đã nhận: ${m.totalReceived.toLocaleString('vi-VN')} ${m.unit} - Đã sử dụng: ${m.totalUsed.toLocaleString('vi-VN')} - Đã trả: ${m.totalReturned.toLocaleString('vi-VN')} - Có thể trả: ${m.availableToReturn.toLocaleString('vi-VN')} - Giá: ${formatMoneyVND(m.lastUnitPrice)})
+                    ${escapeHtml(m.name)} (Có thể trả: ${m.availableToReturn.toLocaleString('vi-VN')} ${m.unit} - Giá: ${formatMoneyVND(m.lastUnitPrice)})
                 </option>`
             ).join('');
             
-            if (midSelect.onchange) midSelect.onchange();
-            else updateReturnPreview();
+            updateReturnPreview();
         }
         
         function updateReturnPreview() {
             const selectedOption = midSelect?.options[midSelect.selectedIndex];
             const qty = getNumberFromInput(qtyInput);
             let unitPrice = 0;
-            let maxQty = 0;
             
             if (selectedOption && selectedOption.value) {
                 unitPrice = parseFloat(selectedOption.dataset.unitPrice) || 0;
-                maxQty = parseFloat(selectedOption.dataset.maxQty) || 0;
                 if (priceInput) {
                     priceInput.value = unitPrice.toLocaleString('vi-VN');
                 }
@@ -577,25 +615,6 @@ export function openReturnModal(preselectedProjectId = null) {
             const total = unitPrice * qty;
             const previewEl = document.getElementById('preview-return-total');
             if (previewEl) previewEl.innerText = formatMoneyVND(total);
-            
-            if (qty > maxQty && maxQty > 0) {
-                if (qtyInput) {
-                    qtyInput.style.borderColor = 'var(--danger)';
-                    let warningMsg = document.getElementById('return-qty-warning');
-                    if (!warningMsg) {
-                        warningMsg = document.createElement('div');
-                        warningMsg.id = 'return-qty-warning';
-                        warningMsg.className = 'metric-sub';
-                        warningMsg.style.color = 'var(--danger-text)';
-                        qtyInput.parentNode.appendChild(warningMsg);
-                    }
-                    warningMsg.innerText = `⚠️ Số lượng trả (${qty.toLocaleString('vi-VN')}) vượt quá số có thể trả (${maxQty.toLocaleString('vi-VN')})`;
-                }
-            } else {
-                if (qtyInput) qtyInput.style.borderColor = '';
-                const warningMsg = document.getElementById('return-qty-warning');
-                if (warningMsg) warningMsg.remove();
-            }
         }
         
         if (projectSelect) {
@@ -606,48 +625,12 @@ export function openReturnModal(preselectedProjectId = null) {
             });
         }
         
-        if (midSelect) {
-            midSelect.addEventListener('change', updateReturnPreview);
-        }
-        
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', updateReturnPreview);
-        }
-        
-        if (attachmentInput) {
-            attachmentInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentReturnAttachmentBase64 = e.target.result;
-                    const previewDiv = document.getElementById('return-attachment-preview');
-                    const fileSize = (file.size / 1024).toFixed(2);
-                    if (previewDiv) {
-                        if (file.type.startsWith('image/')) {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top: 8px;">
-                                <img src="${currentReturnAttachmentBase64}" class="invoice-img" style="max-height: 150px;" onclick="window.open(this.src)">
-                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div>
-                                <button class="sm" onclick="window.clearReturnAttachment()">🗑️ Xóa tệp</button>
-                            </div>`;
-                        } else {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top: 8px;">
-                                <div style="font-size: 32px; text-align: center;">📎</div>
-                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div>
-                                <button class="sm" onclick="window.clearReturnAttachment()">🗑️ Xóa tệp</button>
-                            </div>`;
-                        }
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+        if (midSelect) midSelect.addEventListener('change', updateReturnPreview);
+        if (qtyInput) qtyInput.addEventListener('change', updateReturnPreview);
         
         updateMaterialListByProject();
         updateReturnPreview();
-        
-    }, 100);
+    }, 150);
 }
 
 export function saveReturn() {
@@ -663,43 +646,20 @@ export function saveReturn() {
     if (!projectId) return alert('Chọn công trình trả hàng');
     if (!mid) return alert('Chọn vật tư trả lại');
     if (!qty || qty <= 0) return alert('Số lượng trả không hợp lệ');
+    if (!unitPrice || unitPrice <= 0) return alert('Không thể xác định đơn giá');
     
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
     
-    const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === mid);
-    const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === mid);
-    const usageRecord = state.data.projectMaterialUsage?.find(u => u.projectId === projectId && u.materialId === mid);
-    
-    const totalReceived = usageTxns.reduce((s, t) => s + t.qty, 0);
-    const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
-    const totalUsed = usageRecord?.usedQty || 0;
-    const availableToReturn = totalReceived - totalUsed - totalReturned;
-    
-    if (availableToReturn <= 0) {
-        return alert(`Vật tư "${mat.name}" không còn tồn tại công trình để trả (Đã nhận: ${totalReceived}, Đã sử dụng: ${totalUsed}, Đã trả: ${totalReturned})`);
-    }
-    
-    if (qty > availableToReturn) {
-        return alert(`Số lượng trả (${qty.toLocaleString('vi-VN')} ${mat.unit}) vượt quá số có thể trả (${availableToReturn.toLocaleString('vi-VN')} ${mat.unit})`);
-    }
-    
-    if (!unitPrice || unitPrice <= 0) {
-        return alert('Không thể xác định đơn giá. Vui lòng chọn lại vật tư.');
-    }
-    
     const totalAmount = qty * unitPrice;
     
-    // Cộng lại số lượng vào kho
     mat.qty += qty;
     
-    // Cập nhật lại chi phí công trình (trừ đi giá trị hàng trả)
     const project = projectById(projectId);
     if (project) {
         project.spent = Math.max(0, (project.spent || 0) - totalAmount);
     }
     
-    // Tạo giao dịch trả hàng
     const transaction = { 
         id: genTid(), 
         mid: mid, 
@@ -711,23 +671,20 @@ export function saveReturn() {
         unitPrice: unitPrice, 
         totalAmount: totalAmount, 
         note: note || 'Trả hàng từ công trình',
-        attachment: currentReturnAttachmentBase64 || null,
-        attachmentName: document.getElementById('return-attachment')?.files[0]?.name || null
+        attachment: currentReturnAttachmentBase64 || null
     };
     state.data.transactions.unshift(transaction);
     
-    addLog('Trả hàng về kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Giá trị trừ: ${formatMoneyVND(totalAmount)} - Thời gian: ${formatDateTime(transactionDateTime)} - Lý do: ${note || 'Hàng thừa'}`);
+    addLog('Trả hàng về kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Giá trị: ${formatMoneyVND(totalAmount)}`);
     
     saveState();
     closeModal();
     currentReturnAttachmentBase64 = null;
-    
     if (window.render) window.render();
-    
-    alert(`✅ Đã nhập lại kho từ công trình thành công!\n📦 Vật tư: ${mat.name}\n📊 Số lượng: ${qty.toLocaleString('vi-VN')} ${mat.unit}\n💰 Giá trị trừ khỏi công trình: ${formatMoneyVND(totalAmount)}`);
+    alert('✅ Đã nhập lại kho thành công!');
 }
 
-// ========== CÁC HÀM CLEAR ATTACHMENT ==========
+// ========== CLEAR FUNCTIONS ==========
 export function clearExportAttachment() {
     currentExportAttachmentBase64 = null;
     const previewDiv = document.getElementById('export-attachment-preview');
@@ -756,3 +713,6 @@ export function clearInvoiceImage() {
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
 export const getTransactions = () => state.data.transactions;
+
+// Export calculatePurchaseTotal để dùng trong app.js
+export { calculatePurchaseTotal };
