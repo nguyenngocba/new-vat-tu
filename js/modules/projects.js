@@ -1,3 +1,5 @@
+// Thay thế toàn bộ nội dung file projects.js với thuật ngữ đúng
+
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genPid, projectById, hasPermission } from './state.js';
 import { handleIntegerInput, formatMoneyVND, setupNumberInput } from './utils.js';
 
@@ -44,31 +46,32 @@ function getFilteredProjects() {
     }
     if (f.status !== '' && f.status !== 'all') {
         result = result.filter(p => {
-            const usageTotal = getProjectNetCost(p.id);
-            const remaining = p.budget - usageTotal;
+            const totalReceived = getProjectTotalReceived(p.id);
+            const remaining = p.budget - totalReceived;
             if (f.status === 'has_budget') return remaining > 0;
             if (f.status === 'out_of_budget') return remaining <= 0;
-            if (f.status === 'over_budget') return usageTotal > p.budget;
+            if (f.status === 'over_budget') return totalReceived > p.budget;
             return true;
         });
     }
     return result;
 }
 
-function getProjectNetCost(projectId) {
-    const usageTotal = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
+// Tổng giá trị đã nhận từ kho (sau khi đã trừ trả hàng)
+function getProjectTotalReceived(projectId) {
+    const receivedTotal = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
     const returnTotal = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
-    return usageTotal - returnTotal;
+    return receivedTotal - returnTotal;
 }
 
 function getMaterialUsageDetails(projectId) {
-    const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
+    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
     const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId) || [];
     
     const materialMap = new Map();
     
-    usageTxns.forEach(t => {
+    receiveTxns.forEach(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         if (mat) {
             if (!materialMap.has(t.mid)) {
@@ -122,11 +125,11 @@ export function openMaterialUsageModal(projectId, materialId) {
     const material = state.data.materials.find(m => m.id === materialId);
     if (!project || !material) return;
     
-    const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === materialId);
+    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === materialId);
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === materialId);
     const usageRecord = state.data.projectMaterialUsage?.find(u => u.projectId === projectId && u.materialId === materialId);
     
-    const totalReceived = usageTxns.reduce((s, t) => s + t.qty, 0);
+    const totalReceived = receiveTxns.reduce((s, t) => s + t.qty, 0);
     const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
     const totalUsed = usageRecord?.usedQty || 0;
     const remainingAtSite = totalReceived - totalUsed - totalReturned;
@@ -150,7 +153,7 @@ export function openMaterialUsageModal(projectId, materialId) {
                 <div class="metric-card">
                     <div class="metric-label">📥 Đã nhận từ kho</div>
                     <div class="metric-val" style="font-size: 20px; color: var(--accent);">${totalReceived.toLocaleString('vi-VN')} ${material.unit}</div>
-                    <div class="metric-sub">Số lượng đã xuất sang công trình</div>
+                    <div class="metric-sub">Số lượng đã chuyển đến công trình</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">✅ Đã sử dụng thực tế</div>
@@ -193,18 +196,18 @@ export function openMaterialUsageModal(projectId, materialId) {
                 </div>
             </div>
             
-            <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT/NHẬP/SỬ DỤNG</div>
+            <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ NHẬN/TRẢ/SỬ DỤNG</div>
             <div class="tbl-wrap">
                 <table style="min-width: 600px;">
                     <thead>
                         <tr><th>Thời gian</th><th>Loại</th><th>Số lượng</th><th>Ghi chú</th></tr>
                     </thead>
                     <tbody>
-                        ${[...usageTxns, ...returnTxns, ...(usageRecord?.history || [])].sort((a, b) => new Date(b.datetime || b.date || b.lastUpdated) - new Date(a.datetime || a.date || a.lastUpdated)).slice(0, 20).map(t => {
+                        ${[...receiveTxns, ...returnTxns, ...(usageRecord?.history || [])].sort((a, b) => new Date(b.datetime || b.date || b.lastUpdated) - new Date(a.datetime || a.date || a.lastUpdated)).slice(0, 20).map(t => {
                             if (t.type === 'usage') {
                                 return `<tr>
                                     <td>${formatDateTime(t.datetime || t.date)}</td>
-                                    <td>📤 Xuất kho</td>
+                                    <td>📥 Nhận từ kho</td>
                                     <td>${t.qty.toLocaleString('vi-VN')} ${material.unit}</td>
                                     <td>${escapeHtml(t.note || '—')}</td>
                                 </tr>`;
@@ -225,7 +228,7 @@ export function openMaterialUsageModal(projectId, materialId) {
                                 </tr>`;
                             }
                         }).join('')}
-                        ${usageTxns.length === 0 && returnTxns.length === 0 && (!usageRecord?.history || usageRecord.history.length === 0) ? '<tr><td colspan="4" style="text-align: center;">Chưa có dữ liệu</td></tr>' : ''}
+                        ${receiveTxns.length === 0 && returnTxns.length === 0 && (!usageRecord?.history || usageRecord.history.length === 0) ? '<tr><td colspan="4" style="text-align: center;">Chưa có dữ liệu</td>' : ''}
                     </tbody>
                 </table>
             </div>
@@ -264,7 +267,7 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
         return;
     }
     
-    const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === materialId);
+    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === materialId);
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === materialId);
     const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
     
@@ -355,7 +358,7 @@ function renderProjectHistory() {
         .slice(0, 50);
     
     if (transactions.length === 0) {
-        return '<tr><td colspan="7" style="text-align: center;">📭 Chưa có dữ liệu xuất/nhập cho công trình nào</td></tr>';
+        return '<tr><td colspan="7" style="text-align: center;">📭 Chưa có dữ liệu nhận/trả cho công trình nào</td>' + '</tr>';
     }
     
     return transactions.map(t => {
@@ -364,8 +367,8 @@ function renderProjectHistory() {
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
         const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
         const isReturn = t.type === 'return';
-        const typeIcon = isReturn ? '🔄 Trả về' : '📤 Xuất đi';
-        const typeColor = isReturn ? 'var(--success-text)' : 'var(--warn-text)';
+        const typeIcon = isReturn ? '🔄 Trả kho' : '📥 Nhận từ kho';
+        const typeColor = isReturn ? 'var(--success-text)' : 'var(--accent)';
         const amountDisplay = isReturn ? `- ${formatMoneyVND(t.totalAmount)}` : formatMoneyVND(t.totalAmount);
         const amountClass = isReturn ? 'text-success' : 'text-warning';
         
@@ -386,20 +389,20 @@ function updateProjectListDisplay() {
     const filtered = getFilteredProjects();
     
     const projectStats = filtered.map(p => {
-        const usageTxns = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage');
+        const receiveTxns = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage');
         const returnTxns = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return');
         
-        const totalUsage = usageTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
+        const totalReceived = receiveTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
         const totalReturn = returnTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
-        const netCost = totalUsage - totalReturn;
+        const netCost = totalReceived - totalReturn;
         
-        const items = usageTxns.length;
+        const items = receiveTxns.length;
         const percent = p.budget > 0 ? (netCost / p.budget) * 100 : 0;
         const remaining = p.budget - netCost;
         
         p.spent = netCost;
         
-        return { ...p, netCost, totalUsage, totalReturn, items, percent, remaining };
+        return { ...p, netCost, totalReceived, totalReturn, items, percent, remaining };
     });
     
     projectListContainer.innerHTML = `
@@ -415,7 +418,7 @@ function updateProjectListDisplay() {
                     <div class="metric-sub">📊 Còn lại: ${formatMoneyVND(p.remaining)}</div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, p.percent)}%;background:${p.percent > 90 ? '#A32D2D' : '#378ADD'}"></div></div>
                     <div class="metric-sub" style="margin-top:6px">${p.percent.toFixed(1)}% ngân sách đã sử dụng</div>
-                    <div class="metric-sub" style="margin-top:4px">📦 Xuất: ${p.items} lượt</div>
+                    <div class="metric-sub" style="margin-top:4px">📦 Lượt nhận: ${p.items}</div>
                     ${p.totalReturn > 0 ? `<div class="metric-sub" style="color: var(--success-text);">🔄 Đã trả: ${formatMoneyVND(p.totalReturn)}</div>` : ''}
                     ${hasPermission('canDeleteProject') ? `<button class="sm danger-btn" style="margin-top:12px" onclick="event.stopPropagation(); window.deleteProjectHandler('${p.id}')">🗑️ Xóa công trình</button>` : ''}
                 </div>
@@ -553,16 +556,16 @@ export function showProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
     
-    const usageTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+    const receiveTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const returnTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     
-    const totalUsage = usageTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const totalReceived = receiveTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
     const totalReturn = returnTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-    const totalSpent = totalUsage - totalReturn;
+    const totalSpent = totalReceived - totalReturn;
     const remaining = project.budget - totalSpent;
     const percentUsed = project.budget > 0 ? (totalSpent / project.budget) * 100 : 0;
     
-    const allTransactions = [...usageTransactions, ...returnTransactions].sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+    const allTransactions = [...receiveTransactions, ...returnTransactions].sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     const materialUsageDetails = getMaterialUsageDetails(projectId);
     
     const modalContent = `
@@ -574,15 +577,15 @@ export function showProjectDetail(projectId) {
             <div class="grid2" style="margin-bottom: 20px;">
                 <div class="metric-card"><div class="metric-label">📋 MÃ CÔNG TRÌNH</div><div class="metric-val" style="font-size: 18px;">${project.id}</div></div>
                 <div class="metric-card"><div class="metric-label">💰 NGÂN SÁCH</div><div class="metric-val" style="font-size: 18px; color: var(--accent);">${formatMoneyVND(project.budget)}</div></div>
-                <div class="metric-card"><div class="metric-label">📤 ĐÃ XUẤT</div><div class="metric-val" style="font-size: 18px; color: var(--warn-text);">${formatMoneyVND(totalUsage)}</div></div>
-                <div class="metric-card"><div class="metric-label">🔄 ĐÃ TRẢ</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(totalReturn)}</div></div>
-                <div class="metric-card"><div class="metric-label">💸 CHI PHÍ THỰC TẾ</div><div class="metric-val" style="font-size: 18px;">${formatMoneyVND(totalSpent)}</div></div>
+                <div class="metric-card"><div class="metric-label">📥 ĐÃ NHẬN TỪ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--warn-text);">${formatMoneyVND(totalReceived)}</div></div>
+                <div class="metric-card"><div class="metric-label">🔄 ĐÃ TRẢ KHO</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(totalReturn)}</div></div>
+                <div class="metric-card"><div class="metric-label">💸 GIÁ TRỊ ĐÃ SỬ DỤNG</div><div class="metric-val" style="font-size: 18px;">${formatMoneyVND(totalSpent)}</div></div>
                 <div class="metric-card"><div class="metric-label">📊 CÒN LẠI</div><div class="metric-val" style="font-size: 18px; color: var(--success-text);">${formatMoneyVND(remaining)}</div></div>
             </div>
             <div class="metric-card" style="margin-bottom: 20px;">
                 <div class="metric-label">📈 TIẾN ĐỘ SỬ DỤNG NGÂN SÁCH</div>
                 <div class="progress-bar" style="height: 12px;"><div class="progress-fill" style="width: ${Math.min(100, percentUsed)}%; background: ${percentUsed > 90 ? '#A32D2D' : percentUsed > 70 ? '#BA7517' : '#378ADD'};"></div></div>
-                <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${percentUsed.toFixed(1)}% đã sử dụng (${usageTransactions.length} lượt xuất, ${returnTransactions.length} lượt trả)</div>
+                <div class="metric-sub" style="margin-top: 8px; text-align: center; font-size: 14px; font-weight: bold;">${percentUsed.toFixed(1)}% đã sử dụng (${receiveTransactions.length} lượt nhận, ${returnTransactions.length} lượt trả)</div>
             </div>
             
             <div class="sec-title">📦 THỐNG KÊ VẬT TƯ - NHẬN/SỬ DỤNG/TRẢ</div>
@@ -614,12 +617,12 @@ export function showProjectDetail(projectId) {
                                 </td>
                             </tr>`;
                         }).join('')}
-                        ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được xuất cho công trình</td>' : ''}
+                        ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được nhận cho công trình}' : ''}
                     </tbody>
                 </table>
             </div>
             
-            <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT/TRẢ CHI TIẾT</div>
+            <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ NHẬN/TRẢ CHI TIẾT</div>
             <div class="tbl-wrap">
                 <table style="min-width: 900px;">
                     <thead>
@@ -639,8 +642,8 @@ export function showProjectDetail(projectId) {
                             const mat = state.data.materials.find(m => m.id === t.mid);
                             const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
                             const isReturn = t.type === 'return';
-                            const typeIcon = isReturn ? '🔄 Trả hàng' : '📤 Xuất kho';
-                            const typeColor = isReturn ? 'var(--success-text)' : 'var(--warn-text)';
+                            const typeIcon = isReturn ? '🔄 Trả kho' : '📥 Nhận từ kho';
+                            const typeColor = isReturn ? 'var(--success-text)' : 'var(--accent)';
                             const attachmentHtml = t.attachment ? `<a href="${t.attachment}" target="_blank" style="color: var(--accent);">📎 Xem</a>` : (t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—');
                             const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
                             return `<tr>
@@ -665,8 +668,8 @@ export function showProjectDetail(projectId) {
         </div>
         <div class="modal-ft">
             <button onclick="closeModal()">Đóng</button>
-            ${hasPermission('canExport') ? `<button class="primary" onclick="closeModal(); window.openTxnModal('usage', '${projectId}')">📤 Xuất kho cho công trình này</button>` : ''}
-            ${hasPermission('canImport') ? `<button class="primary" style="background: var(--success);" onclick="closeModal(); window.openReturnModal('${projectId}')">🔄 Trả hàng từ công trình này</button>` : ''}
+            ${hasPermission('canExport') ? `<button class="primary" onclick="closeModal(); window.openTxnModal('usage', '${projectId}')">📥 Nhận hàng từ kho</button>` : ''}
+            ${hasPermission('canImport') ? `<button class="primary" style="background: var(--success);" onclick="closeModal(); window.openReturnModal('${projectId}')">🔄 Trả hàng về kho</button>` : ''}
         </div>
     `;
     showModal(modalContent, null);
@@ -675,11 +678,11 @@ export function showProjectDetail(projectId) {
 export function exportProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
-    const usageTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
+    const receiveTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
     const returnTransactions = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
-    const totalUsage = usageTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const totalReceived = receiveTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
     const totalReturn = returnTransactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-    const totalSpent = totalUsage - totalReturn;
+    const totalSpent = totalReceived - totalReturn;
     const remaining = project.budget - totalSpent;
     
     const materialUsageDetails = getMaterialUsageDetails(projectId);
@@ -688,9 +691,9 @@ export function exportProjectDetail(projectId) {
         { 'Thông tin': 'Tên công trình', 'Giá trị': project.name },
         { 'Thông tin': 'Mã công trình', 'Giá trị': project.id },
         { 'Thông tin': 'Ngân sách', 'Giá trị': formatMoneyVND(project.budget) },
-        { 'Thông tin': 'Đã xuất', 'Giá trị': formatMoneyVND(totalUsage) },
-        { 'Thông tin': 'Đã trả', 'Giá trị': formatMoneyVND(totalReturn) },
-        { 'Thông tin': 'Chi phí thực tế', 'Giá trị': formatMoneyVND(totalSpent) },
+        { 'Thông tin': 'Đã nhận từ kho', 'Giá trị': formatMoneyVND(totalReceived) },
+        { 'Thông tin': 'Đã trả kho', 'Giá trị': formatMoneyVND(totalReturn) },
+        { 'Thông tin': 'Giá trị đã sử dụng', 'Giá trị': formatMoneyVND(totalSpent) },
         { 'Thông tin': 'Còn lại', 'Giá trị': formatMoneyVND(remaining) }
     ];
     
@@ -704,12 +707,12 @@ export function exportProjectDetail(projectId) {
         'Tỷ lệ sử dụng': `${item.usagePercentage.toFixed(1)}%`
     }));
     
-    const detailData = [...usageTransactions, ...returnTransactions].map(t => {
+    const detailData = [...receiveTransactions, ...returnTransactions].map(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         const displayDateTime = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN') : t.date;
         return { 
             'Thời gian': displayDateTime,
-            'Loại giao dịch': t.type === 'usage' ? 'Xuất kho' : 'Trả hàng',
+            'Loại giao dịch': t.type === 'usage' ? 'Nhận từ kho' : 'Trả kho',
             'Mã vật tư': t.mid,
             'Tên vật tư': mat?.name || 'N/A',
             'Số lượng': t.qty,
@@ -733,18 +736,18 @@ export function exportProjectDetail(projectId) {
 
 export function exportAllProjectsReport() {
     const projects = state.data.projects.map(p => {
-        const usageTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
+        const receiveTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
         const returnTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
-        const netSpent = usageTotal - returnTotal;
+        const netSpent = receiveTotal - returnTotal;
         const remaining = p.budget - netSpent;
         const percent = p.budget > 0 ? (netSpent / p.budget) * 100 : 0;
         return { 
             'Mã công trình': p.id, 
             'Tên công trình': p.name, 
             'Ngân sách (VNĐ)': p.budget, 
-            'Đã xuất (VNĐ)': usageTotal, 
+            'Đã nhận (VNĐ)': receiveTotal, 
             'Đã trả (VNĐ)': returnTotal,
-            'Chi phí thực tế (VNĐ)': netSpent, 
+            'Đã sử dụng (VNĐ)': netSpent, 
             'Còn lại (VNĐ)': remaining, 
             '% sử dụng': percent.toFixed(1)
         };
@@ -772,7 +775,7 @@ export function renderProjects() {
             </div>
             <div class="resizable-panel" id="projects-history-panel">
                 <div class="panel-header">
-                    <div class="sec-title">📜 LỊCH SỬ XUẤT/TRẢ CHI TIẾT</div>
+                    <div class="sec-title">📜 LỊCH SỬ NHẬN/TRẢ CHI TIẾT</div>
                     <span class="resize-icon">⤥ Kéo để điều chỉnh</span>
                 </div>
                 <div class="panel-content" style="max-height: 300px; overflow-y: auto;">
