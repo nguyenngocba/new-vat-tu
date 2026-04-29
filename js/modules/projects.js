@@ -53,13 +53,14 @@ function renderProjectHistory() {
         const mat = state.data.materials.find(m => m.id === t.mid);
         const proj = projectById(t.projectId);
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
+        const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
         return `<tr>
-            <td><strong>${proj?.name || 'N/A'}</strong></td>
-            <td>${mat?.name || 'N/A'}</td>
-            <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
-            <td>${formatMoneyVND(t.unitPrice || mat?.cost || 0)}</td>
-            <td class="text-warning">${formatMoneyVND(t.totalAmount || 0)}</td>
-            <td>${displayDateTime}</td>
+            <td style="white-space: nowrap;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
+            <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
+            <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
+            <td style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.unitPrice || mat?.cost || 0)}</td>
+            <td style="text-align: right; white-space: nowrap;" class="text-warning">${formatMoneyVND(t.totalAmount || 0)}</td>
+            <td style="white-space: nowrap;">${displayDateTime}</td>
         </tr>`;
     }).join('');
 }
@@ -272,15 +273,16 @@ export function showProjectDetail(projectId) {
                 }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có vật tư nào được xuất</div></div>'}
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT KHO CHI TIẾT</div>
-            <div class="tbl-wrap"><table style="min-width: 700px;"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th><th>Tệp đính kèm</th></tr></thead>
+            <div class="tbl-wrap"><table style="min-width: 700px; width: 100%;"><thead><tr><th>Ngày giờ</th><th>Vật tư</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th><th>Tệp đính kèm</th></tr></thead>
             <tbody>${transactions.map(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
                 const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
                 const attachmentHtml = t.attachment ? `<a href="${t.attachment}" target="_blank" style="color: var(--accent);">📎 Xem tệp</a>` : (t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Hóa đơn</a>` : '—');
+                const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
                 return `<tr>
                     <td>${displayDateTime}</td>
                     <td><strong>${mat?.name || 'N/A'}</strong></td>
-                    <td>${t.qty.toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
+                    <td>${displayQty} ${mat?.unit || ''}</td>
                     <td>${formatMoneyVND(t.unitPrice)}</td>
                     <td class="text-warning">${formatMoneyVND(t.totalAmount)}</td>
                     <td>${escapeHtml(t.note || '—')}</td>
@@ -359,7 +361,8 @@ export function exportAllProjectsReport() {
 }
 
 export function renderProjects() {
-    const result = `<div class="card">
+    const result = renderProjectSearchBar() + `
+    <div class="card">
         <div class="resizable-container" id="projects-resizable-container">
             <div class="resizable-panel" id="projects-list-panel">
                 <div class="panel-header">

@@ -7,6 +7,7 @@ let supplierChart = null;
 let categoryChart = null;
 let monthlyChart = null;
 let currentDashboardFilter = '';
+let searchTimeout = null;
 
 export function checkAutoBackup() {
     const lastBackupKey = 'steeltrack_last_backup_date';
@@ -190,7 +191,7 @@ export function renderDashboard() {
                 ${topMaterials.length > 0 ? `
                     <div class="tbl-wrap">
                         <table style="width: 100%;">
-                            <thead><tr><th>#</th><th>Tên vật tư</th><th>Số lượng nhập</th><tr></thead>
+                            <thead><tr><th>#</th><th>Tên vật tư</th><th>Số lượng nhập</th></tr></thead>
                             <tbody>
                                 ${topMaterials.map((m, idx) => `
                                     <tr>
@@ -323,22 +324,87 @@ export function bindDashboardSearchEvents() {
     const clearBtn = document.getElementById('dashboard-clear-search');
     
     if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            currentDashboardFilter = e.target.value;
-            const dashboardPane = document.getElementById('pane-dashboard');
-            if (dashboardPane) {
-                dashboardPane.innerHTML = renderDashboard();
-                setTimeout(() => {
+        // Xóa event cũ nếu có
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+        
+        newSearchInput.addEventListener('input', (e) => {
+            // Clear timeout cũ
+            if (searchTimeout) clearTimeout(searchTimeout);
+            
+            // Delay 300ms để tránh re-render liên tục
+            searchTimeout = setTimeout(() => {
+                currentDashboardFilter = e.target.value;
+                // Cập nhật lại dashboard mà không render lại toàn bộ
+                const dashboardPane = document.getElementById('pane-dashboard');
+                if (dashboardPane) {
+                    // Cập nhật lại biểu đồ
                     renderDashboardChart();
-                    bindDashboardSearchEvents();
-                }, 50);
-            }
+                    // Cập nhật các số liệu
+                    const filteredMaterials = getFilteredMaterials();
+                    const totalVal = filteredMaterials.reduce((s, m) => s + (m.qty * m.cost), 0);
+                    
+                    // Cập nhật các metric card
+                    const metricCards = dashboardPane.querySelectorAll('.grid4 .metric-card');
+                    if (metricCards.length >= 4) {
+                        metricCards[0].querySelector('.metric-val').innerText = formatMoneyVND(totalVal);
+                        metricCards[1].querySelector('.metric-val').innerText = filteredMaterials.length;
+                    }
+                    
+                    // Cập nhật top 10
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    let recentImports = state.data.transactions.filter(t => t.type === 'purchase' && new Date(t.datetime || t.date) >= thirtyDaysAgo);
+                    if (currentDashboardFilter) {
+                        const keyword = currentDashboardFilter.toLowerCase();
+                        recentImports = recentImports.filter(t => {
+                            const mat = state.data.materials.find(m => m.id === t.mid);
+                            return mat && mat.name.toLowerCase().includes(keyword);
+                        });
+                    }
+                    const materialImportStats = {};
+                    recentImports.forEach(t => {
+                        if (!materialImportStats[t.mid]) materialImportStats[t.mid] = { qty: 0, name: '' };
+                        materialImportStats[t.mid].qty += t.qty;
+                        const mat = state.data.materials.find(m => m.id === t.mid);
+                        if (mat) materialImportStats[t.mid].name = mat.name;
+                    });
+                    const topMaterials = Object.entries(materialImportStats)
+                        .map(([id, data]) => ({ id, name: data.name, qty: data.qty }))
+                        .sort((a, b) => b.qty - a.qty)
+                        .slice(0, 10);
+                    
+                    const top10Container = dashboardPane.querySelector('.grid2 .card:first-child .tbl-wrap');
+                    if (top10Container && topMaterials.length > 0) {
+                        top10Container.innerHTML = `
+                            <table style="width: 100%;">
+                                <thead><tr><th>#</th><th>Tên vật tư</th><th>Số lượng nhập</th></tr></thead>
+                                <tbody>
+                                    ${topMaterials.map((m, idx) => `
+                                        <tr>
+                                            <td>${idx + 1}</td>
+                                            <td><strong>${escapeHtml(m.name)}</strong></td>
+                                            <td>${m.qty.toLocaleString('vi-VN')}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else if (top10Container) {
+                        top10Container.innerHTML = '<div class="metric-sub">Chưa có dữ liệu nhập trong 30 ngày qua</div>';
+                    }
+                }
+            }, 300);
         });
     }
     
     if (clearBtn) {
-        clearBtn.onclick = () => {
-            if (searchInput) searchInput.value = '';
+        const newClearBtn = clearBtn.cloneNode(true);
+        clearBtn.parentNode.replaceChild(newClearBtn, clearBtn);
+        
+        newClearBtn.onclick = () => {
+            const searchInputEl = document.getElementById('dashboard-search');
+            if (searchInputEl) searchInputEl.value = '';
             currentDashboardFilter = '';
             const dashboardPane = document.getElementById('pane-dashboard');
             if (dashboardPane) {
