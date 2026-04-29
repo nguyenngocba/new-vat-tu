@@ -432,7 +432,6 @@ export function saveExport() {
 // ========== TRẢ HÀNG TỪ CÔNG TRÌNH VỀ KHO ==========
 export function openReturnModal(preselectedProjectId = null) {
     if (!hasPermission('canImport')) { alert('Bạn không có quyền nhập kho'); return; }
-    if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (state.data.projects.length === 0) return alert('Chưa có công trình nào');
     
     // Lọc các công trình đã có xuất kho
@@ -446,25 +445,31 @@ export function openReturnModal(preselectedProjectId = null) {
         return;
     }
     
-    const optsProj = projectsWithUsage.map(p => `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${p.name} (Đã xuất: ${formatMoneyVND(state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0))})</option>`).join('');
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${m.name} (Tồn kho hiện tại: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsProj = projectsWithUsage.map(p => {
+        const totalUsed = state.data.transactions
+            .filter(t => t.projectId === p.id && t.type === 'usage')
+            .reduce((s, t) => s + (t.totalAmount || 0), 0);
+        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(totalUsed)})</option>`;
+    }).join('');
+    
     const currentDateTime = getCurrentDateTime();
     
     showModal(`<div class="modal-hd" style="background: var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình về kho</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="metric-card" style="margin-bottom: 16px; background: var(--success-bg);">
                 <div class="metric-sub">📋 Chọn công trình đã xuất kho để nhập lại vật tư thừa</div>
+                <div class="metric-sub" style="margin-top: 8px; color: var(--warn-text);">⚠️ Chỉ hiển thị vật tư đã từng xuất cho công trình này</div>
             </div>
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian trả</label><input type="datetime-local" id="return-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình trả hàng</label><select id="return-project">${optsProj}</select></div>
-                <div class="form-group"><label class="form-label">📦 Vật tư trả lại</label><select id="return-mid">${optsMat}</select></div>
+                <div class="form-group"><label class="form-label">📦 Vật tư trả lại</label><select id="return-mid"></select></div>
                 <div class="form-group"><label class="form-label">🔢 Số lượng trả</label><input type="text" id="return-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá trả (VNĐ)</label><input type="text" id="return-price" placeholder="Để trống sẽ lấy giá gốc" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá trả (VNĐ)</label><input type="text" id="return-price" readonly style="background: var(--surface3);" placeholder="Tự động lấy giá lúc xuất"></div>
             </div>
             <div class="metric-card" style="margin-top:8px">
                 <div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-return-total">0 ₫</strong></div>
-                <div class="metric-sub" style="margin-top:4px">📌 Lưu ý: Hàng trả lại sẽ được cộng vào tồn kho</div>
+                <div class="metric-sub" style="margin-top:4px">📌 Lưu ý: Hàng trả lại sẽ được cộng vào tồn kho và trừ chi phí công trình</div>
             </div>
             <div class="form-group"><label class="form-label">📎 Tệp đính kèm (biên bản trả hàng)</label><input type="file" id="return-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"></div>
             <div id="return-attachment-preview"></div>
@@ -473,11 +478,117 @@ export function openReturnModal(preselectedProjectId = null) {
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background: var(--success);" onclick="window.saveReturn()">Xác nhận trả hàng</button></div>`);
     
     setTimeout(() => {
+        const projectSelect = document.getElementById('return-project');
+        const midSelect = document.getElementById('return-mid');
         const qtyInput = document.getElementById('return-qty');
         const priceInput = document.getElementById('return-price');
-        const midSelect = document.getElementById('return-mid');
-        const projectSelect = document.getElementById('return-project');
         const attachmentInput = document.getElementById('return-attachment');
+        
+        // Hàm cập nhật danh sách vật tư dựa trên công trình đã chọn
+        function updateMaterialListByProject() {
+            const projectId = projectSelect?.value;
+            if (!projectId) return;
+            
+            // Lấy danh sách vật tư đã xuất cho công trình này
+            const projectTransactions = state.data.transactions.filter(t => 
+                t.projectId === projectId && t.type === 'usage'
+            );
+            
+            // Gom nhóm theo vật tư, tính tổng số lượng đã xuất và giá gần nhất
+            const materialMap = new Map();
+            projectTransactions.forEach(t => {
+                const mat = state.data.materials.find(m => m.id === t.mid);
+                if (mat) {
+                    if (!materialMap.has(t.mid)) {
+                        materialMap.set(t.mid, {
+                            id: t.mid,
+                            name: mat.name,
+                            unit: mat.unit,
+                            totalExported: 0,
+                            lastUnitPrice: t.unitPrice,
+                            lastTransactionDate: t.datetime || t.date
+                        });
+                    }
+                    const item = materialMap.get(t.mid);
+                    item.totalExported += t.qty;
+                    if (new Date(t.datetime || t.date) > new Date(item.lastTransactionDate)) {
+                        item.lastUnitPrice = t.unitPrice;
+                        item.lastTransactionDate = t.datetime || t.date;
+                    }
+                }
+            });
+            
+            const materials = Array.from(materialMap.values()).filter(m => m.totalExported > 0);
+            
+            if (materials.length === 0) {
+                midSelect.innerHTML = '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
+                return;
+            }
+            
+            midSelect.innerHTML = materials.map(m => 
+                `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.totalExported}">
+                    ${escapeHtml(m.name)} (Đã xuất: ${m.totalExported.toLocaleString('vi-VN')} ${m.unit} - Giá xuất cuối: ${formatMoneyVND(m.lastUnitPrice)})
+                </option>`
+            ).join('');
+            
+            if (midSelect.onchange) midSelect.onchange();
+            else updateReturnPreview();
+        }
+        
+        // Hàm cập nhật preview
+        function updateReturnPreview() {
+            const selectedOption = midSelect?.options[midSelect.selectedIndex];
+            const qty = getNumberFromInput(qtyInput);
+            let unitPrice = 0;
+            let maxQty = 0;
+            
+            if (selectedOption && selectedOption.value) {
+                unitPrice = parseFloat(selectedOption.dataset.unitPrice) || 0;
+                maxQty = parseFloat(selectedOption.dataset.maxQty) || 0;
+                if (priceInput) priceInput.value = unitPrice.toLocaleString('vi-VN');
+            }
+            
+            const total = unitPrice * qty;
+            const previewEl = document.getElementById('preview-return-total');
+            if (previewEl) previewEl.innerText = formatMoneyVND(total);
+            
+            if (qty > maxQty && maxQty > 0) {
+                if (qtyInput) {
+                    qtyInput.style.borderColor = 'var(--danger)';
+                    let warningMsg = document.getElementById('return-qty-warning');
+                    if (!warningMsg) {
+                        warningMsg = document.createElement('div');
+                        warningMsg.id = 'return-qty-warning';
+                        warningMsg.className = 'metric-sub';
+                        warningMsg.style.color = 'var(--danger-text)';
+                        qtyInput.parentNode.appendChild(warningMsg);
+                    }
+                    warningMsg.innerText = `⚠️ Số lượng trả (${qty.toLocaleString('vi-VN')}) vượt quá số đã xuất (${maxQty.toLocaleString('vi-VN')})`;
+                }
+            } else {
+                if (qtyInput) qtyInput.style.borderColor = '';
+                const warningMsg = document.getElementById('return-qty-warning');
+                if (warningMsg) warningMsg.remove();
+            }
+        }
+        
+        if (projectSelect) {
+            projectSelect.addEventListener('change', () => {
+                updateMaterialListByProject();
+                if (qtyInput) qtyInput.value = '1';
+                updateReturnPreview();
+            });
+        }
+        
+        if (midSelect) {
+            midSelect.addEventListener('change', updateReturnPreview);
+        }
+        
+        if (qtyInput) {
+            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
+            qtyInput.addEventListener('input', updateReturnPreview);
+            qtyInput.addEventListener('change', updateReturnPreview);
+        }
         
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
@@ -488,18 +599,17 @@ export function openReturnModal(preselectedProjectId = null) {
                     currentReturnAttachmentBase64 = e.target.result;
                     const previewDiv = document.getElementById('return-attachment-preview');
                     const fileSize = (file.size / 1024).toFixed(2);
-                    const fileType = file.type.split('/')[1]?.toUpperCase() || file.name.split('.').pop().toUpperCase();
                     if (previewDiv) {
                         if (file.type.startsWith('image/')) {
                             previewDiv.innerHTML = `<div class="metric-card" style="margin-top: 8px;">
                                 <img src="${currentReturnAttachmentBase64}" class="invoice-img" style="max-height: 150px;" onclick="window.open(this.src)">
-                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB) - ${fileType}</div>
+                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div>
                                 <button class="sm" onclick="window.clearReturnAttachment()">🗑️ Xóa tệp</button>
                             </div>`;
                         } else {
                             previewDiv.innerHTML = `<div class="metric-card" style="margin-top: 8px;">
                                 <div style="font-size: 32px; text-align: center;">📎</div>
-                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB) - ${fileType}</div>
+                                <div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div>
                                 <button class="sm" onclick="window.clearReturnAttachment()">🗑️ Xóa tệp</button>
                             </div>`;
                         }
@@ -509,31 +619,9 @@ export function openReturnModal(preselectedProjectId = null) {
             });
         }
         
-        const updatePreview = () => {
-            const mid = midSelect?.value;
-            const mat = matById(mid);
-            const qty = getNumberFromInput(qtyInput);
-            let unitPrice = getNumberFromInput(priceInput);
-            if (!unitPrice || unitPrice <= 0) {
-                unitPrice = mat?.cost || 0;
-                if (priceInput) priceInput.value = unitPrice.toLocaleString('vi-VN');
-            }
-            const total = (unitPrice || 0) * qty;
-            const previewEl = document.getElementById('preview-return-total');
-            if (previewEl) previewEl.innerText = formatMoneyVND(total);
-        };
+        updateMaterialListByProject();
+        updateReturnPreview();
         
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: null });
-            qtyInput.addEventListener('change', updatePreview);
-        }
-        if (priceInput) {
-            setupNumberInput(priceInput, { isInteger: true, decimals: 0 });
-            priceInput.addEventListener('change', updatePreview);
-        }
-        if (midSelect) midSelect.addEventListener('change', updatePreview);
-        
-        updatePreview();
     }, 100);
 }
 
@@ -544,7 +632,7 @@ export function saveReturn() {
     const transactionDateTime = datetimeInput ? datetimeInput.value : getCurrentDateTime();
     
     const qty = getNumberFromInput(document.getElementById('return-qty'));
-    let unitPrice = getNumberFromInput(document.getElementById('return-price'));
+    const unitPrice = getNumberFromInput(document.getElementById('return-price'));
     const note = document.getElementById('return-note')?.value || '';
     
     if (!projectId) return alert('Chọn công trình trả hàng');
@@ -554,17 +642,28 @@ export function saveReturn() {
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
     
-    // Nếu không nhập đơn giá, lấy giá gốc hiện tại
+    const projectTransactions = state.data.transactions.filter(t => 
+        t.projectId === projectId && t.type === 'usage' && t.mid === mid
+    );
+    
+    const totalExported = projectTransactions.reduce((sum, t) => sum + t.qty, 0);
+    
+    if (totalExported === 0) {
+        return alert(`Vật tư "${mat.name}" chưa từng được xuất cho công trình này!`);
+    }
+    
+    if (qty > totalExported) {
+        return alert(`Số lượng trả (${qty.toLocaleString('vi-VN')} ${mat.unit}) vượt quá số đã xuất (${totalExported.toLocaleString('vi-VN')} ${mat.unit})`);
+    }
+    
     if (!unitPrice || unitPrice <= 0) {
-        unitPrice = mat.cost;
+        return alert('Không thể xác định đơn giá. Vui lòng chọn lại vật tư.');
     }
     
     const totalAmount = qty * unitPrice;
     
-    // Cộng lại số lượng vào kho
     mat.qty += qty;
     
-    // Trừ chi phí đã tính cho công trình (giảm chi phí)
     const project = projectById(projectId);
     if (project) {
         project.spent = Math.max(0, (project.spent || 0) - totalAmount);
@@ -576,7 +675,7 @@ export function saveReturn() {
         projectId: projectId, 
         date: transactionDateTime.split('T')[0],
         datetime: transactionDateTime,
-        type: 'return',  // Loại mới: return
+        type: 'return',
         qty: qty, 
         unitPrice: unitPrice, 
         totalAmount: totalAmount, 
@@ -594,7 +693,7 @@ export function saveReturn() {
     alert('✅ Đã nhập lại kho từ công trình thành công!');
 }
 
-// Các hàm clear attachment
+// ========== CÁC HÀM CLEAR ATTACHMENT ==========
 export function clearExportAttachment() {
     currentExportAttachmentBase64 = null;
     const previewDiv = document.getElementById('export-attachment-preview');
@@ -619,6 +718,7 @@ export function clearInvoiceImage() {
     if (fileInput) fileInput.value = '';
 }
 
+// ========== EXPORTS ==========
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
 export const getTransactions = () => state.data.transactions;
