@@ -375,10 +375,3 @@ export function debounce(func, wait) {
         timeout = setTimeout(() => func(...args), wait);
     };
 }
-// Thêm vào CUỐI file utils.js
-console.log('=== DEBUG utils.js ===');
-console.log('formatRawToDisplay(9999):', formatRawToDisplay('9999'));
-console.log('formatRawToDisplay(99999):', formatRawToDisplay('99999'));
-console.log('formatRawToDisplay(1000000):', formatRawToDisplay('1000000'));
-console.log('formatRawToDisplay(1000000,5):', formatRawToDisplay('1000000,5'));
-
