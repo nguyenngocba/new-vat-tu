@@ -29,8 +29,7 @@ export function formatMoneyVND(value) {
     if (isNaN(num)) num = 0;
     
     // Format thủ công: thêm dấu chấm mỗi 3 số
-    let parts = num.toFixed(0).split('.');
-    let integerPart = parts[0];
+    let integerPart = Math.round(num).toString();
     let formatted = '';
     let count = 0;
     for (let i = integerPart.length - 1; i >= 0; i--) {
@@ -171,7 +170,14 @@ export function setInputValue(inputElement, value) {
 export function formatNumberVN(value, decimalPlaces = 0) {
     let num = typeof value === 'string' ? parseNumber(value) : value;
     if (isNaN(num)) num = 0;
-    return num.toLocaleString('vi-VN', decimalPlaces > 0 ? { minimumFractionDigits: decimalPlaces, maximumFractionDigits: decimalPlaces } : undefined);
+    let intPart = Math.round(num).toString();
+    let formatted = '', count = 0;
+    for (let i = intPart.length - 1; i >= 0; i--) {
+        formatted = intPart[i] + formatted;
+        count++;
+        if (count % 3 === 0 && i > 0) formatted = '.' + formatted;
+    }
+    return formatted;
 }
 
 // ========== COLUMN CONFIGURATION ==========
