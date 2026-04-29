@@ -1,4 +1,4 @@
-import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission } from './state.js';
+import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genMid, matById, hasPermission, projectById, supplierById } from './state.js';
 import { 
     handleIntegerInput, getNumberFromInput, formatMoneyVND, setupNumberInput,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
@@ -7,6 +7,11 @@ import {
 
 let materialFilters = { keyword: '', category: '', minStock: '', maxStock: '', showFavoritesOnly: false };
 let materialListContainer = null;
+
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return '';
+    return new Date(dateTimeStr).toLocaleString('vi-VN');
+}
 
 function getFilteredMaterials() {
     let result = [...state.data.materials];
@@ -79,19 +84,21 @@ function updateMaterialList() {
                             ${visibleColumns.map(col => {
                                 if (col.key === 'actions') {
                                     return `<td style="width: ${col.width}px; white-space: nowrap;">
-                                        ${hasPermission('canEditMaterial') ? `<button class="sm" onclick="editMaterial('${m.id}')">✏️ Sửa</button>` : ''}
-                                        ${hasPermission('canDeleteMaterial') ? `<button class="sm danger-btn" onclick="deleteMaterial('${m.id}')">🗑️ Xóa</button>` : ''}
+                                        ${hasPermission('canEditMaterial') ? `<button class="sm" onclick="event.stopPropagation();editMaterial('${m.id}')">✏️ Sửa</button>` : ''}
+                                        ${hasPermission('canDeleteMaterial') ? `<button class="sm danger-btn" onclick="event.stopPropagation();deleteMaterial('${m.id}')">🗑️ Xóa</button>` : ''}
                                        </td>`;
                                 }
                                 if (col.key === 'id') {
                                     return `<td style="width: ${col.width}px; font-family:mono">
-                                        <button class="favorite-btn ${favorites.includes(m.id) ? 'active' : ''}" onclick="toggleFavoriteItem('${m.id}')">★</button>
+                                        <button class="favorite-btn ${favorites.includes(m.id) ? 'active' : ''}" onclick="event.stopPropagation();toggleFavoriteItem('${m.id}')">★</button>
                                         ${m.id}
                                        </td>`;
                                 }
                                 if (col.key === 'name') {
-									return `<td style="width: ${col.width}px;"><strong style="cursor:pointer;color:var(--accent);text-decoration:underline;" onclick="window.showMaterialDetail('${m.id}')">${escapeHtml(m.name)}</strong></td>`;
-								}
+                                    return `<td style="width: ${col.width}px; cursor:pointer;" onclick="window.showMaterialDetail('${m.id}')">
+                                        <strong style="color:var(--accent);text-decoration:underline;">${escapeHtml(m.name)}</strong>
+                                       </td>`;
+                                }
                                 if (col.key === 'qty') {
                                     return `<td style="width: ${col.width}px;">${displayQty} ${m.unit}</td>`;
                                 }
@@ -388,25 +395,17 @@ export function deleteMaterial(mid) {
     saveState(); if(window.render) window.render();
 }
 
-export const addMaterial = (data) => {
-    const newId = genMid();
-    const newMat = { id: newId, name: data.name, cat: data.cat || data.category, unit: data.unit, qty: data.qty || 0, cost: data.cost || 0, low: data.low || 5, note: data.note || '' };
-    state.data.materials.push(newMat);
-    addLog('Thêm vật tư', `Đã thêm: ${newMat.name} (${newMat.id})`);
-    saveState(); if(window.render) window.render();
-    return newMat;
-};
 // ========== XEM CHI TIẾT VẬT TƯ ==========
 window.showMaterialDetail = function(mid) {
     const mat = matById(mid);
     if (!mat) return;
 
-    // Lấy giao dịch nhập (purchase)
+    // Lấy giao dịch nhập
     const purchaseTxns = state.data.transactions
         .filter(t => t.mid === mid && t.type === 'purchase')
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
 
-    // Lấy giao dịch xuất (usage) và trả (return)
+    // Lấy giao dịch xuất và trả
     const exportTxns = state.data.transactions
         .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return'))
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
@@ -418,43 +417,43 @@ window.showMaterialDetail = function(mid) {
 
     const html = `
         <div class="modal-hd" style="background: var(--accent-bg);">
-            <span class="modal-title">📦 Chi tiết: ${escapeHtml(mat.name)} (${mat.id})</span>
+            <span class="modal-title" style="font-size:20px;">📦 Chi tiết: ${escapeHtml(mat.name)} (${mat.id})</span>
             <button class="xbtn" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
             <div class="grid4" style="margin-bottom: 20px;">
                 <div class="metric-card">
                     <div class="metric-label">📦 TỒN KHO</div>
-                    <div class="metric-val">${mat.qty.toLocaleString('vi-VN')} ${mat.unit}</div>
+                    <div class="metric-val" style="font-size:18px;">${mat.qty.toLocaleString('vi-VN')} ${mat.unit}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">💰 ĐƠN GIÁ</div>
-                    <div class="metric-val">${formatMoneyVND(mat.cost)}</div>
+                    <div class="metric-val" style="font-size:18px;">${formatMoneyVND(mat.cost)}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">📥 TỔNG NHẬP</div>
-                    <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
+                    <div class="metric-val" style="font-size:18px; color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">📤 TỔNG XUẤT</div>
-                    <div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(totalExport)}</div>
+                    <div class="metric-val" style="font-size:18px; color: var(--warn-text);">${formatMoneyVND(totalExport - totalReturn)}</div>
                 </div>
             </div>
 
-            <div class="sec-title">📥 LỊCH SỬ NHẬP KHO</div>
+            <div class="sec-title">📥 LỊCH SỬ NHẬP KHO (${purchaseTxns.length} giao dịch)</div>
             <div class="tbl-wrap" style="margin-bottom: 20px;">
-                <table style="min-width: 700px;">
+                <table style="min-width: 750px;">
                     <thead><tr><th>Thời gian</th><th>Nhà cung cấp</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
                     <tbody>
                         ${purchaseTxns.length > 0 ? purchaseTxns.map(t => {
-                            const sup = supplierById(t.supplierId);
+                            const sup = state.data.suppliers.find(s => s.id === t.supplierId);
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
                                 <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
                                 <td style="text-align:center;">${t.vatRate||0}%</td>
-                                <td style="text-align:right;color:var(--success-text);font-weight:500;">${formatMoneyVND(t.totalAmount)}</td>
+                                <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
                                 <td>${escapeHtml(t.note || '—')}</td>
                             </tr>`;
                         }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>'}
@@ -462,21 +461,21 @@ window.showMaterialDetail = function(mid) {
                 </table>
             </div>
 
-            <div class="sec-title">📤 LỊCH SỬ XUẤT KHO</div>
+            <div class="sec-title">📤 LỊCH SỬ XUẤT KHO (${exportTxns.length} giao dịch)</div>
             <div class="tbl-wrap">
-                <table style="min-width: 700px;">
+                <table style="min-width: 750px;">
                     <thead><tr><th>Thời gian</th><th>Loại</th><th>Công trình</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
                     <tbody>
                         ${exportTxns.length > 0 ? exportTxns.map(t => {
-                            const proj = projectById(t.projectId);
+                            const proj = state.data.projects.find(p => p.id === t.projectId);
                             const isReturn = t.type === 'return';
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-                                <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:500;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
+                                <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
                                 <td><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
                                 <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
-                                <td style="text-align:right;font-weight:500;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
+                                <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
                                 <td>${escapeHtml(t.note || '—')}</td>
                             </tr>`;
                         }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch xuất</td></tr>'}
@@ -492,16 +491,7 @@ window.showMaterialDetail = function(mid) {
     showModal(html, null);
 };
 
-// Hàm helper format datetime
-function formatDateTime(dateTimeStr) {
-    if (!dateTimeStr) return '';
-    return new Date(dateTimeStr).toLocaleString('vi-VN');
-}
-
-// Hàm helper lấy supplier by id
-function supplierById(sid) {
-    return state.data.suppliers.find(s => s.id === sid);
-}
+// ========== XUẤT EXCEL CHI TIẾT VẬT TƯ ==========
 window.exportMaterialDetail = function(mid) {
     const mat = matById(mid);
     if (!mat) return;
@@ -511,10 +501,11 @@ window.exportMaterialDetail = function(mid) {
 
     const importData = purchaseTxns.map(t => ({
         'Thời gian': formatDateTime(t.datetime || t.date),
-        'Nhà cung cấp': supplierById(t.supplierId)?.name || '',
+        'Nhà cung cấp': state.data.suppliers.find(s => s.id === t.supplierId)?.name || '',
         'Số lượng': t.qty,
+        'Đơn vị': mat.unit,
         'Đơn giá': t.unitPrice,
-        'VAT': t.vatRate + '%',
+        'VAT': (t.vatRate||0) + '%',
         'Thành tiền': t.totalAmount,
         'Ghi chú': t.note || ''
     }));
@@ -522,8 +513,9 @@ window.exportMaterialDetail = function(mid) {
     const exportData = exportTxns.map(t => ({
         'Thời gian': formatDateTime(t.datetime || t.date),
         'Loại': t.type === 'return' ? 'Trả hàng' : 'Xuất kho',
-        'Công trình': projectById(t.projectId)?.name || '',
+        'Công trình': state.data.projects.find(p => p.id === t.projectId)?.name || '',
         'Số lượng': t.qty,
+        'Đơn vị': mat.unit,
         'Đơn giá': t.unitPrice,
         'Thành tiền': t.totalAmount,
         'Ghi chú': t.note || ''
@@ -531,16 +523,22 @@ window.exportMaterialDetail = function(mid) {
 
     if (typeof XLSX !== 'undefined') {
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(importData), 'Nhập kho');
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), 'Xuất kho');
-        XLSX.writeFile(wb, `chitiet_${mat.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        if (importData.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(importData), 'Nhập kho');
+        if (exportData.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), 'Xuất kho');
+        XLSX.writeFile(wb, `chitiet_${mat.id}_${mat.name.replace(/\s/g,'_')}.xlsx`);
         alert('✅ Đã xuất Excel!');
     } else {
-        alert('Đang tải thư viện Excel...');
+        alert('Đang tải thư viện Excel, thử lại sau...');
     }
 };
 
-function projectById(pid) {
-    return state.data.projects.find(p => p.id === pid);
-}
+export const addMaterial = (data) => {
+    const newId = genMid();
+    const newMat = { id: newId, name: data.name, cat: data.cat || data.category, unit: data.unit, qty: data.qty || 0, cost: data.cost || 0, low: data.low || 5, note: data.note || '' };
+    state.data.materials.push(newMat);
+    addLog('Thêm vật tư', `Đã thêm: ${newMat.name} (${newMat.id})`);
+    saveState(); if(window.render) window.render();
+    return newMat;
+};
+
 export const getMaterials = () => state.data.materials;
