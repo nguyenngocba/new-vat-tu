@@ -27,7 +27,19 @@ export function getIntegerFromInput(inputElement) {
 export function formatMoneyVND(value) {
     let num = typeof value === 'string' ? parseNumber(value) : value;
     if (isNaN(num)) num = 0;
-    return num.toLocaleString('vi-VN') + ' ₫';
+    
+    // Format thủ công: thêm dấu chấm mỗi 3 số
+    let parts = num.toFixed(0).split('.');
+    let integerPart = parts[0];
+    let formatted = '';
+    let count = 0;
+    for (let i = integerPart.length - 1; i >= 0; i--) {
+        formatted = integerPart[i] + formatted;
+        count++;
+        if (count % 3 === 0 && i > 0) formatted = '.' + formatted;
+    }
+    
+    return formatted + ' ₫';
 }
 
 // ========== HÀM FORMAT SỐ HIỂN THỊ ==========
