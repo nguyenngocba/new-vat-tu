@@ -7,9 +7,36 @@ export function parseNumber(str) {
     
     let cleaned = str.toString().trim();
     
-    // Xóa dấu chấm (phân cách hàng nghìn)
-    // Thay dấu phẩy bằng dấu chấm (thập phân)
-    cleaned = cleaned.replace(/\./g, '').replace(/,/g, '.');
+    // Nếu chuỗi chứa cả dấu chấm và dấu phẩy
+    if (cleaned.includes('.') && cleaned.includes(',')) {
+        // Dấu nào đứng sau cùng là dấu thập phân
+        const lastDot = cleaned.lastIndexOf('.');
+        const lastComma = cleaned.lastIndexOf(',');
+        
+        if (lastComma > lastDot) {
+            // Dấu phẩy cuối cùng là thập phân -> xóa dấu chấm, đổi dấu phẩy cuối thành dấu chấm
+            cleaned = cleaned.replace(/\./g, '');
+            // Chỉ đổi dấu phẩy CUỐI CÙNG thành dấu chấm
+            const before = cleaned.substring(0, lastComma);
+            const after = cleaned.substring(lastComma + 1);
+            cleaned = before.replace(/,/g, '') + '.' + after;
+        } else {
+            // Dấu chấm cuối cùng là thập phân -> xóa dấu phẩy
+            cleaned = cleaned.replace(/,/g, '');
+        }
+    } else if (cleaned.includes(',')) {
+        // Chỉ có dấu phẩy -> đổi thành dấu chấm (thập phân)
+        // Nhưng phải đảm bảo chỉ có 1 dấu phẩy
+        const parts = cleaned.split(',');
+        if (parts.length > 2) {
+            // Nhiều dấu phẩy -> dấu phẩy cuối là thập phân, còn lại bỏ
+            const lastIdx = cleaned.lastIndexOf(',');
+            cleaned = cleaned.substring(0, lastIdx).replace(/,/g, '') + '.' + cleaned.substring(lastIdx + 1);
+        } else {
+            cleaned = cleaned.replace(',', '.');
+        }
+    }
+    // Nếu chỉ có dấu chấm -> giữ nguyên
     
     let num = parseFloat(cleaned);
     return isNaN(num) ? 0 : num;
@@ -29,7 +56,7 @@ export function setInputValue(inputElement, value) {
     if (!inputElement) return;
     let num = typeof value === 'string' ? parseNumber(value) : value;
     if (isNaN(num)) num = 0;
-    inputElement.value = num.toLocaleString('vi-VN');
+    inputElement.value = formatNumberRealTime(num.toString().replace('.', ','));
 }
 
 export function formatMoneyVND(value) {
@@ -51,22 +78,76 @@ export function formatNumberVN(value, decimalPlaces = 0) {
     return num.toLocaleString('vi-VN');
 }
 
-export function handleIntegerInput(event) {
-    const input = event.target;
-    let num = parseNumber(input.value);
-    if (isNaN(num)) num = 0;
-    input.value = num.toLocaleString('vi-VN');
-    const changeEvent = new Event('change', { bubbles: true });
-    input.dispatchEvent(changeEvent);
-}
+// ========== HÀM FORMAT SỐ REAL-TIME (GỌI TỪ BÊN NGOÀI) ==========
 
-export function handleQuantityInput(event) {
-    const input = event.target;
-    let num = parseNumber(input.value);
-    if (isNaN(num)) num = 0;
-    input.value = num.toLocaleString('vi-VN');
-    const changeEvent = new Event('change', { bubbles: true });
-    input.dispatchEvent(changeEvent);
+export function formatNumberRealTime(rawValue) {
+    if (!rawValue || rawValue === '') return '';
+    
+    // Lưu dấu âm nếu có
+    let isNegative = false;
+    if (rawValue.startsWith('-')) {
+        isNegative = true;
+        rawValue = rawValue.substring(1);
+    }
+    
+    // Xóa tất cả ký tự không hợp lệ, chỉ giữ số, dấu chấm, dấu phẩy
+    rawValue = rawValue.replace(/[^\d.,]/g, '');
+    
+    // Xác định vị trí dấu thập phân (dấu phẩy hoặc dấu chấm CUỐI CÙNG)
+    let lastComma = rawValue.lastIndexOf(',');
+    let lastDot = rawValue.lastIndexOf('.');
+    let decimalSeparatorIndex = -1;
+    
+    if (lastComma >= 0 && lastDot >= 0) {
+        // Có cả 2 dấu -> dấu nào sau cùng là thập phân
+        decimalSeparatorIndex = Math.max(lastComma, lastDot);
+    } else if (lastComma >= 0) {
+        decimalSeparatorIndex = lastComma;
+    } else if (lastDot >= 0) {
+        decimalSeparatorIndex = lastDot;
+    }
+    
+    let integerPart = '';
+    let decimalPart = '';
+    
+    if (decimalSeparatorIndex >= 0) {
+        integerPart = rawValue.substring(0, decimalSeparatorIndex);
+        decimalPart = rawValue.substring(decimalSeparatorIndex + 1);
+    } else {
+        integerPart = rawValue;
+        decimalPart = '';
+    }
+    
+    // Xóa TẤT CẢ dấu chấm và dấu phẩy trong phần nguyên
+    integerPart = integerPart.replace(/[.,]/g, '');
+    
+    // Xóa dấu chấm và dấu phẩy trong phần thập phân
+    decimalPart = decimalPart.replace(/[.,]/g, '');
+    
+    // Format phần nguyên: thêm dấu chấm mỗi 3 chữ số từ phải sang trái
+    let formattedInteger = '';
+    let count = 0;
+    for (let i = integerPart.length - 1; i >= 0; i--) {
+        formattedInteger = integerPart[i] + formattedInteger;
+        count++;
+        if (count % 3 === 0 && i > 0) {
+            formattedInteger = '.' + formattedInteger;
+        }
+    }
+    
+    if (formattedInteger === '') formattedInteger = '0';
+    
+    // Ghép kết quả
+    let result = formattedInteger;
+    if (decimalPart.length > 0) {
+        result += ',' + decimalPart;
+    }
+    
+    if (isNegative) {
+        result = '-' + result;
+    }
+    
+    return result;
 }
 
 // ========== HÀM SETUP INPUT SỐ - FORMAT REAL-TIME ==========
@@ -74,134 +155,69 @@ export function handleQuantityInput(event) {
 export function setupNumberInput(inputElement, options = {}) {
     if (!inputElement) return;
     
-    const { isInteger = false, decimals = 2 } = options;
+    const { isInteger = false, decimals = null } = options;
     
-    // Hàm format số real-time (có dấu chấm phân cách hàng nghìn)
-    function formatNumberRealTime(rawValue) {
-        if (!rawValue || rawValue === '') return '';
+    // Xóa bỏ giới hạn maxlength nếu có
+    inputElement.removeAttribute('maxlength');
+    inputElement.removeAttribute('size');
+    
+    // Hàm format với giới hạn decimals
+    function formatWithOptions(rawValue) {
+        let formatted = formatNumberRealTime(rawValue);
         
-        // Lưu dấu âm nếu có
-        let isNegative = false;
-        if (rawValue.startsWith('-')) {
-            isNegative = true;
-            rawValue = rawValue.substring(1);
-        }
-        
-        // Tách phần nguyên và phần thập phân
-        // Tìm vị trí dấu phẩy hoặc dấu chấm CUỐI CÙNG làm dấu thập phân
-        let decimalSeparatorIndex = -1;
-        let lastComma = rawValue.lastIndexOf(',');
-        let lastDot = rawValue.lastIndexOf('.');
-        
-        if (lastComma > lastDot) {
-            decimalSeparatorIndex = lastComma;
-        } else if (lastDot > lastComma) {
-            decimalSeparatorIndex = lastDot;
-        }
-        
-        let integerPart = '';
-        let decimalPart = '';
-        
-        if (decimalSeparatorIndex >= 0) {
-            integerPart = rawValue.substring(0, decimalSeparatorIndex);
-            decimalPart = rawValue.substring(decimalSeparatorIndex + 1);
-        } else {
-            integerPart = rawValue;
-            decimalPart = '';
-        }
-        
-        // Xóa tất cả dấu chấm và dấu phẩy còn lại trong phần nguyên
-        integerPart = integerPart.replace(/[.,]/g, '');
-        
-        // Nếu là số nguyên, bỏ phần thập phân
+        // Nếu là số nguyên, cắt bỏ phần thập phân
         if (isInteger) {
-            decimalPart = '';
-        } else if (decimals !== null && decimalPart.length > decimals) {
-            // Giới hạn số chữ số thập phân
-            decimalPart = decimalPart.substring(0, decimals);
+            const commaIdx = formatted.indexOf(',');
+            if (commaIdx >= 0) {
+                formatted = formatted.substring(0, commaIdx);
+            }
+            return formatted;
         }
         
-        // Format phần nguyên: thêm dấu chấm mỗi 3 chữ số
-        let formattedInteger = '';
-        let count = 0;
-        for (let i = integerPart.length - 1; i >= 0; i--) {
-            formattedInteger = integerPart[i] + formattedInteger;
-            count++;
-            if (count % 3 === 0 && i > 0) {
-                formattedInteger = '.' + formattedInteger;
+        // Nếu có giới hạn decimals
+        if (decimals !== null) {
+            const commaIdx = formatted.indexOf(',');
+            if (commaIdx >= 0 && formatted.length - commaIdx - 1 > decimals) {
+                formatted = formatted.substring(0, commaIdx + decimals + 1);
             }
         }
         
-        if (formattedInteger === '') formattedInteger = '0';
-        
-        // Ghép lại
-        let result = formattedInteger;
-        if (decimalPart.length > 0 && !isInteger) {
-            result += ',' + decimalPart;
-        }
-        
-        if (isNegative) {
-            result = '-' + result;
-        }
-        
-        return result;
+        return formatted;
     }
     
-    // Hàm tính vị trí con trỏ mới sau khi format
+    // Tính vị trí con trỏ mới
     function calculateNewCursorPosition(oldValue, newValue, oldCursorPos) {
         if (oldValue === newValue) return oldCursorPos;
         
-        // Đếm số dấu chấm trong giá trị cũ trước vị trí con trỏ
         let oldDotsBefore = 0;
         for (let i = 0; i < Math.min(oldCursorPos, oldValue.length); i++) {
             if (oldValue[i] === '.') oldDotsBefore++;
         }
         
-        // Đếm số dấu chấm trong giá trị mới trước vị trí con trỏ
         let newDotsBefore = 0;
         for (let i = 0; i < Math.min(oldCursorPos, newValue.length); i++) {
             if (newValue[i] === '.') newDotsBefore++;
         }
         
         let newPos = oldCursorPos + (newDotsBefore - oldDotsBefore);
-        
-        // Đảm bảo con trỏ không vượt quá độ dài chuỗi
         newPos = Math.min(newPos, newValue.length);
         newPos = Math.max(0, newPos);
         
         return newPos;
     }
     
-    // Xử lý khi người dùng gõ (input event) - Format real-time
+    // XỬ LÝ INPUT EVENT - Format real-time khi gõ
     inputElement.addEventListener('input', function(e) {
         const oldValue = this.value;
         const oldCursorPos = this.selectionStart;
         
-        // Lấy giá trị raw (chỉ giữ số, dấu trừ, dấu phẩy, dấu chấm)
-        let rawValue = this.value.replace(/[^\d\-,.]/g, '');
-        
-        // Đảm bảo chỉ có MỘT dấu thập phân (dấu phẩy hoặc dấu chấm)
-        let commaCount = (rawValue.match(/,/g) || []).length;
-        let dotCount = (rawValue.match(/\./g) || []).length;
-        
-        // Nếu có nhiều hơn 1 dấu phẩy hoặc dấu chấm, giữ lại dấu cuối cùng làm thập phân
-        if (commaCount + dotCount > 1) {
-            let lastComma = rawValue.lastIndexOf(',');
-            let lastDot = rawValue.lastIndexOf('.');
-            let lastSeparator = Math.max(lastComma, lastDot);
-            
-            if (lastSeparator >= 0) {
-                let before = rawValue.substring(0, lastSeparator).replace(/[,.]/g, '');
-                let separator = rawValue[lastSeparator];
-                let after = rawValue.substring(lastSeparator + 1).replace(/[,.]/g, '');
-                rawValue = before + separator + after;
-            }
-        }
+        // Lấy raw value (chỉ giữ số, dấu trừ, dấu phẩy, dấu chấm)
+        let rawValue = this.value.replace(/[^\d\-.,]/g, '');
         
         // Format lại
-        const formattedValue = formatNumberRealTime(rawValue);
+        const formattedValue = formatWithOptions(rawValue);
         
-        // Tính toán vị trí con trỏ mới
+        // Tính vị trí con trỏ mới
         const newCursorPos = calculateNewCursorPosition(oldValue, formattedValue, oldCursorPos);
         
         // Cập nhật giá trị
@@ -210,75 +226,62 @@ export function setupNumberInput(inputElement, options = {}) {
         // Đặt lại vị trí con trỏ
         this.setSelectionRange(newCursorPos, newCursorPos);
         
-        // Kích hoạt sự kiện change để cập nhật preview
+        // Kích hoạt sự kiện change
         const changeEvent = new Event('change', { bubbles: true });
         this.dispatchEvent(changeEvent);
     });
     
-    // Xử lý khi blur - Đảm bảo format đúng
+    // XỬ LÝ BLUR - Format lại khi mất focus
     inputElement.addEventListener('blur', function() {
-        let rawValue = this.value.replace(/[^\d\-,.]/g, '');
-        const formattedValue = formatNumberRealTime(rawValue);
-        this.value = formattedValue;
+        let rawValue = this.value.replace(/[^\d\-.,]/g, '');
+        this.value = formatWithOptions(rawValue);
         
         const changeEvent = new Event('change', { bubbles: true });
         this.dispatchEvent(changeEvent);
     });
     
-    // Xử lý khi focus - Select all để dễ nhập lại
+    // XỬ LÝ FOCUS - Select all
     inputElement.addEventListener('focus', function() {
         this.select();
     });
     
-    // Ngăn người dùng nhập ký tự không hợp lệ
-    inputElement.addEventListener('keydown', function(e) {
-        // Cho phép: số, backspace, delete, mũi tên, tab, home, end, dấu trừ, dấu chấm, dấu phẩy
-        const allowedKeys = [
-            'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-            'Tab', 'Home', 'End', 'Enter', 'Escape',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '.', ',', '-', 'Minus', 'NumpadDecimal', 'NumpadSubtract',
-            'Numpad0', 'Numpad1', 'Numpad2', 'Numpad3', 'Numpad4',
-            'Numpad5', 'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9'
-        ];
-        
-        // Cho phép Ctrl+C, Ctrl+V, Ctrl+A, Ctrl+X
-        if (e.ctrlKey || e.metaKey) {
-            return;
-        }
-        
-        if (!allowedKeys.includes(e.key)) {
-            e.preventDefault();
-        }
-    });
-    
-    // Xử lý paste - Format sau khi paste
+    // XỬ LÝ PASTE
     inputElement.addEventListener('paste', function(e) {
         e.preventDefault();
         const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-        let rawValue = pastedText.replace(/[^\d\-,.]/g, '');
+        let rawValue = pastedText.replace(/[^\d\-.,]/g, '');
         
-        // Lấy vị trí con trỏ hiện tại
         const start = this.selectionStart;
         const end = this.selectionEnd;
         const currentValue = this.value;
         
-        // Tạo giá trị mới sau khi paste
         const newRawValue = currentValue.substring(0, start) + rawValue + currentValue.substring(end);
-        const formattedValue = formatNumberRealTime(newRawValue);
+        const formattedValue = formatWithOptions(newRawValue);
         
         this.value = formattedValue;
         
-        // Đặt con trỏ ở cuối phần được paste
-        const newCursorPos = Math.min(start + formattedValue.length, formattedValue.length);
+        const newCursorPos = Math.min(formattedValue.length, formattedValue.length);
         this.setSelectionRange(newCursorPos, newCursorPos);
         
         const changeEvent = new Event('change', { bubbles: true });
         this.dispatchEvent(changeEvent);
     });
+    
+    // CHO PHÉP TẤT CẢ CÁC PHÍM (không chặn nữa - vì input event đã lọc)
+    // Chỉ chặn các ký tự thực sự không mong muốn
+    inputElement.addEventListener('keypress', function(e) {
+        // Cho phép tất cả phím điều khiển
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        // Cho phép tất cả các phím không phải ký tự in được
+        if (e.key.length > 1) return;
+        // Cho phép số, dấu chấm, dấu phẩy, dấu trừ
+        if (/[\d.,\-]/.test(e.key)) return;
+        // Chặn các ký tự khác
+        e.preventDefault();
+    });
 }
 
-// ========== ALIAS ==========
+// Aliases
 export const getRawInteger = getIntegerFromInput;
 export const getRawMoney = getIntegerFromInput;
 export const getRawQuantity = getNumberFromInput;
@@ -286,6 +289,18 @@ export const setFormattedValue = setInputValue;
 export const setMoneyValue = setInputValue;
 export const setQuantityValue = setInputValue;
 export const handleMoneyInput = handleIntegerInput;
+
+export function handleIntegerInput(event) {
+    const input = event.target;
+    let rawValue = input.value.replace(/[^\d\-.,]/g, '');
+    input.value = formatNumberRealTime(rawValue);
+    const changeEvent = new Event('change', { bubbles: true });
+    input.dispatchEvent(changeEvent);
+}
+
+export function handleQuantityInput(event) {
+    handleIntegerInput(event);
+}
 
 // ========== COLUMN CONFIGURATION ==========
 const COLUMN_CONFIG_KEY = 'steeltrack_column_config';
