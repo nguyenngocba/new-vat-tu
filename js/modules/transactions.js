@@ -62,9 +62,9 @@ export function openPurchaseModal() {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><select id="purchase-supplier">${optsSup}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align:right;" dir="ltr" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align:right;" dir="ltr" autocomplete="off"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -133,9 +133,9 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><input type="text" value="${escapeHtml(supplier.name)}" disabled style="background: var(--surface3);"></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align:right;" dir="ltr" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align:right;" dir="ltr" autocomplete="off"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -191,9 +191,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
 export function savePurchase() {
     const supplierId = document.getElementById('purchase-supplier')?.value;
     const mid = document.getElementById('purchase-mid')?.value;
-    const datetimeInput = document.getElementById('purchase-datetime');
-    const transactionDateTime = datetimeInput ? datetimeInput.value : getCurrentDateTime();
-
+    const dt = document.getElementById('purchase-datetime')?.value || getCurrentDateTime();
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
     const vatRate = getNumberFromInput(document.getElementById('purchase-vat'));
@@ -202,7 +200,7 @@ export function savePurchase() {
     if (!supplierId) return alert('Chọn nhà cung cấp');
     if (!mid) return alert('Chọn vật tư');
     if (!qty || qty <= 0) return alert('Số lượng không hợp lệ');
-    if (!unitPrice || unitPrice <= 0) return alert('Đơn giá nhập không hợp lệ');
+    if (!unitPrice || unitPrice <= 0) return alert('Đơn giá không hợp lệ');
 
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
@@ -210,68 +208,48 @@ export function savePurchase() {
     const subtotal = qty * unitPrice;
     const vatAmount = subtotal * vatRate / 100;
     const totalAmount = subtotal + vatAmount;
-
-    const oldQty = mat.qty;
-    const oldValue = oldQty * mat.cost;
+    const oldQty = mat.qty, oldValue = oldQty * mat.cost;
     mat.qty += qty;
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
-    const transaction = {
-        id: genTid(), mid: mid, supplierId: supplierId,
-        date: transactionDateTime.split('T')[0], datetime: transactionDateTime,
-        type: 'purchase', qty: qty, unitPrice: unitPrice, vatRate: vatRate,
-        subtotal: subtotal, vatAmount: vatAmount, totalAmount: totalAmount,
-        note: note, invoiceImage: currentInvoiceBase64 || null
-    };
-    state.data.transactions.unshift(transaction);
+    state.data.transactions.unshift({
+        id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
+        type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
+        note, invoiceImage: currentInvoiceBase64 || null
+    });
 
-    const supplier = supplierById(supplierId);
-    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Giá: ${formatMoneyVND(unitPrice)} - VAT: ${vatRate}% - Tổng: ${formatMoneyVND(totalAmount)} - NCC: ${supplier?.name}`);
-    saveState(); closeModal();
-    currentInvoiceBase64 = null;
+    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
+    saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
 }
 
 export function savePurchaseWithSupplier(supplierId) {
     const mid = document.getElementById('purchase-mid')?.value;
-    const datetimeInput = document.getElementById('purchase-datetime');
-    const transactionDateTime = datetimeInput ? datetimeInput.value : getCurrentDateTime();
-
+    const dt = document.getElementById('purchase-datetime')?.value || getCurrentDateTime();
     const qty = getNumberFromInput(document.getElementById('purchase-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('purchase-price'));
     const vatRate = getNumberFromInput(document.getElementById('purchase-vat'));
     const note = document.getElementById('purchase-note')?.value || '';
 
-    if (!mid) return alert('Chọn vật tư');
-    if (!qty || qty <= 0) return alert('Số lượng không hợp lệ');
-    if (!unitPrice || unitPrice <= 0) return alert('Đơn giá nhập không hợp lệ');
+    if (!mid || !qty || qty <= 0 || !unitPrice || unitPrice <= 0) return alert('Thông tin không hợp lệ');
 
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
 
-    const subtotal = qty * unitPrice;
-    const vatAmount = subtotal * vatRate / 100;
-    const totalAmount = subtotal + vatAmount;
-
-    const oldQty = mat.qty;
-    const oldValue = oldQty * mat.cost;
+    const subtotal = qty * unitPrice, vatAmount = subtotal * vatRate / 100, totalAmount = subtotal + vatAmount;
+    const oldQty = mat.qty, oldValue = oldQty * mat.cost;
     mat.qty += qty;
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
-    const transaction = {
-        id: genTid(), mid: mid, supplierId: supplierId,
-        date: transactionDateTime.split('T')[0], datetime: transactionDateTime,
-        type: 'purchase', qty: qty, unitPrice: unitPrice, vatRate: vatRate,
-        subtotal: subtotal, vatAmount: vatAmount, totalAmount: totalAmount,
-        note: note, invoiceImage: currentInvoiceBase64 || null
-    };
-    state.data.transactions.unshift(transaction);
+    state.data.transactions.unshift({
+        id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
+        type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
+        note, invoiceImage: currentInvoiceBase64 || null
+    });
 
-    const supplier = supplierById(supplierId);
-    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Tổng: ${formatMoneyVND(totalAmount)} - NCC: ${supplier?.name}`);
-    saveState(); closeModal();
-    currentInvoiceBase64 = null;
+    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
+    saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
 }
@@ -279,95 +257,74 @@ export function savePurchaseWithSupplier(supplierId) {
 // ========== XUẤT KHO ==========
 export function openTxnModal(type, preselectedProjectId = null) {
     if (type === 'usage' && !hasPermission('canExport')) { alert('Bạn không có quyền xuất kho'); return; }
-    if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
-    if (type === 'usage' && state.data.projects.length === 0) return alert('Chưa có công trình nào');
+    if (state.data.materials.length === 0) return alert('Chưa có vật tư');
+    if (state.data.projects.length === 0) return alert('Chưa có công trình');
 
     const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
-    const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Ngân sách: ${formatMoneyVND(p.budget)})</option>`).join('');
-    const currentDateTime = getCurrentDateTime();
+    const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId===p.id?'selected':''}>${escapeHtml(p.name)} (NS: ${formatMoneyVND(p.budget)})</option>`).join('');
 
     const html = `
         <div class="modal-hd"><span class="modal-title">📤 Xuất kho cho công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
-                <div class="form-group"><label class="form-label">📅 Thời gian xuất</label><input type="datetime-local" id="export-datetime" value="${currentDateTime}" style="width: 100%;"></div>
-                <div class="form-group"><label class="form-label">🏗️ Công trình thi công</label><select id="txn-project">${optsProj}</select></div>
+                <div class="form-group"><label class="form-label">📅 Thời gian</label><input type="datetime-local" id="export-datetime" value="${getCurrentDateTime()}"></div>
+                <div class="form-group"><label class="form-label">🏗️ Công trình</label><select id="txn-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="txn-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
             </div>
-            <div class="metric-card" style="margin-top:8px"><div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-export-total">0 ₫</strong></div></div>
-            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="export-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
+            <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-export-total">0 ₫</strong></div></div>
+            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="export-attachment"></div>
             <div id="export-attachment-preview"></div>
-            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note" placeholder="Mô tả thêm..."></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note"></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận xuất kho</button></div>`;
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận</button></div>`;
 
     showModal(html, null);
 
     setTimeout(() => {
-        const qtyInput = document.getElementById('txn-qty');
-        const midSelect = document.getElementById('txn-mid');
-        const attachmentInput = document.getElementById('export-attachment');
-
-        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', calculateExportTotal); }
-        
-        if (attachmentInput) {
-            attachmentInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentExportAttachmentBase64 = e.target.result;
-                    const previewDiv = document.getElementById('export-attachment-preview');
-                    if (previewDiv) {
-                        if (file.type.startsWith('image/')) {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><img src="${currentExportAttachmentBase64}" class="invoice-img" style="max-height:150px;"><div class="metric-sub">📄 ${file.name}</div><button class="sm" onclick="window.clearExportAttachment()">🗑️</button></div>`;
-                        } else {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><div style="font-size:32px;text-align:center;">📎</div><div class="metric-sub">📄 ${file.name}</div><button class="sm" onclick="window.clearExportAttachment()">🗑️</button></div>`;
-                        }
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        if (midSelect) midSelect.addEventListener('change', calculateExportTotal);
+        const qty = document.getElementById('txn-qty');
+        const mid = document.getElementById('txn-mid');
+        const att = document.getElementById('export-attachment');
+        if (qty) { setupNumberInput(qty, { isInteger: false, decimals: 3 }); qty.addEventListener('change', calculateExportTotal); }
+        if (att) att.addEventListener('change', function() {
+            const f = this.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = function(e) {
+                currentExportAttachmentBase64 = e.target.result;
+                const p = document.getElementById('export-attachment-preview');
+                if (p) p.innerHTML = `<div class="metric-card">📄 ${f.name} <button class="sm" onclick="window.clearExportAttachment()">🗑️</button></div>`;
+            };
+            r.readAsDataURL(f);
+        });
+        if (mid) mid.addEventListener('change', calculateExportTotal);
         calculateExportTotal();
     }, 150);
 }
 
 export function saveExport() {
-    const projectId = document.getElementById('txn-project')?.value;
+    const pid = document.getElementById('txn-project')?.value;
     const mid = document.getElementById('txn-mid')?.value;
-    const datetimeInput = document.getElementById('export-datetime');
-    const transactionDateTime = datetimeInput ? datetimeInput.value : getCurrentDateTime();
-
+    const dt = document.getElementById('export-datetime')?.value || getCurrentDateTime();
     const qty = getNumberFromInput(document.getElementById('txn-qty'));
     const note = document.getElementById('txn-note')?.value || '';
 
-    if (!projectId) return alert('Chọn công trình');
-    if (!mid) return alert('Chọn vật tư');
-    if (!qty || qty <= 0) return alert('Số lượng không hợp lệ');
-
+    if (!pid || !mid || !qty || qty <= 0) return alert('Thiếu thông tin');
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
-    if (mat.qty < qty) return alert(`Không đủ tồn kho! Còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
+    if (mat.qty < qty) return alert(`Không đủ tồn! Còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
 
-    const totalAmount = qty * mat.cost;
+    const total = qty * mat.cost;
     mat.qty -= qty;
+    const proj = projectById(pid);
+    if (proj) proj.spent = (proj.spent || 0) + total;
 
-    const project = projectById(projectId);
-    if (project) project.spent = (project.spent || 0) + totalAmount;
-
-    const transaction = {
-        id: genTid(), mid: mid, projectId: projectId,
-        date: transactionDateTime.split('T')[0], datetime: transactionDateTime,
-        type: 'usage', qty: qty, unitPrice: mat.cost, totalAmount: totalAmount,
-        note: note, attachment: currentExportAttachmentBase64 || null
-    };
-    state.data.transactions.unshift(transaction);
-    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - ${formatMoneyVND(totalAmount)}`);
-    saveState(); closeModal();
-    currentExportAttachmentBase64 = null;
+    state.data.transactions.unshift({
+        id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
+        type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
+        attachment: currentExportAttachmentBase64 || null
+    });
+    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
+    saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Xuất kho thành công!');
 }
@@ -375,32 +332,27 @@ export function saveExport() {
 // ========== TRẢ HÀNG ==========
 export function openReturnModal(preselectedProjectId = null) {
     if (!hasPermission('canImport')) { alert('Bạn không có quyền'); return; }
-    if (state.data.projects.length === 0) return alert('Chưa có công trình nào');
+    const pw = state.data.projects.filter(p => state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage'));
+    if (pw.length === 0) return alert('Chưa có công trình nào được xuất kho');
 
-    const projectsWithUsage = state.data.projects.filter(p =>
-        state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage')
-    );
-    if (projectsWithUsage.length === 0) return alert('Chưa có công trình nào được xuất kho');
-
-    const optsProj = projectsWithUsage.map(p => {
-        const uTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
-        const rTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
-        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Thực tế: ${formatMoneyVND(uTotal - rTotal)})</option>`;
+    const opts = pw.map(p => {
+        const u = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+(t.totalAmount||0),0);
+        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+(t.totalAmount||0),0);
+        return `<option value="${p.id}" ${preselectedProjectId===p.id?'selected':''}>${escapeHtml(p.name)} (Đã SD: ${formatMoneyVND(u-r)})</option>`;
     }).join('');
 
     const html = `
-        <div class="modal-hd" style="background:var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+        <div class="modal-hd" style="background:var(--success-bg);"><span class="modal-title">🔄 Trả hàng</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian</label><input type="datetime-local" id="return-datetime" value="${getCurrentDateTime()}"></div>
-                <div class="form-group"><label class="form-label">🏗️ Công trình</label><select id="return-project">${optsProj}</select></div>
+                <div class="form-group"><label class="form-label">🏗️ Công trình</label><select id="return-project">${opts}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="return-mid"></select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá (VNĐ)</label><input type="text" id="return-price" readonly style="background:var(--surface3);" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá</label><input type="text" id="return-price" readonly style="background:var(--surface3);text-align:right;" dir="ltr"></div>
             </div>
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-return-total">0 ₫</strong></div></div>
-            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="return-attachment"></div>
-            <div id="return-attachment-preview"></div>
+            <div class="form-group"><label class="form-label">📎 Tệp</label><input type="file" id="return-attachment"></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="return-note"></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background:var(--success);" onclick="window.saveReturn()">Xác nhận</button></div>`;
@@ -408,86 +360,78 @@ export function openReturnModal(preselectedProjectId = null) {
     showModal(html, null);
 
     setTimeout(() => {
-        const projectSelect = document.getElementById('return-project');
-        const midSelect = document.getElementById('return-mid');
-        const qtyInput = document.getElementById('return-qty');
-        const priceInput = document.getElementById('return-price');
-        const attachmentInput = document.getElementById('return-attachment');
-
-        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', updateReturnPreview); }
+        const ps = document.getElementById('return-project');
+        const ms = document.getElementById('return-mid');
+        const qty = document.getElementById('return-qty');
+        const prc = document.getElementById('return-price');
+        const att = document.getElementById('return-attachment');
         
-        if (attachmentInput) {
-            attachmentInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentReturnAttachmentBase64 = e.target.result;
-                    const previewDiv = document.getElementById('return-attachment-preview');
-                    if (previewDiv) previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;">📄 ${file.name} <button class="sm" onclick="window.clearReturnAttachment()">🗑️</button></div>`;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+        if (qty) { setupNumberInput(qty, { isInteger: false, decimals: 3 }); qty.addEventListener('change', upd); }
+        if (att) att.addEventListener('change', function() {
+            const f = this.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = function(e) {
+                currentReturnAttachmentBase64 = e.target.result;
+                const p = document.getElementById('return-attachment-preview');
+                if (p) p.innerHTML = `<div class="metric-card">📄 ${f.name}</div>`;
+            };
+            r.readAsDataURL(f);
+        });
 
-        function updateMaterialListByProject() {
-            const pid = projectSelect?.value;
-            if (!pid || !midSelect) return;
-            const uTxns = state.data.transactions.filter(t => t.projectId === pid && t.type === 'usage');
-            const rTxns = state.data.transactions.filter(t => t.projectId === pid && t.type === 'return');
-            const map = new Map();
-            uTxns.forEach(t => {
-                const mat = state.data.materials.find(m => m.id === t.mid);
-                if (mat) {
-                    if (!map.has(t.mid)) map.set(t.mid, { id: t.mid, name: mat.name, unit: mat.unit, totalReceived: 0, totalReturned: 0, lastUnitPrice: t.unitPrice });
-                    map.get(t.mid).totalReceived += t.qty;
-                }
-            });
-            rTxns.forEach(t => { if (map.has(t.mid)) map.get(t.mid).totalReturned += t.qty; });
-            const list = Array.from(map.values()).map(i => ({ ...i, avail: i.totalReceived - i.totalReturned })).filter(i => i.avail > 0);
-            if (list.length === 0) { midSelect.innerHTML = '<option value="">✅ Hết</option>'; return; }
-            midSelect.innerHTML = list.map(m => `<option value="${m.id}" data-up="${m.lastUnitPrice}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
-            updateReturnPreview();
-        }
-
-        function updateReturnPreview() {
-            const opt = midSelect?.options[midSelect.selectedIndex];
-            const qty = getNumberFromInput(qtyInput);
+        function upd() {
+            const o = ms?.options[ms.selectedIndex];
+            const q = getNumberFromInput(qty);
             let up = 0;
-            if (opt?.value) { up = parseFloat(opt.dataset.up) || 0; if (priceInput) priceInput.value = up.toLocaleString('vi-VN'); }
-            document.getElementById('preview-return-total').innerText = formatMoneyVND(up * qty);
+            if (o?.value) { up = parseFloat(o.dataset.up) || 0; if (prc) prc.value = up.toLocaleString('vi-VN'); }
+            const el = document.getElementById('preview-return-total');
+            if (el) el.innerText = formatMoneyVND(up * q);
         }
 
-        if (projectSelect) projectSelect.addEventListener('change', () => { updateMaterialListByProject(); if (qtyInput) qtyInput.value = '1'; });
-        if (midSelect) midSelect.addEventListener('change', updateReturnPreview);
-        updateMaterialListByProject();
+        function loadMat() {
+            const pid = ps?.value; if (!pid || !ms) return;
+            const uT = state.data.transactions.filter(t => t.projectId===pid&&t.type==='usage');
+            const rT = state.data.transactions.filter(t => t.projectId===pid&&t.type==='return');
+            const map = new Map();
+            uT.forEach(t => {
+                const m = state.data.materials.find(x => x.id===t.mid);
+                if (m) { if(!map.has(t.mid)) map.set(t.mid,{id:t.mid,name:m.name,unit:m.unit,rec:0,ret:0,up:t.unitPrice}); map.get(t.mid).rec+=t.qty; }
+            });
+            rT.forEach(t => { if(map.has(t.mid)) map.get(t.mid).ret+=t.qty; });
+            const list = Array.from(map.values()).map(i=>({...i,avail:i.rec-i.ret})).filter(i=>i.avail>0);
+            if(list.length===0){ms.innerHTML='<option value="">✅ Hết</option>';return;}
+            ms.innerHTML = list.map(m=>`<option value="${m.id}" data-up="${m.up}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+            upd();
+        }
+
+        if(ps) ps.addEventListener('change',()=>{loadMat();if(qty)qty.value='1';});
+        if(ms) ms.addEventListener('change',upd);
+        loadMat();
     }, 150);
 }
 
 export function saveReturn() {
-    const projectId = document.getElementById('return-project')?.value;
+    const pid = document.getElementById('return-project')?.value;
     const mid = document.getElementById('return-mid')?.value;
     const dt = document.getElementById('return-datetime')?.value || getCurrentDateTime();
     const qty = getNumberFromInput(document.getElementById('return-qty'));
-    const unitPrice = getNumberFromInput(document.getElementById('return-price'));
+    const up = getNumberFromInput(document.getElementById('return-price'));
     const note = document.getElementById('return-note')?.value || '';
 
-    if (!projectId || !mid || !qty || qty <= 0 || !unitPrice) return alert('Thiếu thông tin');
-
+    if (!pid || !mid || !qty || qty <= 0 || !up) return alert('Thiếu thông tin');
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
 
-    const totalAmount = qty * unitPrice;
+    const total = qty * up;
     mat.qty += qty;
-    const project = projectById(projectId);
-    if (project) project.spent = Math.max(0, (project.spent || 0) - totalAmount);
+    const proj = projectById(pid);
+    if (proj) proj.spent = Math.max(0, (proj.spent || 0) - total);
 
     state.data.transactions.unshift({
-        id: genTid(), mid, projectId, date: dt.split('T')[0], datetime: dt,
-        type: 'return', qty, unitPrice, totalAmount, note: note || 'Trả hàng',
+        id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
+        type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
     });
-    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - ${formatMoneyVND(totalAmount)}`);
+    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Đã nhập lại kho!');
