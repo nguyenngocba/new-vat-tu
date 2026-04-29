@@ -254,3 +254,7 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
         font-size: 20px;
     }
 }
+/* Thêm vào cuối file style.css */
+.text-success {
+    color: var(--success-text);
+}

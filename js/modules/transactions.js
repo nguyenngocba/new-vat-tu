@@ -434,7 +434,6 @@ export function openReturnModal(preselectedProjectId = null) {
     if (!hasPermission('canImport')) { alert('Bạn không có quyền nhập kho'); return; }
     if (state.data.projects.length === 0) return alert('Chưa có công trình nào');
     
-    // Lọc các công trình đã có xuất kho
     const projectsWithUsage = state.data.projects.filter(p => {
         const usage = state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage');
         return usage;
@@ -449,7 +448,11 @@ export function openReturnModal(preselectedProjectId = null) {
         const totalUsed = state.data.transactions
             .filter(t => t.projectId === p.id && t.type === 'usage')
             .reduce((s, t) => s + (t.totalAmount || 0), 0);
-        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(totalUsed)})</option>`;
+        const totalReturn = state.data.transactions
+            .filter(t => t.projectId === p.id && t.type === 'return')
+            .reduce((s, t) => s + (t.totalAmount || 0), 0);
+        const netUsed = totalUsed - totalReturn;
+        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(totalUsed)} - Đã trả: ${formatMoneyVND(totalReturn)} - Thực tế: ${formatMoneyVND(netUsed)})</option>`;
     }).join('');
     
     const currentDateTime = getCurrentDateTime();
@@ -484,17 +487,18 @@ export function openReturnModal(preselectedProjectId = null) {
         const priceInput = document.getElementById('return-price');
         const attachmentInput = document.getElementById('return-attachment');
         
-        // Hàm cập nhật danh sách vật tư dựa trên công trình đã chọn
         function updateMaterialListByProject() {
             const projectId = projectSelect?.value;
             if (!projectId) return;
             
-            // Lấy danh sách vật tư đã xuất cho công trình này
             const projectTransactions = state.data.transactions.filter(t => 
                 t.projectId === projectId && t.type === 'usage'
             );
             
-            // Gom nhóm theo vật tư, tính tổng số lượng đã xuất và giá gần nhất
+            const returnTransactions = state.data.transactions.filter(t => 
+                t.projectId === projectId && t.type === 'return'
+            );
+            
             const materialMap = new Map();
             projectTransactions.forEach(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
@@ -505,6 +509,7 @@ export function openReturnModal(preselectedProjectId = null) {
                             name: mat.name,
                             unit: mat.unit,
                             totalExported: 0,
+                            totalReturned: 0,
                             lastUnitPrice: t.unitPrice,
                             lastTransactionDate: t.datetime || t.date
                         });
@@ -518,16 +523,23 @@ export function openReturnModal(preselectedProjectId = null) {
                 }
             });
             
-            const materials = Array.from(materialMap.values()).filter(m => m.totalExported > 0);
+            returnTransactions.forEach(t => {
+                if (materialMap.has(t.mid)) {
+                    materialMap.get(t.mid).totalReturned += t.qty;
+                }
+            });
+            
+            const materials = Array.from(materialMap.values())
+                .filter(m => m.totalExported - m.totalReturned > 0);
             
             if (materials.length === 0) {
-                midSelect.innerHTML = '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
+                midSelect.innerHTML = '<option value="">⚠️ Chưa có vật tư nào có thể trả cho công trình này</option>';
                 return;
             }
             
             midSelect.innerHTML = materials.map(m => 
-                `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.totalExported}">
-                    ${escapeHtml(m.name)} (Đã xuất: ${m.totalExported.toLocaleString('vi-VN')} ${m.unit} - Giá xuất cuối: ${formatMoneyVND(m.lastUnitPrice)})
+                `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.totalExported - m.totalReturned}">
+                    ${escapeHtml(m.name)} (Đã xuất: ${m.totalExported.toLocaleString('vi-VN')} ${m.unit} - Đã trả: ${m.totalReturned.toLocaleString('vi-VN')} - Có thể trả: ${(m.totalExported - m.totalReturned).toLocaleString('vi-VN')} - Giá xuất: ${formatMoneyVND(m.lastUnitPrice)})
                 </option>`
             ).join('');
             
@@ -535,7 +547,6 @@ export function openReturnModal(preselectedProjectId = null) {
             else updateReturnPreview();
         }
         
-        // Hàm cập nhật preview
         function updateReturnPreview() {
             const selectedOption = midSelect?.options[midSelect.selectedIndex];
             const qty = getNumberFromInput(qtyInput);
@@ -563,7 +574,7 @@ export function openReturnModal(preselectedProjectId = null) {
                         warningMsg.style.color = 'var(--danger-text)';
                         qtyInput.parentNode.appendChild(warningMsg);
                     }
-                    warningMsg.innerText = `⚠️ Số lượng trả (${qty.toLocaleString('vi-VN')}) vượt quá số đã xuất (${maxQty.toLocaleString('vi-VN')})`;
+                    warningMsg.innerText = `⚠️ Số lượng trả (${qty.toLocaleString('vi-VN')}) vượt quá số có thể trả (${maxQty.toLocaleString('vi-VN')})`;
                 }
             } else {
                 if (qtyInput) qtyInput.style.borderColor = '';
@@ -646,14 +657,20 @@ export function saveReturn() {
         t.projectId === projectId && t.type === 'usage' && t.mid === mid
     );
     
+    const returnTransactions = state.data.transactions.filter(t => 
+        t.projectId === projectId && t.type === 'return' && t.mid === mid
+    );
+    
     const totalExported = projectTransactions.reduce((sum, t) => sum + t.qty, 0);
+    const totalReturned = returnTransactions.reduce((sum, t) => sum + t.qty, 0);
+    const availableToReturn = totalExported - totalReturned;
     
     if (totalExported === 0) {
         return alert(`Vật tư "${mat.name}" chưa từng được xuất cho công trình này!`);
     }
     
-    if (qty > totalExported) {
-        return alert(`Số lượng trả (${qty.toLocaleString('vi-VN')} ${mat.unit}) vượt quá số đã xuất (${totalExported.toLocaleString('vi-VN')} ${mat.unit})`);
+    if (qty > availableToReturn) {
+        return alert(`Số lượng trả (${qty.toLocaleString('vi-VN')} ${mat.unit}) vượt quá số có thể trả (${availableToReturn.toLocaleString('vi-VN')} ${mat.unit})`);
     }
     
     if (!unitPrice || unitPrice <= 0) {
@@ -662,13 +679,18 @@ export function saveReturn() {
     
     const totalAmount = qty * unitPrice;
     
+    // 1. Cộng lại số lượng vào kho
     mat.qty += qty;
     
+    // 2. Cập nhật lại chi phí công trình (trừ đi giá trị hàng trả)
     const project = projectById(projectId);
     if (project) {
-        project.spent = Math.max(0, (project.spent || 0) - totalAmount);
+        const oldSpent = project.spent || 0;
+        const newSpent = Math.max(0, oldSpent - totalAmount);
+        project.spent = newSpent;
     }
     
+    // 3. Tạo giao dịch trả hàng
     const transaction = { 
         id: genTid(), 
         mid: mid, 
@@ -684,13 +706,16 @@ export function saveReturn() {
         attachmentName: document.getElementById('return-attachment')?.files[0]?.name || null
     };
     state.data.transactions.unshift(transaction);
-    addLog('Trả hàng về kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Giá trị: ${formatMoneyVND(totalAmount)} - Thời gian: ${formatDateTime(transactionDateTime)} - Lý do: ${note || 'Hàng thừa'}`);
+    
+    addLog('Trả hàng về kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Giá trị trừ: ${formatMoneyVND(totalAmount)} - Thời gian: ${formatDateTime(transactionDateTime)} - Lý do: ${note || 'Hàng thừa'}`);
     
     saveState();
     closeModal();
     currentReturnAttachmentBase64 = null;
+    
     if (window.render) window.render();
-    alert('✅ Đã nhập lại kho từ công trình thành công!');
+    
+    alert(`✅ Đã nhập lại kho từ công trình thành công!\n📦 Vật tư: ${mat.name}\n📊 Số lượng: ${qty.toLocaleString('vi-VN')} ${mat.unit}\n💰 Giá trị trừ khỏi công trình: ${formatMoneyVND(totalAmount)}`);
 }
 
 // ========== CÁC HÀM CLEAR ATTACHMENT ==========
@@ -718,7 +743,6 @@ export function clearInvoiceImage() {
     if (fileInput) fileInput.value = '';
 }
 
-// ========== EXPORTS ==========
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
 export const getTransactions = () => state.data.transactions;
