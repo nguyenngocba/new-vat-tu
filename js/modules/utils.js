@@ -381,4 +381,4 @@ console.log('formatRawToDisplay(9999):', formatRawToDisplay('9999'));
 console.log('formatRawToDisplay(99999):', formatRawToDisplay('99999'));
 console.log('formatRawToDisplay(1000000):', formatRawToDisplay('1000000'));
 console.log('formatRawToDisplay(1000000,5):', formatRawToDisplay('1000000,5'));
-export { formatRawToDisplay };
+
