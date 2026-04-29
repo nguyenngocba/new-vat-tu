@@ -79,11 +79,17 @@ function getMaterialUsageDetails(projectId) {
                     totalReceived: 0,
                     totalUsed: 0,
                     totalReturned: 0,
-                    usageRecords: []
+                    usageRecords: [],
+                    lastUnitPrice: t.unitPrice,
+                    lastTransactionDate: t.datetime || t.date
                 });
             }
             const item = materialMap.get(t.mid);
             item.totalReceived += t.qty;
+            if (new Date(t.datetime || t.date) > new Date(item.lastTransactionDate)) {
+                item.lastUnitPrice = t.unitPrice;
+                item.lastTransactionDate = t.datetime || t.date;
+            }
         }
     });
     
@@ -201,7 +207,7 @@ export function openMaterialUsageModal(projectId, materialId) {
                                     <td>📤 Xuất kho</td>
                                     <td>${t.qty.toLocaleString('vi-VN')} ${material.unit}</td>
                                     <td>${escapeHtml(t.note || '—')}</td>
-                                </table>`;
+                                </tr>`;
                             } else if (t.type === 'return') {
                                 return `<tr>
                                     <td>${formatDateTime(t.datetime || t.date)}</td>
@@ -262,7 +268,9 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === materialId);
     const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
     
-    const currentUsage = state.data.projectMaterialUsage?.find(u => u.projectId === projectId && u.materialId === materialId);
+    if (!state.data.projectMaterialUsage) state.data.projectMaterialUsage = [];
+    
+    const currentUsage = state.data.projectMaterialUsage.find(u => u.projectId === projectId && u.materialId === materialId);
     const currentUsed = currentUsage?.usedQty || 0;
     
     if (newUsedQty === currentUsed) {
@@ -276,9 +284,6 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
     const material = state.data.materials.find(m => m.id === materialId);
     const project = projectById(projectId);
     
-    if (!state.data.projectMaterialUsage) state.data.projectMaterialUsage = [];
-    
-    const existingIndex = state.data.projectMaterialUsage.findIndex(u => u.projectId === projectId && u.materialId === materialId);
     const usageRecord = {
         projectId,
         materialId,
@@ -297,6 +302,7 @@ export function saveMaterialUsage(projectId, materialId, totalReceived) {
         ]
     };
     
+    const existingIndex = state.data.projectMaterialUsage.findIndex(u => u.projectId === projectId && u.materialId === materialId);
     if (existingIndex >= 0) {
         state.data.projectMaterialUsage[existingIndex] = usageRecord;
     } else {
@@ -608,10 +614,9 @@ export function showProjectDetail(projectId) {
                                 </td>
                             </tr>`;
                         }).join('')}
-                        ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được xuất cho công trình}' : ''}
+                        ${materialUsageDetails.length === 0 ? '<tr><td colspan="7" style="text-align: center;">📭 Chưa có vật tư nào được xuất cho công trình</td>' : ''}
                     </tbody>
                 </table>
-                <div class="metric-sub" style="margin-top: 8px;">📌 Ghi chú: "Đã nhận từ kho" là số lượng đã xuất sang công trình. "Đã sử dụng" là số thực tế đã dùng (cập nhật thủ công). "Tồn tại CT" = Đã nhận - Đã sử dụng - Đã trả.</div>
             </div>
             
             <div class="sec-title" style="margin-top: 20px;">📜 LỊCH SỬ XUẤT/TRẢ CHI TIẾT</div>
@@ -649,7 +654,7 @@ export function showProjectDetail(projectId) {
                                 <td style="text-align: center; white-space: nowrap;">${attachmentHtml}</td>
                             </tr>`;
                         }).join('')}
-                        ${allTransactions.length === 0 ? '<tr><td colspan="8" style="text-align: center;">📭 Chưa có giao dịch nào</td></tr>' : ''}
+                        ${allTransactions.length === 0 ? '<tr><td colspan="8" style="text-align: center;">📭 Chưa có giao dịch nào</td>' : ''}
                     </tbody>
                 </table>
             </div>

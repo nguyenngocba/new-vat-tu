@@ -1,4 +1,4 @@
-export const STORAGE_KEY = 'steel_pro_v12';
+export const STORAGE_KEY = 'steel_pro_v14';
 
 export let state = {
   theme: 'dark',
@@ -17,6 +17,7 @@ export let state = {
     nextPid: 1,
     nextSid: 1,
     nextLogId: 1,
+    projectMaterialUsage: [],
     users: [
       { id: 'u1', name: 'Admin System', username: 'admin', password: 'admin123', role: 'admin', permissions: { canCreateMaterial: true, canDeleteMaterial: true, canEditMaterial: true, canImport: true, canExport: true, canDeleteProject: true, canAccessSettings: true, canManageSupplier: true } },
       { id: 'u2', name: 'Nhân viên kho', username: 'staff', password: 'staff123', role: 'user', permissions: { canCreateMaterial: false, canDeleteMaterial: false, canEditMaterial: false, canImport: true, canExport: true, canDeleteProject: false, canAccessSettings: false, canManageSupplier: false } },
@@ -40,10 +41,12 @@ export function saveState() {
       nextPid: state.data.nextPid,
       nextSid: state.data.nextSid,
       nextLogId: state.data.nextLogId,
+      projectMaterialUsage: state.data.projectMaterialUsage,
       users: state.data.users
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-  } catch(e) { console.error(e); }
+    console.log('✅ Đã lưu dữ liệu, projectMaterialUsage:', state.data.projectMaterialUsage.length);
+  } catch(e) { console.error('Lỗi lưu state:', e); }
 }
 
 export function loadState() {
@@ -55,6 +58,7 @@ export function loadState() {
       if (!state.data.projects) state.data.projects = [];
       if (!state.data.suppliers) state.data.suppliers = [];
       if (!state.data.logs) state.data.logs = [];
+      if (!state.data.projectMaterialUsage) state.data.projectMaterialUsage = [];
       if (!state.data.categories || state.data.categories.length === 0) {
         state.data.categories = ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'];
       }
@@ -63,7 +67,9 @@ export function loadState() {
       }
       if (!state.data.transactions) state.data.transactions = [];
       if (!state.data.materials) state.data.materials = [];
+      console.log('✅ Đã tải dữ liệu, projectMaterialUsage:', state.data.projectMaterialUsage.length);
     }
+    // Seed data nếu chưa có
     if (state.data.projects.length === 0) {
       state.data.projects = [
         { id: 'P001', name: 'Nhà kho A', budget: 50000000, spent: 0 },
@@ -83,7 +89,7 @@ export function loadState() {
     if (state.data.materials.length === 0) seedData();
     const savedTheme = localStorage.getItem('steel_theme');
     if (savedTheme) state.theme = savedTheme;
-  } catch(e) { console.error(e); seedData(); }
+  } catch(e) { console.error('Lỗi tải state:', e); seedData(); }
   applyTheme(state.theme);
 }
 
