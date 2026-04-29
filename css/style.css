@@ -390,3 +390,10 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
     .sidebar .sidebar-bottom button{font-size:0;padding:8px;}
     .sidebar .sidebar-bottom button::before{content:'🚪';font-size:18px;}
 }
+/* ===== INPUT SỐ - FIX DIRECTION ===== */
+input.num-input,
+input[type=text][dir=ltr] {
+    text-align: right;
+    direction: ltr;
+    unicode-bidi: plaintext;
+}

@@ -345,9 +345,9 @@ export function openMatModal() {
       <div class="form-group form-full"><label class="form-label">Tên vật tư *</label><input id="mn-name" placeholder="VD: Thép tấm 12mm"></div>
       <div class="form-group"><label class="form-label">Danh mục</label><select id="mn-cat">${state.data.categories.map(c => `<option>${c}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn vị tính</label><select id="mn-unit">${state.data.units.map(u => `<option>${u}</option>`).join('')}</select></div>
-      <div class="form-group"><label class="form-label">Số lượng nhập đầu</label><input type="text" id="mn-qty" value="0" style="text-align: right;"></div>
-      <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="0" style="text-align: right;"></div>
-      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="5" style="text-align: right;"></div>
+      <div class="form-group"><label class="form-label">Số lượng nhập đầu</label><input type="text" id="mn-qty" value="0" class="num-input" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="0" class="num-input" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="5" class="num-input" dir="ltr"></div>
       <div class="form-group form-full"><label class="form-label">Ghi chú</label><textarea id="mn-note" rows="2" placeholder="Ghi chú thêm về vật tư..."></textarea></div>
     </div></div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="saveMat()">Lưu vật tư</button></div>`);

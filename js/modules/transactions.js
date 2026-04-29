@@ -28,7 +28,6 @@ function calculatePurchaseTotal() {
     const subtotal = qty * price;
     const vatAmount = subtotal * vatRate / 100;
     const total = subtotal + vatAmount;
-
     const subtotalEl = document.getElementById('preview-subtotal');
     const vatEl = document.getElementById('preview-vat');
     const totalEl = document.getElementById('preview-total');
@@ -63,9 +62,9 @@ export function openPurchaseModal() {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><select id="purchase-supplier">${optsSup}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" class="num-input" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -76,7 +75,7 @@ export function openPurchaseModal() {
             <div id="invoice-preview"></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-purchase">Xác nhận nhập kho</button></div>`;
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchase()">Xác nhận nhập kho</button></div>`;
 
     showModal(html, null);
 
@@ -86,7 +85,6 @@ export function openPurchaseModal() {
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
-        const saveBtn = document.getElementById('btn-save-purchase');
 
         if (qtyInput) {
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
@@ -100,7 +98,6 @@ export function openPurchaseModal() {
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
             vatInput.addEventListener('change', calculatePurchaseTotal);
         }
-        if (saveBtn) saveBtn.onclick = savePurchase;
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -119,7 +116,7 @@ export function openPurchaseModal() {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
-                priceInput.value = mat.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                priceInput.value = mat.cost.toLocaleString('vi-VN');
             }
             calculatePurchaseTotal();
         };
@@ -144,9 +141,9 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><input type="text" value="${escapeHtml(supplier.name)}" disabled style="background: var(--surface3);"></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" style="text-align: right;"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" class="num-input" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -157,7 +154,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
             <div id="invoice-preview"></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-purchase-supplier">Xác nhận nhập kho</button></div>`;
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchaseWithSupplier('${supplierId}')">Xác nhận nhập kho</button></div>`;
 
     showModal(html, null);
 
@@ -167,7 +164,6 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
-        const saveBtn = document.getElementById('btn-save-purchase-supplier');
 
         if (qtyInput) {
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
@@ -181,7 +177,6 @@ export function openPurchaseModalWithSupplier(supplierId) {
             setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
             vatInput.addEventListener('change', calculatePurchaseTotal);
         }
-        if (saveBtn) saveBtn.onclick = () => savePurchaseWithSupplier(supplierId);
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -200,7 +195,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
-                priceInput.value = mat.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                priceInput.value = mat.cost.toLocaleString('vi-VN');
             }
             calculatePurchaseTotal();
         };
@@ -316,14 +311,14 @@ export function openTxnModal(type, preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">📅 Thời gian xuất</label><input type="datetime-local" id="export-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình thi công</label><select id="txn-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="txn-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align: right;"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" class="num-input" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-top:8px"><div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-export-total">0 ₫</strong></div></div>
             <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="export-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
             <div id="export-attachment-preview"></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note" placeholder="Mô tả thêm..."></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" id="btn-save-export">Xác nhận xuất kho</button></div>`;
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận xuất kho</button></div>`;
 
     showModal(html, null);
 
@@ -331,13 +326,11 @@ export function openTxnModal(type, preselectedProjectId = null) {
         const qtyInput = document.getElementById('txn-qty');
         const midSelect = document.getElementById('txn-mid');
         const attachmentInput = document.getElementById('export-attachment');
-        const saveBtn = document.getElementById('btn-save-export');
 
         if (qtyInput) {
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', calculateExportTotal);
         }
-        if (saveBtn) saveBtn.onclick = saveExport;
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -346,13 +339,11 @@ export function openTxnModal(type, preselectedProjectId = null) {
                 reader.onload = function(e) {
                     currentExportAttachmentBase64 = e.target.result;
                     const previewDiv = document.getElementById('export-attachment-preview');
-                    const fileSize = (file.size / 1024).toFixed(2);
-                    const fileType = file.type.split('/')[1]?.toUpperCase() || file.name.split('.').pop().toUpperCase();
                     if (previewDiv) {
                         if (file.type.startsWith('image/')) {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><img src="${currentExportAttachmentBase64}" class="invoice-img" style="max-height:150px;" onclick="window.open(this.src)"><div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div><button class="sm" onclick="window.clearExportAttachment()">🗑️ Xóa</button></div>`;
+                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><img src="${currentExportAttachmentBase64}" class="invoice-img" style="max-height:150px;"><div class="metric-sub">📄 ${file.name}</div><button class="sm" onclick="window.clearExportAttachment()">🗑️</button></div>`;
                         } else {
-                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><div style="font-size:32px;text-align:center;">📎</div><div class="metric-sub">📄 ${file.name} (${fileSize} KB)</div><button class="sm" onclick="window.clearExportAttachment()">🗑️ Xóa</button></div>`;
+                            previewDiv.innerHTML = `<div class="metric-card" style="margin-top:8px;"><div style="font-size:32px;text-align:center;">📎</div><div class="metric-sub">📄 ${file.name}</div><button class="sm" onclick="window.clearExportAttachment()">🗑️</button></div>`;
                         }
                     }
                 };
@@ -379,7 +370,7 @@ export function saveExport() {
 
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
-    if (mat.qty < qty) return alert(`Không đủ tồn kho! Hiện còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
+    if (mat.qty < qty) return alert(`Không đủ tồn kho! Còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
 
     const totalAmount = qty * mat.cost;
     mat.qty -= qty;
@@ -391,14 +382,12 @@ export function saveExport() {
         id: genTid(), mid: mid, projectId: projectId,
         date: transactionDateTime.split('T')[0], datetime: transactionDateTime,
         type: 'usage', qty: qty, unitPrice: mat.cost, totalAmount: totalAmount,
-        note: note, attachment: currentExportAttachmentBase64 || null,
-        attachmentName: document.getElementById('export-attachment')?.files[0]?.name || null
+        note: note, attachment: currentExportAttachmentBase64 || null
     };
     state.data.transactions.unshift(transaction);
-    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Thành tiền: ${formatMoneyVND(totalAmount)}`);
+    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - ${formatMoneyVND(totalAmount)}`);
 
-    saveState();
-    closeModal();
+    saveState(); closeModal();
     currentExportAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Xuất kho thành công!');
@@ -406,7 +395,7 @@ export function saveExport() {
 
 // ========== TRẢ HÀNG ==========
 export function openReturnModal(preselectedProjectId = null) {
-    if (!hasPermission('canImport')) { alert('Bạn không có quyền nhập kho'); return; }
+    if (!hasPermission('canImport')) { alert('Bạn không có quyền'); return; }
     if (state.data.projects.length === 0) return alert('Chưa có công trình nào');
 
     const projectsWithUsage = state.data.projects.filter(p =>
@@ -417,25 +406,25 @@ export function openReturnModal(preselectedProjectId = null) {
     const optsProj = projectsWithUsage.map(p => {
         const uTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
         const rTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
-        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(uTotal)} - Thực tế: ${formatMoneyVND(uTotal - rTotal)})</option>`;
+        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Thực tế: ${formatMoneyVND(uTotal - rTotal)})</option>`;
     }).join('');
 
     const html = `
-        <div class="modal-hd" style="background:var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình về kho</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+        <div class="modal-hd" style="background:var(--success-bg);"><span class="modal-title">🔄 Trả hàng từ công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
         <div class="modal-bd">
             <div class="form-grid2">
-                <div class="form-group"><label class="form-label">📅 Thời gian trả</label><input type="datetime-local" id="return-datetime" value="${getCurrentDateTime()}"></div>
+                <div class="form-group"><label class="form-label">📅 Thời gian</label><input type="datetime-local" id="return-datetime" value="${getCurrentDateTime()}"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình</label><select id="return-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="return-mid"></select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" style="text-align:right;"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá (VNĐ)</label><input type="text" id="return-price" readonly style="background:var(--surface3);"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá (VNĐ)</label><input type="text" id="return-price" readonly style="background:var(--surface3);" class="num-input" dir="ltr"></div>
             </div>
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-return-total">0 ₫</strong></div></div>
-            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="return-attachment" accept=".pdf,.jpg,.jpeg,.png"></div>
+            <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="return-attachment"></div>
             <div id="return-attachment-preview"></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="return-note"></div>
         </div>
-        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background:var(--success);" id="btn-save-return">Xác nhận</button></div>`;
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background:var(--success);" onclick="window.saveReturn()">Xác nhận</button></div>`;
 
     showModal(html, null);
 
@@ -444,15 +433,12 @@ export function openReturnModal(preselectedProjectId = null) {
         const midSelect = document.getElementById('return-mid');
         const qtyInput = document.getElementById('return-qty');
         const priceInput = document.getElementById('return-price');
-        const saveBtn = document.getElementById('btn-save-return');
         const attachmentInput = document.getElementById('return-attachment');
 
         if (qtyInput) {
             setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
             qtyInput.addEventListener('change', updateReturnPreview);
         }
-        if (saveBtn) saveBtn.onclick = saveReturn;
-
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -470,29 +456,20 @@ export function openReturnModal(preselectedProjectId = null) {
         function updateMaterialListByProject() {
             const pid = projectSelect?.value;
             if (!pid || !midSelect) return;
-
             const uTxns = state.data.transactions.filter(t => t.projectId === pid && t.type === 'usage');
             const rTxns = state.data.transactions.filter(t => t.projectId === pid && t.type === 'return');
-            const uRecs = state.data.projectMaterialUsage?.filter(u => u.projectId === pid) || [];
-
             const map = new Map();
             uTxns.forEach(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
                 if (mat) {
-                    if (!map.has(t.mid)) map.set(t.mid, { id: t.mid, name: mat.name, unit: mat.unit, totalReceived: 0, totalReturned: 0, totalUsed: 0, lastUnitPrice: t.unitPrice });
+                    if (!map.has(t.mid)) map.set(t.mid, { id: t.mid, name: mat.name, unit: mat.unit, totalReceived: 0, totalReturned: 0, lastUnitPrice: t.unitPrice });
                     map.get(t.mid).totalReceived += t.qty;
                 }
             });
             rTxns.forEach(t => { if (map.has(t.mid)) map.get(t.mid).totalReturned += t.qty; });
-            uRecs.forEach(r => { if (map.has(r.materialId)) map.get(r.materialId).totalUsed = r.usedQty || 0; });
-
-            const list = Array.from(map.values()).map(i => ({ ...i, avail: i.totalReceived - i.totalUsed - i.totalReturned })).filter(i => i.avail > 0);
-            if (list.length === 0) {
-                midSelect.innerHTML = '<option value="">✅ Hết vật tư có thể trả</option>';
-                if (priceInput) priceInput.value = '';
-                return;
-            }
-            midSelect.innerHTML = list.map(m => `<option value="${m.id}" data-up="${m.lastUnitPrice}" data-max="${m.avail}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+            const list = Array.from(map.values()).map(i => ({ ...i, avail: i.totalReceived - i.totalReturned })).filter(i => i.avail > 0);
+            if (list.length === 0) { midSelect.innerHTML = '<option value="">✅ Hết</option>'; return; }
+            midSelect.innerHTML = list.map(m => `<option value="${m.id}" data-up="${m.lastUnitPrice}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
             updateReturnPreview();
         }
 
@@ -501,16 +478,12 @@ export function openReturnModal(preselectedProjectId = null) {
             const qty = getNumberFromInput(qtyInput);
             let up = 0;
             if (opt?.value) { up = parseFloat(opt.dataset.up) || 0; if (priceInput) priceInput.value = up.toLocaleString('vi-VN'); }
-            const total = up * qty;
-            const el = document.getElementById('preview-return-total');
-            if (el) el.innerText = formatMoneyVND(total);
+            document.getElementById('preview-return-total').innerText = formatMoneyVND(up * qty);
         }
 
-        if (projectSelect) projectSelect.addEventListener('change', () => { updateMaterialListByProject(); if (qtyInput) qtyInput.value = '1'; updateReturnPreview(); });
+        if (projectSelect) projectSelect.addEventListener('change', () => { updateMaterialListByProject(); if (qtyInput) qtyInput.value = '1'; });
         if (midSelect) midSelect.addEventListener('change', updateReturnPreview);
-
         updateMaterialListByProject();
-        updateReturnPreview();
     }, 150);
 }
 
@@ -518,41 +491,31 @@ export function saveReturn() {
     const projectId = document.getElementById('return-project')?.value;
     const mid = document.getElementById('return-mid')?.value;
     const dt = document.getElementById('return-datetime')?.value || getCurrentDateTime();
-
     const qty = getNumberFromInput(document.getElementById('return-qty'));
     const unitPrice = getNumberFromInput(document.getElementById('return-price'));
     const note = document.getElementById('return-note')?.value || '';
 
-    if (!projectId) return alert('Chọn công trình');
-    if (!mid) return alert('Chọn vật tư');
-    if (!qty || qty <= 0) return alert('Số lượng không hợp lệ');
-    if (!unitPrice) return alert('Không xác định được đơn giá');
+    if (!projectId || !mid || !qty || qty <= 0 || !unitPrice) return alert('Thiếu thông tin');
 
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
 
     const totalAmount = qty * unitPrice;
     mat.qty += qty;
-
     const project = projectById(projectId);
     if (project) project.spent = Math.max(0, (project.spent || 0) - totalAmount);
 
-    const transaction = {
-        id: genTid(), mid, projectId,
-        date: dt.split('T')[0], datetime: dt, type: 'return',
-        qty, unitPrice, totalAmount, note: note || 'Trả hàng từ công trình',
+    state.data.transactions.unshift({
+        id: genTid(), mid, projectId, date: dt.split('T')[0], datetime: dt,
+        type: 'return', qty, unitPrice, totalAmount, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
-    };
-    state.data.transactions.unshift(transaction);
-    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - Giá trị: ${formatMoneyVND(totalAmount)}`);
-
-    saveState(); closeModal();
-    currentReturnAttachmentBase64 = null;
+    });
+    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - ${formatMoneyVND(totalAmount)}`);
+    saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Đã nhập lại kho!');
 }
 
-// ========== CLEAR ==========
 export function clearExportAttachment() {
     currentExportAttachmentBase64 = null;
     const el = document.getElementById('export-attachment-preview'); if (el) el.innerHTML = '';
@@ -569,7 +532,6 @@ export function clearInvoiceImage() {
     const fi = document.getElementById('purchase-invoice'); if (fi) fi.value = '';
 }
 
-// ========== EXPORTS ==========
 export { calculatePurchaseTotal, calculateExportTotal };
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
