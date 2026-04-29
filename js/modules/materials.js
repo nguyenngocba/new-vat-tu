@@ -90,8 +90,8 @@ function updateMaterialList() {
                                        </td>`;
                                 }
                                 if (col.key === 'name') {
-                                    return `<td style="width: ${col.width}px;"><strong>${escapeHtml(m.name)}</strong></td>`;
-                                }
+									return `<td style="width: ${col.width}px;"><strong style="cursor:pointer;color:var(--accent);text-decoration:underline;" onclick="window.showMaterialDetail('${m.id}')">${escapeHtml(m.name)}</strong></td>`;
+								}
                                 if (col.key === 'qty') {
                                     return `<td style="width: ${col.width}px;">${displayQty} ${m.unit}</td>`;
                                 }
@@ -396,5 +396,151 @@ export const addMaterial = (data) => {
     saveState(); if(window.render) window.render();
     return newMat;
 };
+// ========== XEM CHI TIẾT VẬT TƯ ==========
+window.showMaterialDetail = function(mid) {
+    const mat = matById(mid);
+    if (!mat) return;
 
+    // Lấy giao dịch nhập (purchase)
+    const purchaseTxns = state.data.transactions
+        .filter(t => t.mid === mid && t.type === 'purchase')
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+
+    // Lấy giao dịch xuất (usage) và trả (return)
+    const exportTxns = state.data.transactions
+        .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return'))
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+
+    // Tính tổng
+    const totalImport = purchaseTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
+    const totalExport = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
+    const totalReturn = exportTxns.filter(t => t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
+
+    const html = `
+        <div class="modal-hd" style="background: var(--accent-bg);">
+            <span class="modal-title">📦 Chi tiết: ${escapeHtml(mat.name)} (${mat.id})</span>
+            <button class="xbtn" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
+            <div class="grid4" style="margin-bottom: 20px;">
+                <div class="metric-card">
+                    <div class="metric-label">📦 TỒN KHO</div>
+                    <div class="metric-val">${mat.qty.toLocaleString('vi-VN')} ${mat.unit}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">💰 ĐƠN GIÁ</div>
+                    <div class="metric-val">${formatMoneyVND(mat.cost)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📥 TỔNG NHẬP</div>
+                    <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📤 TỔNG XUẤT</div>
+                    <div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(totalExport)}</div>
+                </div>
+            </div>
+
+            <div class="sec-title">📥 LỊCH SỬ NHẬP KHO</div>
+            <div class="tbl-wrap" style="margin-bottom: 20px;">
+                <table style="min-width: 700px;">
+                    <thead><tr><th>Thời gian</th><th>Nhà cung cấp</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+                    <tbody>
+                        ${purchaseTxns.length > 0 ? purchaseTxns.map(t => {
+                            const sup = supplierById(t.supplierId);
+                            return `<tr>
+                                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
+                                <td><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
+                                <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
+                                <td style="text-align:center;">${t.vatRate||0}%</td>
+                                <td style="text-align:right;color:var(--success-text);font-weight:500;">${formatMoneyVND(t.totalAmount)}</td>
+                                <td>${escapeHtml(t.note || '—')}</td>
+                            </tr>`;
+                        }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="sec-title">📤 LỊCH SỬ XUẤT KHO</div>
+            <div class="tbl-wrap">
+                <table style="min-width: 700px;">
+                    <thead><tr><th>Thời gian</th><th>Loại</th><th>Công trình</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+                    <tbody>
+                        ${exportTxns.length > 0 ? exportTxns.map(t => {
+                            const proj = projectById(t.projectId);
+                            const isReturn = t.type === 'return';
+                            return `<tr>
+                                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
+                                <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:500;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
+                                <td><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
+                                <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
+                                <td style="text-align:right;font-weight:500;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
+                                <td>${escapeHtml(t.note || '—')}</td>
+                            </tr>`;
+                        }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch xuất</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-ft">
+            <button onclick="closeModal()">Đóng</button>
+            <button class="sm" onclick="closeModal();window.exportMaterialDetail('${mid}')">📎 Xuất Excel</button>
+        </div>`;
+
+    showModal(html, null);
+};
+
+// Hàm helper format datetime
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return '';
+    return new Date(dateTimeStr).toLocaleString('vi-VN');
+}
+
+// Hàm helper lấy supplier by id
+function supplierById(sid) {
+    return state.data.suppliers.find(s => s.id === sid);
+}
+window.exportMaterialDetail = function(mid) {
+    const mat = matById(mid);
+    if (!mat) return;
+
+    const purchaseTxns = state.data.transactions.filter(t => t.mid === mid && t.type === 'purchase');
+    const exportTxns = state.data.transactions.filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return'));
+
+    const importData = purchaseTxns.map(t => ({
+        'Thời gian': formatDateTime(t.datetime || t.date),
+        'Nhà cung cấp': supplierById(t.supplierId)?.name || '',
+        'Số lượng': t.qty,
+        'Đơn giá': t.unitPrice,
+        'VAT': t.vatRate + '%',
+        'Thành tiền': t.totalAmount,
+        'Ghi chú': t.note || ''
+    }));
+
+    const exportData = exportTxns.map(t => ({
+        'Thời gian': formatDateTime(t.datetime || t.date),
+        'Loại': t.type === 'return' ? 'Trả hàng' : 'Xuất kho',
+        'Công trình': projectById(t.projectId)?.name || '',
+        'Số lượng': t.qty,
+        'Đơn giá': t.unitPrice,
+        'Thành tiền': t.totalAmount,
+        'Ghi chú': t.note || ''
+    }));
+
+    if (typeof XLSX !== 'undefined') {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(importData), 'Nhập kho');
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), 'Xuất kho');
+        XLSX.writeFile(wb, `chitiet_${mat.id}_${new Date().toISOString().split('T')[0]}.xlsx`);
+        alert('✅ Đã xuất Excel!');
+    } else {
+        alert('Đang tải thư viện Excel...');
+    }
+};
+
+function projectById(pid) {
+    return state.data.projects.find(p => p.id === pid);
+}
 export const getMaterials = () => state.data.materials;
