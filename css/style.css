@@ -45,9 +45,11 @@ button.sm{padding:4px 9px;font-size:12px;}
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500;font-family:var(--mono);}
 .b-ok{background:var(--success-bg);color:var(--success-text);}
 .b-low{background:var(--warn-bg);color:var(--warn-text);}
+.b-warning{background:var(--warn-bg);color:var(--warn-text);}
+.b-danger{background:var(--danger-bg);color:var(--danger-text);}
+.b-success{background:var(--success-bg);color:var(--success-text);}
 
-/* Bảng cố định - không bị kéo dãn cột */
-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+table{width:100%;border-collapse:collapse;}
 th{text-align:left;padding:8px 10px;font-size:11px;font-family:var(--mono);color:var(--muted);border-bottom:1px solid var(--border2);}
 td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--border);word-break:break-word;}
 tr:last-child td{border-bottom:none;}
@@ -92,7 +94,7 @@ tr:hover td{background:var(--surface2);}
 .pane.active{display:block;}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--rl);width:100%;max-width:800px;max-height:85vh;overflow:auto;}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--rl);width:100%;max-width:900px;max-height:85vh;overflow:auto;}
 .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:0.5px solid var(--border);}
 .modal-title{font-size:16px;font-weight:600;}
 .modal-bd{padding:20px;}
@@ -120,7 +122,6 @@ tr:hover td{background:var(--surface2);}
 .search-box{margin-bottom:16px;display:flex;gap:10px;}
 .invoice-img{max-width:100%;max-height:200px;border-radius:var(--r);margin-top:8px;cursor:pointer;}
 
-/* Resize handle cho cột - chỉ áp dụng cho bảng vật tư */
 .resizable-table{position:relative;overflow-x:auto;}
 .resizable-table th{position:relative;user-select:none;}
 .resizable-table .resize-handle{position:absolute;top:0;right:0;width:5px;height:100%;cursor:col-resize;background:transparent;z-index:10;}
@@ -158,9 +159,12 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
 .project-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.2);border-color:var(--accent);}
 
 .text-warning{color:var(--warn-text);font-weight:500;}
+.text-success{color:var(--success-text);font-weight:500;}
+.text-danger{color:var(--danger-text);font-weight:500;}
+
 .chart-container{position:relative;height:250px;margin-bottom:20px;}
 
-/* Resizable Panels - Chỉ áp dụng trong container cụ thể */
+/* Resizable Panels */
 #projects-resizable-container,
 #suppliers-resizable-container {
     display: flex;
@@ -217,6 +221,30 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
     color: var(--muted);
 }
 
+/* Tooltip cho usage */
+.usage-tooltip {
+    position: relative;
+    cursor: help;
+    border-bottom: 1px dashed var(--accent);
+}
+
+.usage-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r);
+    padding: 8px 12px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 100;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .grid4 {
@@ -253,8 +281,4 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
     .nav-item:first-child {
         font-size: 20px;
     }
-}
-/* Thêm vào cuối file style.css */
-.text-success {
-    color: var(--success-text);
 }
