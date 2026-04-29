@@ -89,6 +89,9 @@ window.logout = logout;
 window.switchPane = switchPane;
 window.closeModal = closeModal;
 window.showModal = showModal;
+window.openReturnModal = openReturnModal;
+window.saveReturn = saveReturn;
+window.clearReturnAttachment = clearReturnAttachment;
 
 // Material
 window.openMatModal = openMatModal;

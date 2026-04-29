@@ -39,14 +39,15 @@ function getFilteredProjects() {
     return result;
 }
 
+// Cập nhật renderProjectHistory
 function renderProjectHistory() {
     const transactions = state.data.transactions
-        .filter(t => t.type === 'usage' && t.projectId)
+        .filter(t => (t.type === 'usage' || t.type === 'return') && t.projectId)
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date))
         .slice(0, 50);
     
     if (transactions.length === 0) {
-        return '<tr><td colspan="6" style="text-align: center;">📭 Chưa có dữ liệu xuất kho cho công trình nào</td></tr>';
+        return '<tr><td colspan="7" style="text-align: center;">📭 Chưa có dữ liệu xuất/nhập cho công trình nào</td></tr>';
     }
     
     return transactions.map(t => {
@@ -54,13 +55,18 @@ function renderProjectHistory() {
         const proj = projectById(t.projectId);
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
         const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+        const isReturn = t.type === 'return';
+        const typeIcon = isReturn ? '🔄 Trả về' : '📤 Xuất đi';
+        const typeColor = isReturn ? 'var(--success-text)' : 'var(--warn-text)';
+        
         return `<tr>
+            <td style="white-space: nowrap;">${displayDateTime}</td>
             <td style="white-space: nowrap;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
             <td style="white-space: nowrap;">${escapeHtml(mat?.name || 'N/A')}</td>
             <td style="text-align: right; white-space: nowrap;">${displayQty} ${mat?.unit || ''}</td>
-            <td style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.unitPrice || mat?.cost || 0)}</td>
-            <td style="text-align: right; white-space: nowrap;" class="text-warning">${formatMoneyVND(t.totalAmount || 0)}</td>
-            <td style="white-space: nowrap;">${displayDateTime}</td>
+            <td style="text-align: right; white-space: nowrap;">${formatMoneyVND(t.unitPrice)}</td>
+            <td style="text-align: right; white-space: nowrap;" class="${isReturn ? 'text-success' : 'text-warning'}">${isReturn ? '+' : '-'} ${formatMoneyVND(t.totalAmount)}</td>
+            <td style="text-align: center; white-space: nowrap; color: ${typeColor};">${typeIcon}</td>
         </tr>`;
     }).join('');
 }
