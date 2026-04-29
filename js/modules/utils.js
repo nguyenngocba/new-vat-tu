@@ -16,7 +16,14 @@ export function parseNumber(str) {
 
 export function getNumberFromInput(inputElement) {
     if (!inputElement) return 0;
-    return parseNumber(inputElement.value);
+    // Bỏ dấu chấm (phân cách hàng nghìn), đổi dấu phẩy thành dấu chấm (thập phân)
+    let val = inputElement.value || '0';
+    console.log('getNumberFromInput raw:', val);
+    let cleaned = val.replace(/\./g, '').replace(/,/g, '.');
+    console.log('getNumberFromInput cleaned:', cleaned);
+    let num = parseFloat(cleaned);
+    console.log('getNumberFromInput result:', num);
+    return isNaN(num) ? 0 : num;
 }
 
 export function getIntegerFromInput(inputElement) {
