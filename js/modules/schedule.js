@@ -1,5 +1,5 @@
-import { state, saveState, addLog, escapeHtml, showModal, closeModal, formatMoneyVND } from './state.js';
-import { setupNumberInput } from './utils.js';
+import { state, saveState, addLog, escapeHtml, showModal, closeModal } from './state.js';
+import { formatMoneyVND, setupNumberInput } from './utils.js';
 
 // Lấy tiến độ của công trình
 export function getProjectSchedule(projectId) {
@@ -73,7 +73,7 @@ export function addTask(projectId, parentTaskId = null) {
         weight: 1,
         progress: 0,
         completed: false,
-        materials: [], // [{ materialId, quantity, unit, totalAmount, assignedFromStock }]
+        materials: [],
         subTasks: [],
         expanded: true
     };
@@ -107,7 +107,6 @@ export function updateTask(projectId, taskId, updates) {
         for (const task of tasks) {
             if (task.id === taskId) {
                 Object.assign(task, updates);
-                // Cập nhật progress nếu có thay đổi
                 if (updates.completed !== undefined || updates.progress !== undefined) {
                     task.completed = updates.completed || task.progress >= 100;
                     if (task.completed) task.progress = 100;
