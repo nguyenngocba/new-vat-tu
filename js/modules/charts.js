@@ -18,7 +18,12 @@ let advancedFilters = {
     transactionType: 'all'
 };
 
+// Dashboard tab hiện tại
+let currentDashboardTab = 'overview'; // 'overview' | 'projects' | 'suppliers'
+
 let searchTimeout = null;
+
+// ===== EXPORT CÁC HÀM CẦN THIẾT =====
 
 export function checkAutoBackup() {
     const lastBackupKey = 'steeltrack_last_backup_date';
@@ -203,12 +208,12 @@ function renderAdvancedFilters() {
     const suppliers = [{ id: 'all', name: '📂 Tất cả nhà cung cấp' }, ...state.data.suppliers];
     
     return `
-        <div class="card" style="margin-bottom: 16px;">
-            <div class="sec-title" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="window.toggleAdvancedFilters()">
-                <span>🔧 TÌM KIẾM NÂNG CAO</span>
-                <span id="filter-toggle-icon" style="font-size: 16px;">▼</span>
+        <div class="card advanced-filters-section" style="margin-bottom: 16px;">
+            <div class="advanced-filters-header" onclick="window.toggleAdvancedFilters()">
+                <span class="sec-title" style="margin-bottom:0;">🔧 TÌM KIẾM NÂNG CAO</span>
+                <span id="filter-toggle-icon" style="font-size: 16px;">▶</span>
             </div>
-            <div id="advanced-filters-content" style="display: block;">
+            <div id="advanced-filters-content" class="advanced-filters-body">
                 <div class="grid2" style="margin-bottom: 12px;">
                     <div class="form-group">
                         <label class="form-label">📅 Từ ngày</label>
@@ -263,12 +268,12 @@ window.toggleAdvancedFilters = function() {
     const content = document.getElementById('advanced-filters-content');
     const icon = document.getElementById('filter-toggle-icon');
     if (content && icon) {
-        if (content.style.display === 'none') {
-            content.style.display = 'block';
-            icon.innerHTML = '▼';
-        } else {
-            content.style.display = 'none';
+        if (content.classList.contains('show')) {
+            content.classList.remove('show');
             icon.innerHTML = '▶';
+        } else {
+            content.classList.add('show');
+            icon.innerHTML = '▼';
         }
     }
 };
@@ -376,6 +381,13 @@ function renderTransactionList() {
     }).join('');
 }
 
+// ===== SWITCH DASHBOARD TAB =====
+window.switchDashboardTab = function(tabName) {
+    currentDashboardTab = tabName;
+    updateDashboardContent();
+};
+
+// ===== RENDER DASHBOARD =====
 export function renderDashboard() {
     const filteredMaterials = getFilteredMaterials();
     const { totalImport, totalExport, totalReturn, netSpent } = getTotalValues();
@@ -423,139 +435,285 @@ export function renderDashboard() {
         </div>
     ` : '';
     
-    return renderAdvancedFilters() + `
-        <div class="grid4">
-            <div class="metric-card">
-                <div class="metric-label">💰 TỔNG NHẬP KHO</div>
-                <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">📤 TỔNG XUẤT KHO</div>
-                <div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(totalExport)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">🔄 TRẢ HÀNG VỀ KHO</div>
-                <div class="metric-val" style="color: var(--accent);">${formatMoneyVND(totalReturn)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">📦 CHI PHÍ THỰC TẾ</div>
-                <div class="metric-val">${formatMoneyVND(netSpent)}</div>
-            </div>
+    // ===== DASHBOARD TABS =====
+    const tabsHtml = `
+        <div class="dashboard-tabs">
+            <div class="dashboard-tab ${currentDashboardTab === 'overview' ? 'active' : ''}" onclick="window.switchDashboardTab('overview')">📊 Tổng quan</div>
+            <div class="dashboard-tab ${currentDashboardTab === 'projects' ? 'active' : ''}" onclick="window.switchDashboardTab('projects')">🏗️ Chi tiết công trình</div>
+            <div class="dashboard-tab ${currentDashboardTab === 'suppliers' ? 'active' : ''}" onclick="window.switchDashboardTab('suppliers')">🏭 Chi tiết nhà cung cấp</div>
         </div>
-        
-        <div class="grid4" style="margin-bottom: 18px;">
-            <div class="metric-card" style="grid-column: span 4; background: var(--accent-bg);">
-                <div class="metric-label">🏪 GIÁ TRỊ TỒN KHO HIỆN TẠI</div>
-                <div class="metric-val" style="font-size: 28px;">${formatMoneyVND(totalInventory)}</div>
-                <div class="metric-sub">Tổng số mặt hàng: ${state.data.materials.length}</div>
+    `;
+    
+    // ===== FILTERS (LUÔN ẨN MẶC ĐỊNH) =====
+    const filtersHtml = renderAdvancedFilters();
+    
+    // ===== TAB CONTENT =====
+    let tabContent = '';
+    
+    if (currentDashboardTab === 'overview') {
+        tabContent = `
+            <div class="grid4">
+                <div class="metric-card">
+                    <div class="metric-label">💰 TỔNG NHẬP KHO</div>
+                    <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📤 TỔNG XUẤT KHO</div>
+                    <div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(totalExport)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">🔄 TRẢ HÀNG VỀ KHO</div>
+                    <div class="metric-val" style="color: var(--accent);">${formatMoneyVND(totalReturn)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📦 CHI PHÍ THỰC TẾ</div>
+                    <div class="metric-val">${formatMoneyVND(netSpent)}</div>
+                </div>
             </div>
-        </div>
-        
-        ${lowStockHtml}
-        
-        <div class="grid2" style="margin-bottom: 18px;">
+            
+            <div class="grid4" style="margin-bottom: 18px;">
+                <div class="metric-card" style="grid-column: span 4; background: var(--accent-bg);">
+                    <div class="metric-label">🏪 GIÁ TRỊ TỒN KHO HIỆN TẠI</div>
+                    <div class="metric-val" style="font-size: 28px;">${formatMoneyVND(totalInventory)}</div>
+                    <div class="metric-sub">Tổng số mặt hàng: ${state.data.materials.length}</div>
+                </div>
+            </div>
+            
+            ${lowStockHtml}
+            
+            <div class="grid2" style="margin-bottom: 18px;">
+                <div class="card">
+                    <div class="sec-title">🏷️ TOP DANH MỤC VẬT TƯ</div>
+                    ${topCategories.length > 0 ? `
+                        <div class="tbl-wrap">
+                            <table style="width: 100%;">
+                                <thead><tr><th>Danh mục</th><th>Giá trị</th></tr></thead>
+                                <tbody>
+                                    ${topCategories.map(([cat, total]) => `
+                                        <tr>
+                                            <td><strong>${escapeHtml(cat)}</strong></td>
+                                            <td class="text-warning">${formatMoneyVND(total)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
+                </div>
+                <div class="card">
+                    <div class="sec-title">🏭 TOP NHÀ CUNG CẤP</div>
+                    ${topSuppliers.length > 0 ? `
+                        <div class="tbl-wrap">
+                            <table style="width: 100%;">
+                                <thead><tr><th>Nhà cung cấp</th><th>Giá trị</th></tr></thead>
+                                <tbody>
+                                    ${topSuppliers.map(s => `
+                                        <tr>
+                                            <td><strong>${escapeHtml(s.name)}</strong></td>
+                                            <td class="text-warning">${formatMoneyVND(s.total)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
+                </div>
+            </div>
+            
+            <div class="grid2" style="margin-bottom: 18px;">
+                <div class="card">
+                    <div class="sec-title">🏗️ TOP CÔNG TRÌNH</div>
+                    ${topProjects.length > 0 ? `
+                        <div class="tbl-wrap">
+                            <table style="width: 100%;">
+                                <thead><tr><th>Công trình</th><th>Chi phí</th></tr></thead>
+                                <tbody>
+                                    ${topProjects.map(p => `
+                                        <tr>
+                                            <td><strong>${escapeHtml(p.name)}</strong></td>
+                                            <td class="text-warning">${formatMoneyVND(p.total)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
+                </div>
+                <div class="card">
+                    <div class="sec-title">📈 THỐNG KÊ NHẬP/XUẤT THEO THÁNG</div>
+                    <div class="chart-container" style="height: 220px;"><canvas id="monthly-chart"></canvas></div>
+                </div>
+            </div>
+            
+            <div class="grid2" style="margin-bottom: 18px;">
+                <div class="card">
+                    <div class="sec-title">📊 BIỂU ĐỒ NHẬP/XUẤT THEO DANH MỤC</div>
+                    <div class="chart-container" style="height: 250px;"><canvas id="category-pie-chart"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="sec-title">📊 BIỂU ĐỒ NHẬP HÀNG THEO NHÀ CUNG CẤP</div>
+                    <div class="chart-container" style="height: 250px;"><canvas id="supplier-pie-chart"></canvas></div>
+                </div>
+            </div>
+            
             <div class="card">
-                <div class="sec-title">🏷️ TOP DANH MỤC VẬT TƯ</div>
-                ${topCategories.length > 0 ? `
-                    <div class="tbl-wrap">
-                        <table style="width: 100%;">
-                            <thead><tr><th>Danh mục</th><th>Giá trị</th></tr></thead>
-                            <tbody>
-                                ${topCategories.map(([cat, total]) => `
-                                    <tr>
-                                        <td><strong>${escapeHtml(cat)}</strong></td>
-                                        <td class="text-warning">${formatMoneyVND(total)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
+                <div class="sec-title">📋 DANH SÁCH GIAO DỊCH THEO BỘ LỌC</div>
+                <div class="tbl-wrap">
+                    <table style="min-width: 800px; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Loại</th>
+                                <th>Vật tư</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Đối tượng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list-tbody">
+                            ${renderTransactionList()}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="card">
-                <div class="sec-title">🏭 TOP NHÀ CUNG CẤP</div>
-                ${topSuppliers.length > 0 ? `
-                    <div class="tbl-wrap">
-                        <table style="width: 100%;">
-                            <thead><tr><th>Nhà cung cấp</th><th>Giá trị</th></tr></thead>
-                            <tbody>
-                                ${topSuppliers.map(s => `
-                                    <tr>
-                                        <td><strong>${escapeHtml(s.name)}</strong></td>
-                                        <td class="text-warning">${formatMoneyVND(s.total)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
-            </div>
-        </div>
+        `;
+    } else if (currentDashboardTab === 'projects') {
+        // ===== TAB CHI TIẾT CÔNG TRÌNH =====
+        const allProjects = state.data.projects.map(p => {
+            const receiveTxns = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage');
+            const returnTxns = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return');
+            const totalReceived = receiveTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
+            const totalReturn = returnTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
+            const netCost = totalReceived - totalReturn;
+            const remaining = p.budget - netCost;
+            const percent = p.budget > 0 ? (netCost / p.budget) * 100 : 0;
+            return { ...p, netCost, totalReceived, totalReturn, remaining, percent, receiveCount: receiveTxns.length, returnCount: returnTxns.length };
+        });
         
-        <div class="grid2" style="margin-bottom: 18px;">
-            <div class="card">
-                <div class="sec-title">🏗️ TOP CÔNG TRÌNH</div>
-                ${topProjects.length > 0 ? `
-                    <div class="tbl-wrap">
-                        <table style="width: 100%;">
-                            <thead><tr><th>Công trình</th><th>Chi phí</th></tr></thead>
-                            <tbody>
-                                ${topProjects.map(p => `
-                                    <tr>
-                                        <td><strong>${escapeHtml(p.name)}</strong></td>
-                                        <td class="text-warning">${formatMoneyVND(p.total)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                ` : '<div class="metric-sub">Chưa có dữ liệu</div>'}
+        tabContent = `
+            <div class="grid4" style="margin-bottom: 18px;">
+                <div class="metric-card">
+                    <div class="metric-label">🏗️ TỔNG SỐ CÔNG TRÌNH</div>
+                    <div class="metric-val">${allProjects.length}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">💰 TỔNG NGÂN SÁCH</div>
+                    <div class="metric-val">${formatMoneyVND(allProjects.reduce((s, p) => s + p.budget, 0))}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📤 TỔNG ĐÃ CHI</div>
+                    <div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(allProjects.reduce((s, p) => s + p.netCost, 0))}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📊 CÒN LẠI</div>
+                    <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(allProjects.reduce((s, p) => s + p.remaining, 0))}</div>
+                </div>
             </div>
-            <div class="card">
-                <div class="sec-title">📈 THỐNG KÊ NHẬP/XUẤT THEO THÁNG</div>
-                <div class="chart-container" style="height: 220px;"><canvas id="monthly-chart"></canvas></div>
+            
+            <div class="tbl-wrap">
+                <table style="min-width: 900px; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Tên công trình</th>
+                            <th>Ngân sách</th>
+                            <th>Đã nhận</th>
+                            <th>Đã trả</th>
+                            <th>Đã chi</th>
+                            <th>Còn lại</th>
+                            <th>% sử dụng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allProjects.map(p => `
+                            <tr style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
+                                <td>${p.id}</td>
+                                <td><strong>${escapeHtml(p.name)}</strong></td>
+                                <td style="text-align: right;">${formatMoneyVND(p.budget)}</td>
+                                <td style="text-align: right;">${formatMoneyVND(p.totalReceived)}</td>
+                                <td style="text-align: right; color: var(--success-text);">${formatMoneyVND(p.totalReturn)}</td>
+                                <td style="text-align: right;" class="text-warning">${formatMoneyVND(p.netCost)}</td>
+                                <td style="text-align: right; color: var(--success-text);">${formatMoneyVND(p.remaining)}</td>
+                                <td style="text-align: center;">
+                                    <div class="progress-bar" style="width: 80px; display: inline-block;"><div class="progress-fill" style="width:${Math.min(100, p.percent)}%;background:${p.percent > 90 ? '#A32D2D' : '#378ADD'}"></div></div>
+                                    ${p.percent.toFixed(1)}%
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
-        </div>
+        `;
+    } else if (currentDashboardTab === 'suppliers') {
+        // ===== TAB CHI TIẾT NHÀ CUNG CẤP =====
+        const allSuppliers = state.data.suppliers.map(s => {
+            const purchases = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
+            const totalSpent = purchases.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+            return { ...s, totalSpent, purchaseCount: purchases.length };
+        }).sort((a, b) => b.totalSpent - a.totalSpent);
         
-        <div class="grid2" style="margin-bottom: 18px;">
-            <div class="card">
-                <div class="sec-title">📊 BIỂU ĐỒ NHẬP/XUẤT THEO DANH MỤC</div>
-                <div class="chart-container" style="height: 250px;"><canvas id="category-pie-chart"></canvas></div>
+        tabContent = `
+            <div class="grid4" style="margin-bottom: 18px;">
+                <div class="metric-card">
+                    <div class="metric-label">🏭 TỔNG SỐ NCC</div>
+                    <div class="metric-val">${allSuppliers.length}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">💰 TỔNG CHI</div>
+                    <div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(allSuppliers.reduce((s, sup) => s + sup.totalSpent, 0))}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📦 TỔNG LẦN NHẬP</div>
+                    <div class="metric-val">${allSuppliers.reduce((s, sup) => s + sup.purchaseCount, 0)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📊 TRUNG BÌNH/LẦN</div>
+                    <div class="metric-val">${formatMoneyVND(allSuppliers.length > 0 ? allSuppliers.reduce((s, sup) => s + sup.totalSpent, 0) / Math.max(1, allSuppliers.reduce((s, sup) => s + sup.purchaseCount, 0)) : 0)}</div>
+                </div>
             </div>
-            <div class="card">
-                <div class="sec-title">📊 BIỂU ĐỒ NHẬP HÀNG THEO NHÀ CUNG CẤP</div>
-                <div class="chart-container" style="height: 250px;"><canvas id="supplier-pie-chart"></canvas></div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="sec-title">📋 DANH SÁCH GIAO DỊCH THEO BỘ LỌC</div>
+            
             <div class="tbl-wrap">
                 <table style="min-width: 800px; width: 100%;">
                     <thead>
                         <tr>
-                            <th>Thời gian</th>
-                            <th>Loại</th>
-                            <th>Vật tư</th>
-                            <th>Số lượng</th>
-                            <th>Đơn giá</th>
-                            <th>Thành tiền</th>
-                            <th>Đối tượng</th>
+                            <th>Mã</th>
+                            <th>Tên nhà cung cấp</th>
+                            <th>SĐT</th>
+                            <th>Email</th>
+                            <th>Tổng chi</th>
+                            <th>Số lần nhập</th>
+                            <th>Trung bình/lần</th>
                         </tr>
                     </thead>
-                    <tbody id="transaction-list-tbody">
-                        ${renderTransactionList()}
+                    <tbody>
+                        ${allSuppliers.map(s => `
+                            <tr style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
+                                <td>${s.id}</td>
+                                <td><strong>${escapeHtml(s.name)}</strong></td>
+                                <td>${s.phone || '—'}</td>
+                                <td>${s.email || '—'}</td>
+                                <td style="text-align: right;" class="text-warning">${formatMoneyVND(s.totalSpent)}</td>
+                                <td style="text-align: center;">${s.purchaseCount}</td>
+                                <td style="text-align: right;">${s.purchaseCount > 0 ? formatMoneyVND(s.totalSpent / s.purchaseCount) : '0 ₫'}</td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
-        </div>
-    `;
+        `;
+    }
+    
+    return tabsHtml + filtersHtml + tabContent;
 }
 
+// ===== RENDER CHART =====
 export function renderDashboardChart() {
     const monthlyStats = getMonthlyStats();
     const categoryStats = getCategoryStats();
     const supplierStats = getSupplierStats();
+    
+    if (currentDashboardTab !== 'overview') return; // Chỉ vẽ chart ở tab tổng quan
     
     const monthlyCtx = document.getElementById('monthly-chart');
     if (monthlyCtx) {
@@ -627,13 +785,11 @@ export function renderDashboardChart() {
     }
 }
 
-// Hàm bind events cho dashboard filter (đổi tên để tránh trùng)
 export function bindDashboardFilterEvents() {
     const applyBtn = document.getElementById('filter-apply');
     const resetBtn = document.getElementById('filter-reset');
     
     if (applyBtn) {
-        // Remove old event listeners by cloning
         const newApplyBtn = applyBtn.cloneNode(true);
         applyBtn.parentNode.replaceChild(newApplyBtn, applyBtn);
         newApplyBtn.onclick = () => applyFilters();
