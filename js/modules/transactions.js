@@ -445,14 +445,10 @@ export function openReturnModal(preselectedProjectId = null) {
     }
     
     const optsProj = projectsWithUsage.map(p => {
-        const totalUsed = state.data.transactions
-            .filter(t => t.projectId === p.id && t.type === 'usage')
-            .reduce((s, t) => s + (t.totalAmount || 0), 0);
-        const totalReturn = state.data.transactions
-            .filter(t => t.projectId === p.id && t.type === 'return')
-            .reduce((s, t) => s + (t.totalAmount || 0), 0);
-        const netUsed = totalUsed - totalReturn;
-        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(totalUsed)} - Đã trả: ${formatMoneyVND(totalReturn)} - Thực tế: ${formatMoneyVND(netUsed)})</option>`;
+        const usageTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
+        const returnTotal = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
+        const netUsed = usageTotal - returnTotal;
+        return `<option value="${p.id}" ${preselectedProjectId === p.id ? 'selected' : ''}>${escapeHtml(p.name)} (Đã xuất: ${formatMoneyVND(usageTotal)} - Đã trả: ${formatMoneyVND(returnTotal)} - Thực tế: ${formatMoneyVND(netUsed)})</option>`;
     }).join('');
     
     const currentDateTime = getCurrentDateTime();
@@ -461,7 +457,7 @@ export function openReturnModal(preselectedProjectId = null) {
         <div class="modal-bd">
             <div class="metric-card" style="margin-bottom: 16px; background: var(--success-bg);">
                 <div class="metric-sub">📋 Chọn công trình đã xuất kho để nhập lại vật tư thừa</div>
-                <div class="metric-sub" style="margin-top: 8px; color: var(--warn-text);">⚠️ Chỉ hiển thị vật tư đã từng xuất cho công trình này</div>
+                <div class="metric-sub" style="margin-top: 8px; color: var(--warn-text);">⚠️ Chỉ hiển thị vật tư đã từng xuất cho công trình này và còn tồn tại công trình</div>
             </div>
             <div class="form-grid2">
                 <div class="form-group"><label class="form-label">📅 Thời gian trả</label><input type="datetime-local" id="return-datetime" value="${currentDateTime}" style="width: 100%;"></div>
@@ -491,16 +487,13 @@ export function openReturnModal(preselectedProjectId = null) {
             const projectId = projectSelect?.value;
             if (!projectId) return;
             
-            const projectTransactions = state.data.transactions.filter(t => 
-                t.projectId === projectId && t.type === 'usage'
-            );
-            
-            const returnTransactions = state.data.transactions.filter(t => 
-                t.projectId === projectId && t.type === 'return'
-            );
+            const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
+            const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
+            const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId) || [];
             
             const materialMap = new Map();
-            projectTransactions.forEach(t => {
+            
+            usageTxns.forEach(t => {
                 const mat = state.data.materials.find(m => m.id === t.mid);
                 if (mat) {
                     if (!materialMap.has(t.mid)) {
@@ -508,14 +501,15 @@ export function openReturnModal(preselectedProjectId = null) {
                             id: t.mid,
                             name: mat.name,
                             unit: mat.unit,
-                            totalExported: 0,
+                            totalReceived: 0,
                             totalReturned: 0,
+                            totalUsed: 0,
                             lastUnitPrice: t.unitPrice,
                             lastTransactionDate: t.datetime || t.date
                         });
                     }
                     const item = materialMap.get(t.mid);
-                    item.totalExported += t.qty;
+                    item.totalReceived += t.qty;
                     if (new Date(t.datetime || t.date) > new Date(item.lastTransactionDate)) {
                         item.lastUnitPrice = t.unitPrice;
                         item.lastTransactionDate = t.datetime || t.date;
@@ -523,23 +517,38 @@ export function openReturnModal(preselectedProjectId = null) {
                 }
             });
             
-            returnTransactions.forEach(t => {
+            returnTxns.forEach(t => {
                 if (materialMap.has(t.mid)) {
-                    materialMap.get(t.mid).totalReturned += t.qty;
+                    const item = materialMap.get(t.mid);
+                    item.totalReturned += t.qty;
+                }
+            });
+            
+            usageRecords.forEach(record => {
+                if (materialMap.has(record.materialId)) {
+                    const item = materialMap.get(record.materialId);
+                    item.totalUsed = record.usedQty || 0;
                 }
             });
             
             const materials = Array.from(materialMap.values())
-                .filter(m => m.totalExported - m.totalReturned > 0);
+                .map(item => ({
+                    ...item,
+                    availableToReturn: item.totalReceived - item.totalUsed - item.totalReturned
+                }))
+                .filter(item => item.availableToReturn > 0);
             
             if (materials.length === 0) {
-                midSelect.innerHTML = '<option value="">⚠️ Chưa có vật tư nào có thể trả cho công trình này</option>';
+                midSelect.innerHTML = '<option value="">✅ Không có vật tư nào có thể trả (đã sử dụng hết)</option>';
+                if (priceInput) priceInput.value = '';
+                const previewEl = document.getElementById('preview-return-total');
+                if (previewEl) previewEl.innerText = formatMoneyVND(0);
                 return;
             }
             
             midSelect.innerHTML = materials.map(m => 
-                `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.totalExported - m.totalReturned}">
-                    ${escapeHtml(m.name)} (Đã xuất: ${m.totalExported.toLocaleString('vi-VN')} ${m.unit} - Đã trả: ${m.totalReturned.toLocaleString('vi-VN')} - Có thể trả: ${(m.totalExported - m.totalReturned).toLocaleString('vi-VN')} - Giá xuất: ${formatMoneyVND(m.lastUnitPrice)})
+                `<option value="${m.id}" data-unit-price="${m.lastUnitPrice}" data-max-qty="${m.availableToReturn}">
+                    ${escapeHtml(m.name)} (Đã nhận: ${m.totalReceived.toLocaleString('vi-VN')} ${m.unit} - Đã sử dụng: ${m.totalUsed.toLocaleString('vi-VN')} - Đã trả: ${m.totalReturned.toLocaleString('vi-VN')} - Có thể trả: ${m.availableToReturn.toLocaleString('vi-VN')} - Giá: ${formatMoneyVND(m.lastUnitPrice)})
                 </option>`
             ).join('');
             
@@ -653,20 +662,17 @@ export function saveReturn() {
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
     
-    const projectTransactions = state.data.transactions.filter(t => 
-        t.projectId === projectId && t.type === 'usage' && t.mid === mid
-    );
+    const usageTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage' && t.mid === mid);
+    const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return' && t.mid === mid);
+    const usageRecord = state.data.projectMaterialUsage?.find(u => u.projectId === projectId && u.materialId === mid);
     
-    const returnTransactions = state.data.transactions.filter(t => 
-        t.projectId === projectId && t.type === 'return' && t.mid === mid
-    );
+    const totalReceived = usageTxns.reduce((s, t) => s + t.qty, 0);
+    const totalReturned = returnTxns.reduce((s, t) => s + t.qty, 0);
+    const totalUsed = usageRecord?.usedQty || 0;
+    const availableToReturn = totalReceived - totalUsed - totalReturned;
     
-    const totalExported = projectTransactions.reduce((sum, t) => sum + t.qty, 0);
-    const totalReturned = returnTransactions.reduce((sum, t) => sum + t.qty, 0);
-    const availableToReturn = totalExported - totalReturned;
-    
-    if (totalExported === 0) {
-        return alert(`Vật tư "${mat.name}" chưa từng được xuất cho công trình này!`);
+    if (availableToReturn <= 0) {
+        return alert(`Vật tư "${mat.name}" không còn tồn tại công trình để trả (Đã nhận: ${totalReceived}, Đã sử dụng: ${totalUsed}, Đã trả: ${totalReturned})`);
     }
     
     if (qty > availableToReturn) {
@@ -743,6 +749,7 @@ export function clearInvoiceImage() {
     if (fileInput) fileInput.value = '';
 }
 
+// ========== EXPORTS ==========
 export const importMaterial = savePurchase;
 export const exportMaterial = saveExport;
 export const getTransactions = () => state.data.transactions;
