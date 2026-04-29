@@ -5,9 +5,8 @@ import { getProjectSchedule, renderScheduleView, updateScheduleInfo, saveSchedul
 let projectFilters = { keyword: '', budgetMin: '', budgetMax: '', status: '' };
 let projectListContainer = null;
 let currentScheduleProjectId = null;
-let projectViewMode = 'large'; // 'small' | 'large' | 'list'
+let projectViewMode = 'large';
 
-// Load view mode từ localStorage
 const savedView = localStorage.getItem('steeltrack_project_view');
 if (savedView) projectViewMode = savedView;
 
@@ -86,7 +85,6 @@ function getMaterialUsageDetails(projectId) {
     return Array.from(materialMap.values());
 }
 
-// ========== LỊCH SỬ (FIX CỘT THỐNG NHẤT) ==========
 function renderProjectHistory() {
     const transactions = state.data.transactions
         .filter(t => (t.type === 'usage' || t.type === 'return') && t.projectId)
@@ -111,7 +109,6 @@ function renderProjectHistory() {
     }).join('');
 }
 
-// ========== UPDATE DISPLAY ==========
 function updateProjectListDisplay() {
     if (!projectListContainer) return;
     const filtered = getFilteredProjects();
@@ -137,6 +134,10 @@ function updateProjectListDisplay() {
                 <div style="font-size:18px;margin-top:6px;color:var(--accent);">${formatMoneyVND(p.net)}</div>
                 <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
                 <div class="metric-sub">${p.pct.toFixed(1)}% | NS: ${formatMoneyVND(p.budget)}</div>
+                <div style="margin-top:6px;display:flex;gap:4px;">
+                    ${hasPermission('canCreateMaterial')?`<button class="sm" onclick="event.stopPropagation();window.editProject('${p.id}')">✏️</button>`:''}
+                    ${hasPermission('canDeleteProject')?`<button class="sm danger-btn" onclick="event.stopPropagation();window.deleteProjectHandler('${p.id}')">🗑️</button>`:''}
+                </div>
             </div>`).join('')}</div>`;
     } else if (projectViewMode === 'list') {
         projectListContainer.innerHTML = `<div class="project-list">${projectsData.map(p => `
@@ -147,6 +148,7 @@ function updateProjectListDisplay() {
                 <div class="progress-bar" style="width:100px;"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
                 <span class="metric-sub">${p.pct.toFixed(1)}%</span>
                 <span class="metric-sub">NS: ${formatMoneyVND(p.budget)}</span>
+                ${hasPermission('canCreateMaterial')?`<button class="sm" onclick="event.stopPropagation();window.editProject('${p.id}')">✏️</button>`:''}
                 ${hasPermission('canDeleteProject')?`<button class="sm danger-btn" onclick="event.stopPropagation();window.deleteProjectHandler('${p.id}')">🗑️</button>`:''}
             </div>`).join('')}</div>`;
     } else {
@@ -157,7 +159,10 @@ function updateProjectListDisplay() {
                 <div class="metric-sub">💰 NS: ${formatMoneyVND(p.budget)} | Còn: ${formatMoneyVND(p.rem)}</div>
                 <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
                 <div class="metric-sub">${p.pct.toFixed(1)}%</div>
-                ${hasPermission('canDeleteProject')?`<button class="sm danger-btn" style="margin-top:8px" onclick="event.stopPropagation();window.deleteProjectHandler('${p.id}')">🗑️ Xóa</button>`:''}
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                    ${hasPermission('canCreateMaterial')?`<button class="sm" onclick="event.stopPropagation();window.editProject('${p.id}')">✏️ Sửa</button>`:''}
+                    ${hasPermission('canDeleteProject')?`<button class="sm danger-btn" onclick="event.stopPropagation();window.deleteProjectHandler('${p.id}')">🗑️ Xóa</button>`:''}
+                </div>
             </div>`).join('')}</div>`;
     }
 }
@@ -167,14 +172,8 @@ function updateProjectHistoryDisplay() {
     if (hc) hc.innerHTML = renderProjectHistory();
 }
 
-// ========== SEARCH BAR ==========
 function renderProjectSearchBar() {
-    const statusOpts = [
-        {v:'',l:'📂 Tất cả'},
-        {v:'has_budget',l:'💰 Còn NS'},
-        {v:'out_of_budget',l:'⚠️ Hết NS'},
-        {v:'over_budget',l:'🔥 Quá NS'}
-    ];
+    const statusOpts = [{v:'',l:'📂 Tất cả'},{v:'has_budget',l:'💰 Còn NS'},{v:'out_of_budget',l:'⚠️ Hết NS'},{v:'over_budget',l:'🔥 Quá NS'}];
     return `<div class="card" style="margin-bottom:16px;">
         <div class="sec-title">🔍 TÌM KIẾM CÔNG TRÌNH</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
@@ -211,14 +210,12 @@ function bindProjectSearchEvents() {
     };
 }
 
-// ========== VIEW TOGGLE ==========
 window.setProjectView = function(mode) {
     projectViewMode = mode;
     localStorage.setItem('steeltrack_project_view', mode);
     updateProjectListDisplay();
 };
 
-// ========== RESIZABLE PANELS ==========
 function initResizablePanels() {
     const container = document.getElementById('projects-resizable-container');
     if (!container) return;
@@ -235,7 +232,6 @@ function initResizablePanels() {
     });
 }
 
-// ========== SHOW PROJECT DETAIL ==========
 export function showProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
@@ -318,7 +314,6 @@ export function showProjectDetail(projectId) {
     }, 100);
 }
 
-// ========== EXPORT ==========
 export function exportProjectDetail(projectId) {
     const project = projectById(projectId);
     if (!project) return;
@@ -347,7 +342,6 @@ export function exportAllProjectsReport() {
     }
 }
 
-// ========== RENDER ==========
 export function renderProjects() {
     const html = renderProjectSearchBar() + `<div class="card">
         <div class="resizable-container" id="projects-resizable-container">
@@ -398,7 +392,6 @@ export function renderProjects() {
     return html;
 }
 
-// ========== CRUD ==========
 export function openProjectModal() {
     if (!hasPermission('canCreateMaterial')) { alert('Bạn không có quyền'); return; }
     showModal(`<div class="modal-hd"><span class="modal-title">🏗️ Thêm công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
@@ -417,6 +410,36 @@ export function saveProject() {
     addLog('Thêm công trình', `${name} (${p.id})`);
     saveState(); closeModal(); if(window.render) window.render();
 }
+
+// ========== SỬA CÔNG TRÌNH ==========
+window.editProject = function(pid) {
+    const project = projectById(pid);
+    if (!project) return;
+    if (!hasPermission('canCreateMaterial')) { alert('Bạn không có quyền sửa'); return; }
+    
+    showModal(`<div class="modal-hd"><span class="modal-title">✏️ Sửa công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+    <div class="modal-bd">
+        <div class="form-group"><label class="form-label">Tên công trình</label><input id="edit-proj-name" value="${escapeHtml(project.name)}"></div>
+        <div class="form-group"><label class="form-label">Ngân sách (VNĐ)</label><input type="text" id="edit-proj-budget" value="${project.budget.toLocaleString('vi-VN')}" dir="ltr"></div>
+    </div>
+    <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveEditProject('${pid}')">Cập nhật</button></div>`);
+    
+    setTimeout(() => {
+        const inp = document.getElementById('edit-proj-budget');
+        if (inp) setupNumberInput(inp, { isInteger: false, decimals: 2 });
+    }, 100);
+};
+
+window.saveEditProject = function(pid) {
+    const project = projectById(pid);
+    if (!project) return;
+    const name = document.getElementById('edit-proj-name')?.value.trim();
+    if (!name) return alert('Nhập tên');
+    project.name = name;
+    project.budget = parseInt(document.getElementById('edit-proj-budget')?.value.replace(/[^0-9]/g, '')) || 0;
+    addLog('Sửa công trình', `Đã cập nhật: ${name} (${pid})`);
+    saveState(); closeModal(); if(window.render) window.render();
+};
 
 export function deleteProject(pid) {
     const p = projectById(pid);
