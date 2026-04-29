@@ -3,7 +3,7 @@ import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, g
 import { renderMaterials, addMaterial, updateMaterial, deleteMaterial, getMaterials, openMatModal, editMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, addProject, deleteProject, getProjects, openProjectModal, saveProject, filterProjects, clearProjectSearch, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
 import { renderSuppliers, addSupplier, deleteSupplier, getSuppliers, openSupplierModal, saveSupplier, updateSupplier, filterSuppliers, clearSupplierSearch, viewSupplierHistory, showSupplierDetail, exportSupplierDetail, exportAllSuppliersReport } from './modules/suppliers.js';
-import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal, openPurchaseModalWithSupplier } from './modules/transactions.js';
+import { importMaterial, exportMaterial, getTransactions, openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal, openPurchaseModalWithSupplier, openReturnModal, saveReturn, clearReturnAttachment } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
 import { renderDashboard, renderDashboardChart, checkAutoBackup, checkLowStockNotification, requestNotificationPermission, bindDashboardSearchEvents } from './modules/charts.js';
 import { exportToExcel } from './modules/export.js';
@@ -89,9 +89,6 @@ window.logout = logout;
 window.switchPane = switchPane;
 window.closeModal = closeModal;
 window.showModal = showModal;
-window.openReturnModal = openReturnModal;
-window.saveReturn = saveReturn;
-window.clearReturnAttachment = clearReturnAttachment;
 
 // Material
 window.openMatModal = openMatModal;
@@ -131,6 +128,11 @@ window.calculatePurchaseTotal = calculatePurchaseTotal;
 window.calculateExportTotal = calculateExportTotal;
 window.openPurchaseModalWithSupplier = openPurchaseModalWithSupplier;
 
+// Return transaction (Trả hàng từ công trình)
+window.openReturnModal = openReturnModal;
+window.saveReturn = saveReturn;
+window.clearReturnAttachment = clearReturnAttachment;
+
 // Settings
 window.addCategory = addCategory;
 window.addUnit = addUnit;
@@ -167,6 +169,14 @@ window.clearInvoiceImage = function() {
     const previewDiv = document.getElementById('invoice-preview');
     if (previewDiv) previewDiv.innerHTML = '';
     const fileInput = document.getElementById('purchase-invoice');
+    if (fileInput) fileInput.value = '';
+};
+
+window.clearExportAttachment = function() {
+    window.currentExportAttachmentBase64 = null;
+    const previewDiv = document.getElementById('export-attachment-preview');
+    if (previewDiv) previewDiv.innerHTML = '';
+    const fileInput = document.getElementById('export-attachment');
     if (fileInput) fileInput.value = '';
 };
 

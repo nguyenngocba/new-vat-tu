@@ -2,7 +2,7 @@ import { state, addLog, escapeHtml } from './state.js';
 
 export function renderLogin() {
   return `<div class="login-wrap"><div class="login-card">
-    <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent);margin-bottom:8px">🏭 STEEL/TRACK PRO</div>
+    <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent);margin-bottom:8px">🏭 TRIVIETSTEEL PRO</div>
     <div style="font-size:13px;color:var(--muted);margin-bottom:28px">Quản lý kho & Công trình & Nhà cung cấp</div>
     ${state.data.users.map(u => `<div class="user-pill" onclick="login('${u.id}')">
         <div class="avatar">${u.name[0]}</div><div><div style="font-weight:500">${escapeHtml(u.name)}</div><div class="tag">${u.role === 'admin' ? 'Quản trị viên' : 'Nhân viên'}</div></div>
@@ -34,7 +34,7 @@ export function getCurrentUser() { return state.currentUser; }
 export function renderSidebar() {
   const hasAccessSettings = state.currentUser?.permissions?.canAccessSettings || state.currentUser?.role === 'admin';
   return `<div class="sidebar">
-    <div class="sidebar-logo">🏭 STEEL/TRACK</div>
+    <div class="sidebar-logo">🏭 TRIVIETSTEEL</div>
     <div class="sidebar-user"><div class="uname">${escapeHtml(state.currentUser.name)}</div><div class="urole">${state.currentUser.role === 'admin' ? 'Quản trị viên' : 'Nhân viên kho'}</div></div>
     <div class="nav-item ${state.currentPane === 'entry' ? 'active' : ''}" onclick="switchPane('entry')">📦 Quản lý kho</div>
     <div class="nav-item ${state.currentPane === 'dashboard' ? 'active' : ''}" onclick="switchPane('dashboard')">📊 Thống kê</div>
@@ -54,6 +54,7 @@ export function renderTopbar() {
     btns = `${hasPermission('canCreateMaterial') ? `<button class="sm" onclick="openMatModal()">+ Thêm vật tư</button>` : ''}
             ${hasPermission('canImport') ? `<button class="sm primary" onclick="openPurchaseModal()">📥 Nhập kho</button>` : ''}
             ${hasPermission('canExport') ? `<button class="sm" onclick="openTxnModal('usage')">📤 Xuất kho</button>` : ''}
+            ${hasPermission('canImport') ? `<button class="sm" style="background: var(--success-bg); color: var(--success-text);" onclick="openReturnModal()">🔄 Trả hàng từ công trình</button>` : ''}
             <button class="sm" onclick="showImportModal('materials', () => window.render())">📂 Import Excel</button>
             <button class="sm" onclick="exportToExcel('materials')">📎 Export Excel</button>`;
   }
