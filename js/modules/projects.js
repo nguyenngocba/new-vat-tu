@@ -1026,7 +1026,7 @@ export function openProjectModal() {
   if (!hasPermission('canCreateMaterial')) { alert('Bạn không có quyền thêm công trình'); return; }
   showModal(`<div class="modal-hd"><span class="modal-title">🏗️ Thêm công trình mới</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="form-group"><label class="form-label">Tên công trình</label><input id="proj-name" placeholder="VD: Cầu vượt X"></div>
-    <div class="form-group"><label class="form-label">Ngân sách dự kiến (VNĐ)</label><input type="text" id="proj-budget" value="0" class="num-input" dir="ltr"></div></div>
+    <div class="form-group"><label class="form-label">Ngân sách dự kiến (VNĐ)</label><input type="text" id="proj-budget" value="0" dir="ltr"></div></div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="saveProject()">Tạo công trình</button></div>`);
   setTimeout(() => { const budgetInput = document.getElementById('proj-budget'); if (budgetInput) setupNumberInput(budgetInput, { isInteger: false, decimals: 2 }); }, 100);
 }

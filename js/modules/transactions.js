@@ -62,9 +62,9 @@ export function openPurchaseModal() {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><select id="purchase-supplier">${optsSup}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" class="num-input" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" class="num-input" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -86,18 +86,10 @@ export function openPurchaseModal() {
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
 
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', calculatePurchaseTotal);
-        }
-        if (priceInput) {
-            setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
-            priceInput.addEventListener('change', calculatePurchaseTotal);
-        }
-        if (vatInput) {
-            setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('change', calculatePurchaseTotal);
-        }
+        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', calculatePurchaseTotal); }
+        if (priceInput) { setupNumberInput(priceInput, { isInteger: false, decimals: 2 }); priceInput.addEventListener('change', calculatePurchaseTotal); }
+        if (vatInput) { setupNumberInput(vatInput, { isInteger: false, decimals: 1 }); vatInput.addEventListener('change', calculatePurchaseTotal); }
+        
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -141,9 +133,9 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="form-group"><label class="form-label">📅 Thời gian nhập</label><input type="datetime-local" id="purchase-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏭 Nhà cung cấp</label><input type="text" value="${escapeHtml(supplier.name)}" disabled style="background: var(--surface3);"></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="purchase-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" class="num-input" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" class="num-input" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="purchase-qty" value="1" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá nhập (VNĐ)</label><input type="text" id="purchase-price" placeholder="Nhập giá thực tế" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🧾 Thuế VAT (%)</label><input type="text" id="purchase-vat" value="10" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-bottom:12px">
                 <div class="metric-sub">💰 Thành tiền trước VAT: <strong id="preview-subtotal">0 ₫</strong></div>
@@ -165,18 +157,10 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
 
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', calculatePurchaseTotal);
-        }
-        if (priceInput) {
-            setupNumberInput(priceInput, { isInteger: false, decimals: 2 });
-            priceInput.addEventListener('change', calculatePurchaseTotal);
-        }
-        if (vatInput) {
-            setupNumberInput(vatInput, { isInteger: false, decimals: 1 });
-            vatInput.addEventListener('change', calculatePurchaseTotal);
-        }
+        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', calculatePurchaseTotal); }
+        if (priceInput) { setupNumberInput(priceInput, { isInteger: false, decimals: 2 }); priceInput.addEventListener('change', calculatePurchaseTotal); }
+        if (vatInput) { setupNumberInput(vatInput, { isInteger: false, decimals: 1 }); vatInput.addEventListener('change', calculatePurchaseTotal); }
+        
         if (fileInput) {
             fileInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -243,8 +227,7 @@ export function savePurchase() {
 
     const supplier = supplierById(supplierId);
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Giá: ${formatMoneyVND(unitPrice)} - VAT: ${vatRate}% - Tổng: ${formatMoneyVND(totalAmount)} - NCC: ${supplier?.name}`);
-    saveState();
-    closeModal();
+    saveState(); closeModal();
     currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
@@ -287,8 +270,7 @@ export function savePurchaseWithSupplier(supplierId) {
 
     const supplier = supplierById(supplierId);
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Tổng: ${formatMoneyVND(totalAmount)} - NCC: ${supplier?.name}`);
-    saveState();
-    closeModal();
+    saveState(); closeModal();
     currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
@@ -311,7 +293,7 @@ export function openTxnModal(type, preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">📅 Thời gian xuất</label><input type="datetime-local" id="export-datetime" value="${currentDateTime}" style="width: 100%;"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình thi công</label><select id="txn-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="txn-mid">${optsMat}</select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" dir="ltr"></div>
             </div>
             <div class="metric-card" style="margin-top:8px"><div class="metric-sub">💰 Thành tiền dự kiến: <strong id="preview-export-total">0 ₫</strong></div></div>
             <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="export-attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"></div>
@@ -327,10 +309,8 @@ export function openTxnModal(type, preselectedProjectId = null) {
         const midSelect = document.getElementById('txn-mid');
         const attachmentInput = document.getElementById('export-attachment');
 
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', calculateExportTotal);
-        }
+        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', calculateExportTotal); }
+        
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
                 const file = this.files[0];
@@ -385,8 +365,7 @@ export function saveExport() {
         note: note, attachment: currentExportAttachmentBase64 || null
     };
     state.data.transactions.unshift(transaction);
-    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - Công trình: ${project?.name} - ${formatMoneyVND(totalAmount)}`);
-
+    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} ${mat.unit} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal();
     currentExportAttachmentBase64 = null;
     if (window.render) window.render();
@@ -416,8 +395,8 @@ export function openReturnModal(preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">📅 Thời gian</label><input type="datetime-local" id="return-datetime" value="${getCurrentDateTime()}"></div>
                 <div class="form-group"><label class="form-label">🏗️ Công trình</label><select id="return-project">${optsProj}</select></div>
                 <div class="form-group"><label class="form-label">📦 Vật tư</label><select id="return-mid"></select></div>
-                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" class="num-input" dir="ltr"></div>
-                <div class="form-group"><label class="form-label">💰 Đơn giá (VNĐ)</label><input type="text" id="return-price" readonly style="background:var(--surface3);" class="num-input" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" dir="ltr"></div>
+                <div class="form-group"><label class="form-label">💰 Đơn giá (VNĐ)</label><input type="text" id="return-price" readonly style="background:var(--surface3);" dir="ltr"></div>
             </div>
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-return-total">0 ₫</strong></div></div>
             <div class="form-group"><label class="form-label">📎 Tệp đính kèm</label><input type="file" id="return-attachment"></div>
@@ -435,10 +414,8 @@ export function openReturnModal(preselectedProjectId = null) {
         const priceInput = document.getElementById('return-price');
         const attachmentInput = document.getElementById('return-attachment');
 
-        if (qtyInput) {
-            setupNumberInput(qtyInput, { isInteger: false, decimals: 3 });
-            qtyInput.addEventListener('change', updateReturnPreview);
-        }
+        if (qtyInput) { setupNumberInput(qtyInput, { isInteger: false, decimals: 3 }); qtyInput.addEventListener('change', updateReturnPreview); }
+        
         if (attachmentInput) {
             attachmentInput.addEventListener('change', function() {
                 const file = this.files[0];

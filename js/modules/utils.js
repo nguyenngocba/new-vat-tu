@@ -84,7 +84,7 @@ export function formatRawToDisplay(rawValue) {
     
     // Ghép kết quả
     let result = formattedInteger;
-    if (decimalPart.length > 0) {
+    if (firstCommaIdx >= 0) {
         result += ',' + decimalPart;
     }
     
