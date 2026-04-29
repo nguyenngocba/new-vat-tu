@@ -3,6 +3,7 @@ import { debounce, formatMoneyVND } from './utils.js';
 
 let supplierFilters = { keyword: '', phone: '', minPurchase: '', maxPurchase: '' };
 let supplierListContainer = null;
+let supplierViewMode = 'large';
 
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
@@ -79,35 +80,45 @@ function updateSupplierList() {
     const filtered = getFilteredSuppliers();
     
     if (filtered.length === 0) {
-        supplierListContainer.innerHTML = '<div class="metric-sub">📭 Không tìm thấy nhà cung cấp phù hợp</div>';
+        supplierListContainer.innerHTML = '<div class="metric-sub">📭 Không tìm thấy</div>';
         return;
     }
     
-    supplierListContainer.innerHTML = `
-        <div class="grid2" style="grid-template-columns:repeat(auto-fill, minmax(350px,1fr))">
-            ${filtered.map(s => {
-                const purchaseTxns = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
-                const totalSpent = purchaseTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-                const purchaseCount = purchaseTxns.length;
-                return `<div class="supplier-card" data-supplier-id="${s.id}" style="cursor: pointer;" onclick="window.showSupplierDetail('${s.id}')">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <strong style="font-size: 16px;">🏭 ${escapeHtml(s.name)}</strong> 
-                        <span class="tag">${s.id}</span>
-                    </div>
-                    <div class="metric-sub" style="margin-top: 8px;">📞 ${s.phone || 'Chưa có'}</div>
-                    <div class="metric-sub">✉️ ${s.email || 'Chưa có'}</div>
-                    <div class="metric-sub">📍 ${s.address || 'Chưa có'}</div>
-                    <div class="metric-sub" style="margin-top:8px">📦 Số lần nhập: ${purchaseCount}</div>
-                    <div class="metric-val" style="font-size: 20px; margin-top: 8px; color: var(--success-text);">💰 ${formatMoneyVND(totalSpent)}</div>
-                    <div style="margin-top:12px;display:flex;gap:8px">
-                        <button class="sm" onclick="event.stopPropagation(); openSupplierModal(${JSON.stringify(s).replace(/"/g, '&quot;')})">✏️ Sửa</button>
-                        <button class="sm danger-btn" onclick="event.stopPropagation(); window.deleteSupplierHandler('${s.id}')">🗑️ Xóa</button>
-                        <button class="sm" onclick="event.stopPropagation(); viewSupplierHistory('${s.id}')">📜 Lịch sử</button>
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>
-    `;
+    const data = filtered.map(s => {
+        const txns = state.data.transactions.filter(t => t.type==='purchase'&&t.supplierId===s.id);
+        return { ...s, total: txns.reduce((sum,t)=>sum+(t.totalAmount||0),0), count: txns.length };
+    });
+    
+    if (supplierViewMode === 'small') {
+        supplierListContainer.innerHTML = `<div class="supplier-grid-small">${data.map(s => `
+            <div class="metric-card" onclick="window.showSupplierDetail('${s.id}')">
+                <strong>🏭 ${escapeHtml(s.name)}</strong>
+                <div style="font-size:16px;color:var(--success-text);margin-top:4px;">${formatMoneyVND(s.total)}</div>
+                <div class="metric-sub">📞 ${s.phone||'—'} | 📦 ${s.count} lần</div>
+            </div>`).join('')}</div>`;
+    } else if (supplierViewMode === 'list') {
+        supplierListContainer.innerHTML = `<div class="supplier-list">${data.map(s => `
+            <div class="supplier-list-item" onclick="window.showSupplierDetail('${s.id}')">
+                <span class="tag">${s.id}</span>
+                <strong style="flex:1;">${escapeHtml(s.name)}</strong>
+                <span>📞 ${s.phone||'—'}</span>
+                <span style="color:var(--success-text);font-weight:bold;">${formatMoneyVND(s.total)}</span>
+                <span class="metric-sub">📦 ${s.count} lần</span>
+            </div>`).join('')}</div>`;
+    } else {
+        supplierListContainer.innerHTML = `<div class="supplier-grid-large">${data.map(s => `
+            <div class="metric-card" onclick="window.showSupplierDetail('${s.id}')" style="cursor:pointer;">
+                <div style="display:flex;justify-content:space-between;"><strong style="font-size:16px;">🏭 ${escapeHtml(s.name)}</strong><span class="tag">${s.id}</span></div>
+                <div class="metric-sub">📞 ${s.phone||'Chưa có'}</div>
+                <div class="metric-sub">✉️ ${s.email||'Chưa có'}</div>
+                <div class="metric-val" style="font-size:20px;color:var(--success-text);">${formatMoneyVND(s.total)}</div>
+                <div class="metric-sub">📦 ${s.count} lần nhập</div>
+                <div style="margin-top:8px;display:flex;gap:6px;">
+                    <button class="sm" onclick="event.stopPropagation();openSupplierModal(${JSON.stringify(s).replace(/"/g,'&quot;')})">✏️</button>
+                    <button class="sm danger-btn" onclick="event.stopPropagation();window.deleteSupplierHandler('${s.id}')">🗑️</button>
+                </div>
+            </div>`).join('')}</div>`;
+    }
 }
 
 function updateSupplierHistoryDisplay() {

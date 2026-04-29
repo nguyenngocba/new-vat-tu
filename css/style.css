@@ -397,3 +397,107 @@ input[type=text][dir=ltr] {
     direction: ltr;
     unicode-bidi: plaintext;
 }
+/* ===== KIỂU HIỂN THỊ: GRID / LIST ===== */
+.view-toggle {
+    display: flex;
+    gap: 4px;
+    margin-left: 10px;
+}
+.view-toggle-btn {
+    padding: 4px 10px;
+    font-size: 14px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--r);
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+}
+.view-toggle-btn:hover { color: var(--text); background: var(--surface3); }
+.view-toggle-btn.active {
+    color: var(--accent);
+    background: var(--accent-bg);
+    border-color: var(--accent);
+}
+
+/* Grid nhỏ (3 cột) */
+.project-grid-small,
+.supplier-grid-small {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+}
+.project-grid-small .metric-card,
+.supplier-grid-small .metric-card {
+    cursor: pointer;
+    padding: 10px 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.project-grid-small .metric-card:hover,
+.supplier-grid-small .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border-color: var(--accent);
+}
+
+/* Grid lớn (2 cột) */
+.project-grid-large,
+.supplier-grid-large {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+.project-grid-large .metric-card,
+.supplier-grid-large .metric-card {
+    cursor: pointer;
+    padding: 16px 18px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.project-grid-large .metric-card:hover,
+.supplier-grid-large .metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    border-color: var(--accent);
+}
+
+/* List (dạng bảng ngang) */
+.project-list,
+.supplier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.project-list-item,
+.supplier-list-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: var(--r);
+    cursor: pointer;
+    border: 0.5px solid var(--border);
+    transition: background 0.15s;
+}
+.project-list-item:hover,
+.supplier-list-item:hover {
+    background: var(--surface3);
+    border-color: var(--accent);
+}
+
+/* ===== LỊCH SỬ - FIX CỘT THỐNG NHẤT ===== */
+.history-table {
+    min-width: 900px;
+    width: 100%;
+}
+.history-table th,
+.history-table td {
+    text-align: left;
+    white-space: nowrap;
+}
+.history-table th:first-child,
+.history-table td:first-child { width: 140px; }
+.history-table td.amount {
+    text-align: right;
+    font-weight: 500;
+}
