@@ -60,6 +60,7 @@ export function addLog(action, details) {
   const id = 'LOG' + String(state.data.nextLogId++).padStart(5, '0');
   const logEntry = { id, timestamp: new Date().toISOString(), userId: state.currentUser.id, userName: state.currentUser.name, action, details };
   state.data.logs.unshift(logEntry);
+  fetch("/api/logs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: "LOG" + String(state.data.nextLogId++).padStart(5, "0"), userId: state.currentUser.id, userName: state.currentUser.name, action, details }) });
   fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logEntry) });
 }
 

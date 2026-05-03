@@ -1,4 +1,6 @@
 import { state, saveState, loadState, addLog } from './modules/state.js';
+window.state = state;
+window.saveState = saveState;
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, openMatModal, editMaterial, updateMaterial, deleteMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, openProjectModal, saveProject, deleteProject, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
@@ -52,6 +54,9 @@ window.deleteUser = deleteUser;
 window.changePassword = changePassword;
     window.exportToExcel = exportToExcel; window.showImportModal = showImportModal;
     window.render = render;
+window.addUser = function() { import("./modules/settings.js").then(m => m.addUser()); };
+window.deleteUser = function(uid) { import("./modules/settings.js").then(m => m.deleteUser(uid)); };
+window.changePassword = function(uid) { import("./modules/settings.js").then(m => m.changePassword(uid)); };
 window.toggleSidebar = function() {
   const s = document.querySelector(".sidebar");
   if (s) s.classList.toggle("collapsed");
