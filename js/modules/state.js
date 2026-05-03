@@ -36,7 +36,11 @@ export async function loadState() {
   applyTheme(state.theme);
 }
 
-export function saveState() {} // KHÔNG LÀM GÌ - lưu riêng từng API
+export function saveState() {
+  fetch("/api/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categories: state.data.categories }) });
+  fetch("/api/units", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ units: state.data.units }) });
+  state.data.users.forEach(u => fetch("/api/users-table", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: u.id, name: u.name, username: u.username, password: u.password, role: u.role, permissions: u.permissions || {} }) }));
+}
 
 export function applyTheme(t) { state.theme = t; document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : ''); localStorage.setItem('steel_theme', t); }
 export function isAdmin() { return state.currentUser?.role === 'admin'; }
