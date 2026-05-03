@@ -213,12 +213,13 @@ export function savePurchase() {
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+
         id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
         type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -244,12 +245,13 @@ export function savePurchaseWithSupplier(supplierId) {
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+
         id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
         type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -321,11 +323,12 @@ export function saveExport() {
     if (proj) proj.spent = (proj.spent || 0) + total;
 
     state.data.transactions.unshift({
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+
         id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
         type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
         attachment: currentExportAttachmentBase64 || null
     });
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
     addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
@@ -430,11 +433,12 @@ export function saveReturn() {
     if (proj) proj.spent = Math.max(0, (proj.spent || 0) - total);
 
     state.data.transactions.unshift({
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+
         id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
         type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
     });
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
     addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();
