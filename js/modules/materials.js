@@ -74,7 +74,7 @@ function updateMaterialList() {
                 </thead>
                 <tbody>
                     ${sorted.map(m => {
-                        const displayQty = typeof m.qty === 'number' ? m.qty.toLocaleString('vi-VN') : parseFloat(m.qty || 0).toLocaleString('vi-VN');
+                        const displayQty = typeof m.qty === 'number' ? parseFloat(m.qty).toLocaleString('vi-VN') : parseFloat(m.qty || 0).toLocaleString('vi-VN');
                         const displayCost = formatMoneyVND(m.cost);
                         const totalValue = (typeof m.qty === 'number' ? m.qty : parseFloat(m.qty || 0)) * (typeof m.cost === 'number' ? m.cost : parseFloat(m.cost || 0));
                         const displayTotal = formatMoneyVND(totalValue);
@@ -342,6 +342,7 @@ export function saveMat() {
   
     state.data.materials.push(newMat);
     addLog('Thêm vật tư', `Đã thêm: ${name} (${newMat.id}) - SL: ${newMat.qty} ${newMat.unit} - Giá: ${formatMoneyVND(newMat.cost)}`);
+  saveState();
     saveState(); closeModal(); if(window.render) window.render();
 }
 
@@ -356,7 +357,7 @@ export function editMaterial(mid) {
       <div class="form-group"><label class="form-label">Danh mục</label><select id="mn-cat">${state.data.categories.map(c => `<option ${mat.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn vị tính</label><select id="mn-unit">${state.data.units.map(u => `<option ${mat.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="${mat.cost.toLocaleString('vi-VN')}" dir="ltr"></div>
-      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="${mat.low.toLocaleString('vi-VN')}" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="${parseFloat(mat.low).toLocaleString('vi-VN')}" dir="ltr"></div>
       <div class="form-group form-full"><label class="form-label">Ghi chú</label><textarea id="mn-note" rows="2">${escapeHtml(mat.note || '')}</textarea></div>
     </div></div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="updateMaterial('${mid}')">Cập nhật</button></div>`);
@@ -382,6 +383,7 @@ export function updateMaterial(mid) {
     mat.low = getNumberFromInput(document.getElementById('mn-low'));
     mat.note = document.getElementById('mn-note')?.value || '';
     addLog('Sửa vật tư', `Đã cập nhật: ${name} (${mid})`);
+  saveState();
     saveState(); closeModal(); if(window.render) window.render();
 }
 
@@ -392,6 +394,7 @@ export function deleteMaterial(mid) {
     state.data.materials = state.data.materials.filter(m => m.id !== mid);
     state.data.transactions = state.data.transactions.filter(t => t.mid !== mid);
     addLog('Xóa vật tư', `Đã xóa: ${mat?.name} (${mid})`);
+  saveState();
     saveState(); if(window.render) window.render();
 }
 
@@ -424,7 +427,7 @@ window.showMaterialDetail = function(mid) {
             <div class="grid4" style="margin-bottom: 20px;">
                 <div class="metric-card">
                     <div class="metric-label">📦 TỒN KHO</div>
-                    <div class="metric-val" style="font-size:18px;">${mat.qty.toLocaleString('vi-VN')} ${mat.unit}</div>
+                    <div class="metric-val" style="font-size:18px;">${parseFloat(mat.qty).toLocaleString('vi-VN')} ${mat.unit}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">💰 ĐƠN GIÁ</div>
@@ -450,7 +453,7 @@ window.showMaterialDetail = function(mid) {
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
-                                <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
                                 <td style="text-align:center;">${t.vatRate||0}%</td>
                                 <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
@@ -473,7 +476,7 @@ window.showMaterialDetail = function(mid) {
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
                                 <td><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
-                                <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
                                 <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
                                 <td>${escapeHtml(t.note || '—')}</td>
@@ -537,6 +540,7 @@ export const addMaterial = (data) => {
     const newMat = { id: newId, name: data.name, cat: data.cat || data.category, unit: data.unit, qty: data.qty || 0, cost: data.cost || 0, low: data.low || 5, note: data.note || '' };
     state.data.materials.push(newMat);
     addLog('Thêm vật tư', `Đã thêm: ${newMat.name} (${newMat.id})`);
+  saveState();
     saveState(); if(window.render) window.render();
     return newMat;
 };

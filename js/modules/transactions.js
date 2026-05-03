@@ -213,6 +213,7 @@ export function savePurchase() {
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
         id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
         type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
         note, invoiceImage: currentInvoiceBase64 || null
@@ -243,6 +244,7 @@ export function savePurchaseWithSupplier(supplierId) {
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
         id: genTid(), mid, supplierId, date: dt.split('T')[0], datetime: dt,
         type: 'purchase', qty, unitPrice, vatRate, subtotal, vatAmount, totalAmount,
         note, invoiceImage: currentInvoiceBase64 || null
@@ -319,6 +321,7 @@ export function saveExport() {
     if (proj) proj.spent = (proj.spent || 0) + total;
 
     state.data.transactions.unshift({
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
         id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
         type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
         attachment: currentExportAttachmentBase64 || null
@@ -427,6 +430,7 @@ export function saveReturn() {
     if (proj) proj.spent = Math.max(0, (proj.spent || 0) - total);
 
     state.data.transactions.unshift({
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
         id: genTid(), mid, projectId: pid, date: dt.split('T')[0], datetime: dt,
         type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null

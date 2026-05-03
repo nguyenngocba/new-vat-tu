@@ -30,7 +30,7 @@ function getFilteredSuppliers() {
         const min = Number(f.minPurchase);
         if (!isNaN(min)) {
             result = result.filter(s => {
-                const total = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id).reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+                const total = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id).reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
                 return total >= min;
             });
         }
@@ -39,7 +39,7 @@ function getFilteredSuppliers() {
         const max = Number(f.maxPurchase);
         if (!isNaN(max)) {
             result = result.filter(s => {
-                const total = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id).reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+                const total = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id).reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
                 return total <= max;
             });
         }
@@ -90,7 +90,7 @@ function updateSupplierList() {
     
     const data = filtered.map(s => {
         const txns = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
-        const total = txns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+        const total = txns.reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
         return { ...s, total, count: txns.length };
     });
     
@@ -270,7 +270,7 @@ export function showSupplierDetail(supplierId) {
         .filter(t => t.type === 'purchase' && t.supplierId === supplierId)
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
     
-    const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const totalSpent = transactions.reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
     
     const materialStats = {};
     transactions.forEach(t => {
@@ -421,7 +421,7 @@ export function exportSupplierDetail(supplierId) {
     const supplier = supplierById(supplierId);
     if (!supplier) return;
     const transactions = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === supplierId).sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
-    const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const totalSpent = transactions.reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
     
     const summaryData = [
         { 'Thông tin': 'Tên nhà cung cấp', 'Giá trị': supplier.name },
@@ -460,7 +460,7 @@ export function exportSupplierDetail(supplierId) {
 export function exportAllSuppliersReport() {
     const suppliers = state.data.suppliers.map(s => {
         const transactions = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === s.id);
-        const totalSpent = transactions.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+        const totalSpent = transactions.reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
         return { 
             'Mã': s.id, 'Tên': s.name, 'SĐT': s.phone || '', 'Email': s.email || '', 
             'Địa chỉ': s.address || '', 'Tổng chi': totalSpent, 'Số lần nhập': transactions.length 
@@ -557,8 +557,10 @@ export function saveSupplier() {
         email: document.getElementById('sup-email')?.value || '', 
         address: document.getElementById('sup-address')?.value || '' 
     };
-    state.data.suppliers.push(newSupplier);
+    state.data.suppliers.push(newSupplier); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) });
+  fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newSupplier) }).catch(function(){});
     addLog('Thêm nhà cung cấp', `Đã thêm: ${name} (${newSupplier.id})`);
+  saveState();
     saveState(); closeModal(); if(window.render) window.render();
 }
 
@@ -572,6 +574,7 @@ export function updateSupplier(sid) {
     supplier.email = document.getElementById('sup-email')?.value || '';
     supplier.address = document.getElementById('sup-address')?.value || '';
     addLog('Cập nhật nhà cung cấp', `Đã cập nhật: ${name} (${sid})`);
+  saveState();
     saveState(); closeModal(); if(window.render) window.render();
 }
 
@@ -580,9 +583,11 @@ export function deleteSupplier(sid) {
     const supplier = supplierById(sid);
     if (!supplier) return;
     if (!confirm(`⚠️ Xóa nhà cung cấp "${supplier.name}"?`)) return;
-    state.data.suppliers = state.data.suppliers.filter(s => s.id !== sid);
+    state.data.suppliers = state.data.suppliers.filter(s => s.id !== sid); fetch('/api/suppliers/' + sid, { method: 'DELETE' });
+  fetch("/api/suppliers/" + sid, { method: "DELETE" }).catch(function(){});
     state.data.transactions = state.data.transactions.filter(t => t.supplierId !== sid);
     addLog('Xóa nhà cung cấp', `Đã xóa: ${supplier.name} (${sid})`);
+  saveState();
     saveState(); if(window.render) window.render();
 }
 
@@ -591,7 +596,7 @@ window.deleteSupplierHandler = (sid) => { deleteSupplier(sid); };
 export function viewSupplierHistory(sid) {
     const supplier = supplierById(sid);
     const purchaseTxns = state.data.transactions.filter(t => t.type === 'purchase' && t.supplierId === sid).sort((a,b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
-    const totalSpent = purchaseTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+    const totalSpent = purchaseTxns.reduce((sum, t) => sum + (parseFloat(t.totalAmount)||0), 0);
     
     showModal(`<div class="modal-hd"><span class="modal-title">📜 Lịch sử nhập hàng - ${escapeHtml(supplier?.name)}</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="metric-card" style="margin-bottom:16px"><div class="metric-label">Tổng chi</div><div class="metric-val" style="font-size:20px">${formatMoneyVND(totalSpent)}</div></div>
@@ -619,8 +624,10 @@ export function clearSupplierSearch() {}
 export const addSupplier = (data) => { 
     const newId = genSid(); 
     const newSupplier = { id: newId, name: data.name, phone: data.phone || '', email: data.email || '', address: data.address || '' }; 
-    state.data.suppliers.push(newSupplier); 
+    state.data.suppliers.push(newSupplier); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) }); 
+  fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newSupplier) }).catch(function(){});
     addLog('Thêm nhà cung cấp', `Đã thêm: ${newSupplier.name} (${newSupplier.id})`); 
+  saveState();
     saveState(); if(window.render) window.render(); 
     return newSupplier; 
 };

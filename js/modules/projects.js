@@ -40,8 +40,8 @@ function getFilteredProjects() {
 }
 
 function getProjectTotalReceived(projectId) {
-    const r = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
-    const rt = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
+    const r = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (parseFloat(Number(t.totalAmount))||0), 0);
+    const rt = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').reduce((s, t) => s + (parseFloat(Number(t.totalAmount))||0), 0);
     return r - rt;
 }
 
@@ -103,7 +103,7 @@ function renderProjectHistory() {
             <td>${escapeHtml(mat?.name || 'N/A')}</td>
             <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
             <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
-            <td class="amount ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
+            <td class="amount ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
             <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
         </tr>`;
     }).join('');
@@ -119,8 +119,8 @@ function updateProjectListDisplay() {
     }
     
     const projectsData = filtered.map(p => {
-        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+(t.totalAmount||0),0);
-        const rt = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+(t.totalAmount||0),0);
+        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+(Number(t.totalAmount)||0),0);
+        const rt = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+(Number(t.totalAmount)||0),0);
         const net = r - rt; p.spent = net;
         const pct = p.budget > 0 ? (net/p.budget)*100 : 0;
         const rem = p.budget - net;
@@ -240,8 +240,8 @@ export function showProjectDetail(projectId) {
     
     const rTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
     const retTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
-    const totalR = rTxns.reduce((s,t) => s + (t.totalAmount||0), 0);
-    const totalRet = retTxns.reduce((s,t) => s + (t.totalAmount||0), 0);
+    const totalR = rTxns.reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
+    const totalRet = retTxns.reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
     const spent = totalR - totalRet;
     const rem = project.budget - spent;
     const pct = project.budget > 0 ? (spent/project.budget)*100 : 0;
@@ -284,7 +284,7 @@ export function showProjectDetail(projectId) {
                 <tbody>${allTxns.map(t => {
                     const mat = state.data.materials.find(m=>m.id===t.mid);
                     const isRet = t.type === 'return';
-                    return `<tr><td style="white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td>${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td><td class="amount ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(t.totalAmount)}</td><td>${escapeHtml(t.note||'—')}</td></tr>`;
+                    return `<tr><td style="white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td>${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td><td class="amount ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td>${escapeHtml(t.note||'—')}</td></tr>`;
                 }).join('') || '<tr><td colspan="7">📭 Chưa có giao dịch</td></tr>'}</tbody></table></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
@@ -330,8 +330,8 @@ export function exportProjectDetail(projectId) {
 
 export function exportAllProjectsReport() {
     const data = state.data.projects.map(p => {
-        const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+(t.totalAmount||0),0);
-        const rt = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(t.totalAmount||0),0);
+        const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+(Number(t.totalAmount)||0),0);
+        const rt = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(Number(t.totalAmount)||0),0);
         return {'Mã':p.id,'Tên':p.name,'NS':p.budget,'Đã nhận':r,'Đã trả':rt,'Đã SD':r-rt,'Còn':p.budget-(r-rt),'%':p.budget>0?((r-rt)/p.budget*100).toFixed(1):0};
     });
     if (typeof XLSX !== 'undefined') {
@@ -445,7 +445,7 @@ export function deleteProject(pid) {
     const p = projectById(pid);
     if (!p) return;
     if (!confirm(`Xóa "${p.name}"?`)) return;
-    state.data.projects = state.data.projects.filter(x => x.id !== pid);
+    state.data.projects = state.data.projects.filter(x => x.id !== pid); fetch('/api/projects/' + pid, { method: 'DELETE' });
     state.data.transactions = state.data.transactions.filter(x => x.projectId !== pid);
     if (state.data.projectSchedules) state.data.projectSchedules = state.data.projectSchedules.filter(x => x.projectId !== pid);
     if (state.data.projectMaterialUsage) state.data.projectMaterialUsage = state.data.projectMaterialUsage.filter(x => x.projectId !== pid);
@@ -457,7 +457,7 @@ window.deleteProjectHandler = deleteProject;
 window.openMaterialUsageModal = (pid, mid) => import('./projects.js').then(m => m.openMaterialUsageModal?.(pid, mid));
 window.saveMaterialUsage = (pid, mid, tr) => import('./projects.js').then(m => m.saveMaterialUsage?.(pid, mid, tr));
 
-export const addProject = (d) => { const p = { id: genPid(), name: d.name, budget: Number(d.budget)||0, spent: 0 }; state.data.projects.push(p); addLog('Thêm CT', p.name); saveState(); if(window.render) window.render(); return p; };
+export const addProject = (d) => { const p = { id: genPid(), name: d.name, budget: Number(d.budget)||0, spent: 0 }; state.data.projects.push(p); addLog('Thêm CT', p.name); saveState(); fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if(window.render) window.render(); return p; };
 export const getProjects = () => state.data.projects;
 export function filterProjects() {}
 export function clearProjectSearch() {}

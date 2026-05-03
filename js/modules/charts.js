@@ -82,9 +82,9 @@ function getMonthlyData() {
         const d = new Date(t.datetime || t.date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         if (months[key]) {
-            if (t.type === 'purchase') months[key].import += t.totalAmount || 0;
-            if (t.type === 'usage') months[key].export += t.totalAmount || 0;
-            if (t.type === 'return') months[key].return += t.totalAmount || 0;
+            if (t.type === 'purchase') months[key].import += (parseFloat(parseFloat(t.totalAmount))||0);
+            if (t.type === 'usage') months[key].export += (parseFloat(parseFloat(t.totalAmount))||0);
+            if (t.type === 'return') months[key].return += (parseFloat(parseFloat(t.totalAmount))||0);
         }
     });
     
@@ -94,9 +94,9 @@ function getMonthlyData() {
 function getTotalsForPeriod(transactions) {
     let totalImport = 0, totalExport = 0, totalReturn = 0;
     transactions.forEach(t => {
-        if (t.type === 'purchase') totalImport += t.totalAmount || 0;
-        if (t.type === 'usage') totalExport += t.totalAmount || 0;
-        if (t.type === 'return') totalReturn += t.totalAmount || 0;
+        if (t.type === 'purchase') totalImport += (parseFloat(parseFloat(t.totalAmount))||0);
+        if (t.type === 'usage') totalExport += (parseFloat(parseFloat(t.totalAmount))||0);
+        if (t.type === 'return') totalReturn += (parseFloat(parseFloat(t.totalAmount))||0);
     });
     return { totalImport, totalExport, totalReturn, netSpent: totalExport - totalReturn };
 }
@@ -130,7 +130,7 @@ export function checkAutoBackup() {
 
 export function checkLowStockNotification() {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    const lowStockItems = state.data.materials.filter(m => m.qty <= m.low);
+    const lowStockItems = state.data.materials.filter(m => m.qty <= parseFloat(m.low));
     if (lowStockItems.length > 0) {
         new Notification('⚠️ Cảnh báo tồn kho thấp', {
             body: `${lowStockItems.length} vật tư sắp hết: ${lowStockItems.slice(0,3).map(m=>m.name).join(', ')}`,
@@ -247,7 +247,7 @@ function renderKPICards() {
     const allTxns = getFilteredTransactions();
     const { totalImport, totalExport, totalReturn, netSpent } = getTotalsForPeriod(allTxns);
     const totalInventory = state.data.materials.reduce((s, m) => s + (m.qty * m.cost), 0);
-    const lowStockCount = state.data.materials.filter(m => m.qty <= m.low).length;
+    const lowStockCount = state.data.materials.filter(m => m.qty <= parseFloat(m.low)).length;
     
     // So sánh với tháng trước
     const lastMonthTxns = state.data.transactions.filter(t => {
@@ -313,8 +313,8 @@ export function renderDashboard() {
         const mat = state.data.materials.find(m => m.id === t.mid);
         if (mat) {
             if (!catStats[mat.cat]) catStats[mat.cat] = { import: 0, export: 0, qty: 0 };
-            if (t.type === 'purchase') catStats[mat.cat].import += t.totalAmount || 0;
-            if (t.type === 'usage') catStats[mat.cat].export += t.totalAmount || 0;
+            if (t.type === 'purchase') catStats[mat.cat].import += (parseFloat(parseFloat(t.totalAmount))||0);
+            if (t.type === 'usage') catStats[mat.cat].export += (parseFloat(parseFloat(t.totalAmount))||0);
         }
     });
     
@@ -322,7 +322,7 @@ export function renderDashboard() {
     const projectStats = {};
     allTxns.filter(t => t.type === 'usage' && t.projectId).forEach(t => {
         if (!projectStats[t.projectId]) projectStats[t.projectId] = 0;
-        projectStats[t.projectId] += t.totalAmount || 0;
+        projectStats[t.projectId] += (parseFloat(parseFloat(t.totalAmount))||0);
     });
     const topProjects = Object.entries(projectStats)
         .map(([id, total]) => ({ name: state.data.projects.find(p=>p.id===id)?.name||'Khác', total, id }))
@@ -333,7 +333,7 @@ export function renderDashboard() {
     const supplierStats = {};
     allTxns.filter(t => t.type === 'purchase' && t.supplierId).forEach(t => {
         if (!supplierStats[t.supplierId]) supplierStats[t.supplierId] = 0;
-        supplierStats[t.supplierId] += t.totalAmount || 0;
+        supplierStats[t.supplierId] += (parseFloat(parseFloat(t.totalAmount))||0);
     });
     const topSuppliers = Object.entries(supplierStats)
         .map(([id, total]) => ({ name: state.data.suppliers.find(s=>s.id===id)?.name||'Khác', total, id }))
@@ -412,7 +412,7 @@ export function renderDashboard() {
                                 <td>${icon} ${label}</td>
                                 <td>${escapeHtml(mat?.name||'N/A')}</td>
                                 <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
-                                <td style="text-align:right;font-weight:500;">${formatMoneyVND(t.totalAmount)}</td>
+                                <td style="text-align:right;font-weight:500;">${formatMoneyVND(parseFloat(parseFloat(t.totalAmount)))}</td>
                                 <td>${escapeHtml(target)}</td>
                             </tr>`;
                         }).join('')}
@@ -449,8 +449,8 @@ function renderTabContent(tab) {
     
     if (tab === 'projects') {
         const projects = state.data.projects.map(p => {
-            const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+(t.totalAmount||0),0);
-            const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(t.totalAmount||0),0);
+            const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+(parseFloat(parseFloat(t.totalAmount))||0),0);
+            const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(parseFloat(parseFloat(t.totalAmount))||0),0);
             return { ...p, spent: u-r, pct: p.budget>0?(u-r)/p.budget*100:0 };
         }).sort((a,b)=>b.spent-a.spent);
         
@@ -484,7 +484,7 @@ function renderTabContent(tab) {
     if (tab === 'suppliers') {
         const suppliers = state.data.suppliers.map(s => {
             const txns = state.data.transactions.filter(t=>t.type==='purchase'&&t.supplierId===s.id);
-            return { ...s, total: txns.reduce((sum,t)=>sum+(t.totalAmount||0),0), count: txns.length };
+            return { ...s, total: txns.reduce((sum,t)=>sum+(parseFloat(parseFloat(t.totalAmount))||0),0), count: txns.length };
         }).sort((a,b)=>b.total-a.total);
         
         return filters + `
