@@ -341,6 +341,7 @@ export function saveMat() {
     };
   
     state.data.materials.push(newMat);
+  fetch('/api/materials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newMat) }).catch(function(){});
     addLog('Thêm vật tư', `Đã thêm: ${name} (${newMat.id}) - SL: ${newMat.qty} ${newMat.unit} - Giá: ${formatMoneyVND(newMat.cost)}`);
   saveState();
     saveState(); closeModal(); if(window.render) window.render();
@@ -382,7 +383,8 @@ export function updateMaterial(mid) {
     mat.cost = getNumberFromInput(document.getElementById('mn-cost'));
     mat.low = getNumberFromInput(document.getElementById('mn-low'));
     mat.note = document.getElementById('mn-note')?.value || '';
-    addLog('Sửa vật tư', `Đã cập nhật: ${name} (${mid})`);
+    fetch('/api/materials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(mat) }).catch(function(){});
+  addLog('Sửa vật tư', `Đã cập nhật: ${name} (${mid})`);
   saveState();
     saveState(); closeModal(); if(window.render) window.render();
 }
@@ -392,6 +394,7 @@ export function deleteMaterial(mid) {
     const mat = matById(mid);
     if (!confirm(`⚠️ Xóa vật tư "${mat?.name}"?`)) return;
     state.data.materials = state.data.materials.filter(m => m.id !== mid);
+  fetch('/api/materials/' + mid, { method: 'DELETE' }).catch(function(){});
     state.data.transactions = state.data.transactions.filter(t => t.mid !== mid);
     addLog('Xóa vật tư', `Đã xóa: ${mat?.name} (${mid})`);
   saveState();
@@ -539,6 +542,7 @@ export const addMaterial = (data) => {
     const newId = genMid();
     const newMat = { id: newId, name: data.name, cat: data.cat || data.category, unit: data.unit, qty: data.qty || 0, cost: data.cost || 0, low: data.low || 5, note: data.note || '' };
     state.data.materials.push(newMat);
+  fetch('/api/materials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newMat) }).catch(function(){});
     addLog('Thêm vật tư', `Đã thêm: ${newMat.name} (${newMat.id})`);
   saveState();
     saveState(); if(window.render) window.render();

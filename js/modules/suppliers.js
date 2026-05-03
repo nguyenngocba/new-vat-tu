@@ -557,7 +557,8 @@ export function saveSupplier() {
         email: document.getElementById('sup-email')?.value || '', 
         address: document.getElementById('sup-address')?.value || '' 
     };
-    state.data.suppliers.push(newSupplier); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) });
+    state.data.suppliers.push(newSupplier);
+  fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) }).catch(function(){}); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) });
   fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newSupplier) }).catch(function(){});
     addLog('Thêm nhà cung cấp', `Đã thêm: ${name} (${newSupplier.id})`);
   saveState();
@@ -583,7 +584,8 @@ export function deleteSupplier(sid) {
     const supplier = supplierById(sid);
     if (!supplier) return;
     if (!confirm(`⚠️ Xóa nhà cung cấp "${supplier.name}"?`)) return;
-    state.data.suppliers = state.data.suppliers.filter(s => s.id !== sid); fetch('/api/suppliers/' + sid, { method: 'DELETE' });
+    state.data.suppliers = state.data.suppliers.filter(s => s.id !== sid);
+  fetch('/api/suppliers/' + sid, { method: 'DELETE' }).catch(function(){}); fetch('/api/suppliers/' + sid, { method: 'DELETE' });
   fetch("/api/suppliers/" + sid, { method: "DELETE" }).catch(function(){});
     state.data.transactions = state.data.transactions.filter(t => t.supplierId !== sid);
     addLog('Xóa nhà cung cấp', `Đã xóa: ${supplier.name} (${sid})`);
@@ -624,7 +626,8 @@ export function clearSupplierSearch() {}
 export const addSupplier = (data) => { 
     const newId = genSid(); 
     const newSupplier = { id: newId, name: data.name, phone: data.phone || '', email: data.email || '', address: data.address || '' }; 
-    state.data.suppliers.push(newSupplier); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) }); 
+    state.data.suppliers.push(newSupplier);
+  fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) }).catch(function(){}); fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newSupplier) }); 
   fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newSupplier) }).catch(function(){});
     addLog('Thêm nhà cung cấp', `Đã thêm: ${newSupplier.name} (${newSupplier.id})`); 
   saveState();

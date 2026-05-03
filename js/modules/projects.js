@@ -407,6 +407,7 @@ export function saveProject() {
     const budget = parseInt(document.getElementById('proj-budget')?.value.replace(/[^0-9]/g,'')) || 0;
     const p = { id: genPid(), name, budget, spent: 0 };
     state.data.projects.push(p);
+  fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).catch(function(){});
     addLog('Thêm công trình', `${name} (${p.id})`);
     saveState(); closeModal(); if(window.render) window.render();
 }
@@ -445,7 +446,8 @@ export function deleteProject(pid) {
     const p = projectById(pid);
     if (!p) return;
     if (!confirm(`Xóa "${p.name}"?`)) return;
-    state.data.projects = state.data.projects.filter(x => x.id !== pid); fetch('/api/projects/' + pid, { method: 'DELETE' });
+    state.data.projects = state.data.projects.filter(x => x.id !== pid);
+  fetch('/api/projects/' + pid, { method: 'DELETE' }).catch(function(){}); fetch('/api/projects/' + pid, { method: 'DELETE' });
     state.data.transactions = state.data.transactions.filter(x => x.projectId !== pid);
     if (state.data.projectSchedules) state.data.projectSchedules = state.data.projectSchedules.filter(x => x.projectId !== pid);
     if (state.data.projectMaterialUsage) state.data.projectMaterialUsage = state.data.projectMaterialUsage.filter(x => x.projectId !== pid);
@@ -457,7 +459,8 @@ window.deleteProjectHandler = deleteProject;
 window.openMaterialUsageModal = (pid, mid) => import('./projects.js').then(m => m.openMaterialUsageModal?.(pid, mid));
 window.saveMaterialUsage = (pid, mid, tr) => import('./projects.js').then(m => m.saveMaterialUsage?.(pid, mid, tr));
 
-export const addProject = (d) => { const p = { id: genPid(), name: d.name, budget: Number(d.budget)||0, spent: 0 }; state.data.projects.push(p); addLog('Thêm CT', p.name); saveState(); fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if(window.render) window.render(); return p; };
+export const addProject = (d) => { const p = { id: genPid(), name: d.name, budget: Number(d.budget)||0, spent: 0 }; state.data.projects.push(p);
+  fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).catch(function(){}); addLog('Thêm CT', p.name); saveState(); fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if(window.render) window.render(); return p; };
 export const getProjects = () => state.data.projects;
 export function filterProjects() {}
 export function clearProjectSearch() {}

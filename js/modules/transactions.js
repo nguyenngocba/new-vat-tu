@@ -219,7 +219,7 @@ export function savePurchase() {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -251,7 +251,7 @@ export function savePurchaseWithSupplier(supplierId) {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -328,7 +328,7 @@ export function saveExport() {
         type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
         attachment: currentExportAttachmentBase64 || null
     });
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
     addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
@@ -438,7 +438,7 @@ export function saveReturn() {
         type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
     });
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transaction) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
     addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();

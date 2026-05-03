@@ -47,6 +47,9 @@ window.savePurchaseWithSupplier = savePurchaseWithSupplier;
     window.addCategory = addCategory; window.addUnit = addUnit; window.toggleTheme = toggleTheme;
 window.saveNow = function() { saveState(); alert("✅ Đã lưu vào database!"); };
     window.addUser = addUser; window.deleteUser = deleteUser; window.changePassword = changePassword; window.toggleUserPermission = toggleUserPermission;
+window.addUser = addUser;
+window.deleteUser = deleteUser;
+window.changePassword = changePassword;
     window.exportToExcel = exportToExcel; window.showImportModal = showImportModal;
     window.render = render;
 window.toggleSidebar = function() {
