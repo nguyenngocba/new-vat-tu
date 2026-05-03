@@ -417,9 +417,9 @@ window.showMaterialDetail = function(mid) {
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
 
     // Tính tổng
-    const totalImport = purchaseTxns.reduce((s, t) => s + (t.totalAmount || 0), 0);
-    const totalExport = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + (t.totalAmount || 0), 0);
-    const totalReturn = exportTxns.filter(t => t.type === 'return').reduce((s, t) => s + (t.totalAmount || 0), 0);
+    const totalImport = purchaseTxns.reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
+    const totalExport = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
+    const totalReturn = exportTxns.filter(t => t.type === 'return').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
 
     const html = `
         <div class="modal-hd" style="background: var(--accent-bg);">

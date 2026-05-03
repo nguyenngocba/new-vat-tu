@@ -107,7 +107,7 @@ export function openPurchaseModal() {
         const updateDefaultPrice = () => {
             const mid = midSelect?.value;
             const mat = matById(mid);
-            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
+            if (mat && priceInput) {
                 priceInput.value = mat.cost.toLocaleString('vi-VN');
             }
             calculatePurchaseTotal();
@@ -178,7 +178,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
         const updateDefaultPrice = () => {
             const mid = midSelect?.value;
             const mat = matById(mid);
-            if (mat && priceInput && (!priceInput.value || priceInput.value === '0')) {
+            if (mat && priceInput) {
                 priceInput.value = mat.cost.toLocaleString('vi-VN');
             }
             calculatePurchaseTotal();
@@ -219,7 +219,7 @@ export function savePurchase() {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -251,7 +251,7 @@ export function savePurchaseWithSupplier(supplierId) {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -328,7 +328,7 @@ export function saveExport() {
         type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
         attachment: currentExportAttachmentBase64 || null
     });
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
@@ -342,8 +342,8 @@ export function openReturnModal(preselectedProjectId = null) {
     if (pw.length === 0) return alert('Chưa có công trình nào được xuất kho');
 
     const opts = pw.map(p => {
-        const u = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+(t.totalAmount||0),0);
-        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+(t.totalAmount||0),0);
+        const u = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+Number(t.totalAmount||0),0);
+        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+Number(t.totalAmount||0),0);
         return `<option value="${p.id}" ${preselectedProjectId===p.id?'selected':''}>${escapeHtml(p.name)} (Đã SD: ${formatMoneyVND(u-r)})</option>`;
     }).join('');
 
@@ -438,7 +438,7 @@ export function saveReturn() {
         type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
     });
-    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) }).catch(function(){});
+    fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();

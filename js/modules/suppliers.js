@@ -280,7 +280,7 @@ export function showSupplierDetail(supplierId) {
                 materialStats[t.mid] = { name: mat.name, unit: mat.unit, qty: 0, totalAmount: 0, lastPrice: t.unitPrice };
             }
             materialStats[t.mid].qty += t.qty;
-            materialStats[t.mid].totalAmount += t.totalAmount;
+            materialStats[t.mid].totalAmount += Number(t.totalAmount);
             materialStats[t.mid].lastPrice = t.unitPrice;
         }
     });
@@ -291,7 +291,7 @@ export function showSupplierDetail(supplierId) {
         const date = new Date(t.datetime || t.date);
         const monthKey = `${date.getMonth() + 1}/${date.getFullYear()}`;
         if (!monthlyStats[monthKey]) monthlyStats[monthKey] = { month: monthKey, total: 0, count: 0 };
-        monthlyStats[monthKey].total += t.totalAmount;
+        monthlyStats[monthKey].total += Number(t.totalAmount);
         monthlyStats[monthKey].count++;
     });
     const monthlyStatsArray = Object.values(monthlyStats).sort((a, b) => {
@@ -336,7 +336,7 @@ export function showSupplierDetail(supplierId) {
                         <td style="text-align: right;">${stat.qty.toLocaleString('vi-VN')}</td>
                         <td style="text-align: right;">${stat.unit}</td>
                         <td style="text-align: right;">${formatMoneyVND(stat.lastPrice)}/đv</td>
-                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(stat.totalAmount)}</td>
+                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(Number(stat.totalAmount))}</td>
                         <td style="text-align: center;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
                 }).join('')}</tbody></table></div>
