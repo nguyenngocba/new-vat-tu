@@ -4,7 +4,7 @@ const { Pool, types } = require('pg');
 types.setTypeParser(1700, 'text', parseFloat);
 const app = express();
 const PORT = 3000;
-const pool = new Pool({ host: '/var/run/postgresql', database: 'steeltrack', user: 'postgres', port: 5432 });
+const pool = new Pool({ host: 'localhost', database: 'steeltrack', user: 'postgres', port: 5432 });
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 app.get('/api/data', async (req, res) => {
@@ -17,6 +17,7 @@ app.get('/api/data', async (req, res) => {
         const l = await pool.query('SELECT * FROM logs ORDER BY timestamp DESC LIMIT 200');
         const c = await pool.query('SELECT name FROM categories ORDER BY name');
         const un = await pool.query('SELECT name FROM units ORDER BY name');
+    console.log("Attachment sample:", t.rows[0]?.attachment);
         res.json({ success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name) }});
     } catch (err) { res.json({ success: false }); }
 });

@@ -71,8 +71,7 @@ export function openPurchaseModal() {
                 <div class="metric-sub">🧾 Tiền VAT: <strong id="preview-vat">0 ₫</strong></div>
                 <div class="metric-val" style="font-size:18px">💵 Tổng thanh toán: <strong id="preview-total">0 ₫</strong></div>
             </div>
-            <div class="form-group"><label class="form-label">📎 Ảnh hóa đơn (tùy chọn)</label><input type="file" id="purchase-invoice" accept="image/*"></div>
-            <div id="invoice-preview"></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchase()">Xác nhận nhập kho</button></div>`;
@@ -142,8 +141,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="metric-sub">🧾 Tiền VAT: <strong id="preview-vat">0 ₫</strong></div>
                 <div class="metric-val" style="font-size:18px">💵 Tổng thanh toán: <strong id="preview-total">0 ₫</strong></div>
             </div>
-            <div class="form-group"><label class="form-label">📎 Ảnh hóa đơn (tùy chọn)</label><input type="file" id="purchase-invoice" accept="image/*"></div>
-            <div id="invoice-preview"></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchaseWithSupplier('${supplierId}')">Xác nhận nhập kho</button></div>`;
@@ -219,10 +217,11 @@ export function savePurchase() {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    state.data.transactions[0].attachment = JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
-    state.data.transactions[0].attachment = state.data.transactions[0].attachment || JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
+    state.data.transactions[0].attachment = JSON.stringify(window._upPaths && (window._upPaths.purchase || window._upPaths.usage || window._upPaths.return) || []);
+    state.data.transactions[0].attachment = JSON.stringify((window._upPaths && window._upPaths.purchase) || (window._upPaths && window._upPaths.usage) || (window._upPaths && window._upPaths.return) || []);
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
-    window._upFiles = {};
+    window._upPaths = {};
+    window._upPaths = {};
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -254,10 +253,11 @@ export function savePurchaseWithSupplier(supplierId) {
         note, invoiceImage: currentInvoiceBase64 || null
     });
 
-    state.data.transactions[0].attachment = JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
-    state.data.transactions[0].attachment = state.data.transactions[0].attachment || JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
+    state.data.transactions[0].attachment = JSON.stringify(window._upPaths && (window._upPaths.purchase || window._upPaths.usage || window._upPaths.return) || []);
+    state.data.transactions[0].attachment = JSON.stringify((window._upPaths && window._upPaths.purchase) || (window._upPaths && window._upPaths.usage) || (window._upPaths && window._upPaths.return) || []);
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
-    window._upFiles = {};
+    window._upPaths = {};
+    window._upPaths = {};
     addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
@@ -283,6 +283,8 @@ export function openTxnModal(type, preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
             </div>
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-export-total">0 ₫</strong></div></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="export-files" multiple onchange="upFiles(this,'usage')"><div id="usage-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note"></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận</button></div>`;
 
@@ -331,10 +333,11 @@ export function saveExport() {
         type: 'usage', qty, unitPrice: mat.cost, totalAmount: total, note,
         attachment: currentExportAttachmentBase64 || null
     });
-    state.data.transactions[0].attachment = JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
-    state.data.transactions[0].attachment = state.data.transactions[0].attachment || JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
+    state.data.transactions[0].attachment = JSON.stringify(window._upPaths && (window._upPaths.purchase || window._upPaths.usage || window._upPaths.return) || []);
+    state.data.transactions[0].attachment = JSON.stringify((window._upPaths && window._upPaths.purchase) || (window._upPaths && window._upPaths.usage) || (window._upPaths && window._upPaths.return) || []);
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
-    window._upFiles = {};
+    window._upPaths = {};
+    window._upPaths = {};
     addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
@@ -363,7 +366,10 @@ export function openReturnModal(preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
                 <div class="form-group"><label class="form-label">💰 Đơn giá</label><input type="text" id="return-price" readonly style="background:var(--surface3);text-align:right;" dir="ltr"></div>
             </div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="return-files" multiple onchange="upFiles(this,'return')"><div id="return-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="return-note">
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-return-total">0 ₫</strong></div></div>
+        </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" style="background:var(--success);" onclick="window.saveReturn()">Xác nhận</button></div>`;
 
     showModal(html, null);
@@ -441,10 +447,11 @@ export function saveReturn() {
         type: 'return', qty, unitPrice: up, totalAmount: total, note: note || 'Trả hàng',
         attachment: currentReturnAttachmentBase64 || null
     });
-    state.data.transactions[0].attachment = JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
-    state.data.transactions[0].attachment = state.data.transactions[0].attachment || JSON.stringify(window._upFiles.purchase || window._upFiles.usage || window._upFiles.return || []);
+    state.data.transactions[0].attachment = JSON.stringify(window._upPaths && (window._upPaths.purchase || window._upPaths.usage || window._upPaths.return) || []);
+    state.data.transactions[0].attachment = JSON.stringify((window._upPaths && window._upPaths.purchase) || (window._upPaths && window._upPaths.usage) || (window._upPaths && window._upPaths.return) || []);
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
-    window._upFiles = {};
+    window._upPaths = {};
+    window._upPaths = {};
     addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();

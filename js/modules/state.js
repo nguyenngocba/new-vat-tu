@@ -29,6 +29,8 @@ export async function loadState() {
     if (res.success && res.data) {
       if (res.data.materials?.length) state.data.materials = res.data.materials;
       if (res.data.transactions?.length) state.data.transactions = res.data.transactions.map(t => ({ ...t, supplierId: t.supplier_id, projectId: t.project_id, unitPrice: t.unit_price, vatRate: t.vat_rate, totalAmount: t.total_amount, vatAmount: t.vat_amount, invoiceImage: t.invoice_image }));
+  console.log("First transaction attachment:", res.data.transactions[0]?.attachment);
+      state.data.transactions = state.data.transactions.map(t => ({ ...t, attachment: t.attachment || "[]" }));
       if (res.data.projects?.length) state.data.projects = res.data.projects;
       if (res.data.suppliers?.length) state.data.suppliers = res.data.suppliers;
       if (res.data.users?.length) state.data.users = res.data.users;

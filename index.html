@@ -17,130 +17,30 @@
             }
         });
     </script>
-<script>
-window._uploadedFiles = {};
-window.handleFileUpload = function(input, type) {
-    var files = input.files;
-    var listId = type + '-file-list';
-    var list = document.getElementById(listId);
-    if (!window._uploadedFiles[type]) window._uploadedFiles[type] = [];
-    
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        var fd = new FormData();
-        var tid = type + '_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
-        fd.append('file', file);
-        
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/upload/' + type + '/' + tid);
-        xhr.onload = function() {
-            var d = JSON.parse(xhr.responseText);
-            if (d.success) {
-                window._uploadedFiles[type].push(d.path);
-                if (list) list.innerHTML += '<a href="' + d.path + '" target="_blank" style="color:#378ADD;margin:0 4px;">📎 ' + d.filename + '</a>';
-            }
-        };
-        xhr.send(fd);
-    }
-};
-</script>
 </head>
 <body>
     <div id="root"></div>
-  <script>
-    window.uploadTransactionFiles = function(input, type) {
-      var files = input.files;
-      var sd = document.getElementById(type + "-upload-status");
-      var ld = document.getElementById(type + "-file-list");
-      if (!sd) return;
-      if (!window._uploadedFiles) window._uploadedFiles = {};
-      if (!window._uploadedFiles[type]) window._uploadedFiles[type] = [];
-      for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        var fd = new FormData();
-        var tid = type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4);
-        fd.append("file", file);
-        fetch("/api/upload/" + type + "/" + tid, { method: "POST", body: fd })
-          .then(function(r) { return r.json(); })
-          .then(function(d) {
-            if (d.success) {
-              window._uploadedFiles[type].push(d.path);
-              sd.innerHTML += "<span style=\"color:green\">✅</span> ";
-              ld.innerHTML += "<a href=\"" + d.path + "\" target=\"_blank\">📎 " + d.filename + "</a> ";
-            }
-          });
-      }
-    };
-  </script>
 <script>
-window.uploadTransactionFiles = function(input, type) {
-    var files = input.files;
-    var sd = document.getElementById(type + "-upload-status");
-    var ld = document.getElementById(type + "-file-list");
-    if (!sd) return;
-    if (!window._uploadedFiles) window._uploadedFiles = {};
-    if (!window._uploadedFiles[type]) window._uploadedFiles[type] = [];
-    for (var i = 0; i < files.length; i++) {
-        var file = files[i];
-        var fd = new FormData();
-        var tid = type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4);
-        fd.append("file", file);
-        fetch("/api/upload/" + type + "/" + tid, { method: "POST", body: fd })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    window._uploadedFiles[type].push(d.path);
-                    sd.innerHTML += '<span style="color:green">✅</span> ';
-                    ld.innerHTML += '<a href="' + d.path + '" target="_blank">📎 ' + d.filename + '</a> ';
-                }
-            });
-    }
-};
-</script>
-<script>
-window._uploaded = {};
-function handleFiles(input, type) {
-  if (!window._uploaded[type]) window._uploaded[type] = [];
-  for (var i = 0; i < input.files.length; i++) {
-    var f = input.files[i];
-    var fd = new FormData();
-    fd.append("file", f);
-    var id = type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4);
-    fetch("/api/upload/" + type + "/" + id, { method: "POST", body: fd })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          window._uploaded[type].push(d.path);
-          var list = document.getElementById(type + "-file-list");
-          if (list) list.innerHTML += "<a href=\"" + d.path + "\" target=\"_blank\" style=\"color:var(--accent);margin-right:6px;\">📎 " + d.filename + "</a>";
-        }
-      });
-  }
-}
-</script>
-    <script type="module" src="js/app.js?v=1777880706"></script>
-<script>
-window._upFiles = {};
-window.uploadFile = function(input, type) {
-    if (!window._upFiles[type]) window._upFiles[type] = [];
-    var list = document.getElementById(type + "-file-list");
+window._upPaths = {};
+function upFiles(input, type) {
+    if (!window._upPaths[type]) window._upPaths[type] = [];
+    var list = document.getElementById((type==="usage"?"usage":type) + "-file-list");
     for (var i = 0; i < input.files.length; i++) {
         var f = input.files[i];
         var fd = new FormData();
         fd.append("file", f);
-        var id = type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4);
+        var id = (type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4));
         fetch("/api/upload/" + type + "/" + id, { method: "POST", body: fd })
             .then(r => r.json())
             .then(d => {
                 if (d.success) {
-    console.log("File uploaded:", d.path);
-                    window._upFiles[type].push(d.path);
-                    if (window.state && window.state.data && window.state.data.transactions.length > 0) { window.state.data.transactions[0].attachment = JSON.stringify(window._upFiles[type]); }
+                    window._upPaths[type].push(d.path);
                     if (list) list.innerHTML += "<a href=\"" + d.path + "\" target=\"_blank\" style=\"color:var(--accent);margin-right:6px;\">📎 " + d.filename + "</a> ";
                 }
             });
     }
-};
+}
 </script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
