@@ -103,7 +103,7 @@ function renderProjectHistory() {
             <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
             <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
             <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
-            <td class="amount ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
+            <td class="amount" style="text-align:right;white-space:nowrap;" ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
             <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
         </tr>`;
     }).join('');
@@ -271,7 +271,7 @@ export function showProjectDetail(projectId) {
                 <div class="metric-sub" style="text-align:center;margin-top:8px;">${pct.toFixed(1)}% (${rTxns.length} nhận, ${retTxns.length} trả)</div>
             </div>
             <div id="tab-materials" class="tab-content" style="display:none;">
-                <div class="tbl-wrap"><table style="min-width:800px;"><thead><tr><th>Vật tư</th><th>Đã nhận</th><th>Đã sử dụng</th><th>Đã trả</th><th>Tồn CT</th><th>%</th><th>Nguồn</th><th>Thao tác</th></tr></thead>
+                <div class="tbl-wrap"><table style="min-width:800px;"><thead><tr><th style="text-align:left;">Vật tư</th><th style="text-align:right;">Đã nhận</th><th style="text-align:right;">Đã sử dụng</th><th style="text-align:right;">Đã trả</th><th style="text-align:right;">Tồn CT</th><th style="text-align:center;">%</th><th style="text-align:center;">Nguồn</th><th style="text-align:center;">Thao tác</th></tr></thead>
                 <tbody>${matUsage.map(m => {
                     const cls = m.usagePercentage > 90 ? 'text-danger' : m.usagePercentage > 70 ? 'text-warning' : 'text-success';
                     let src = m.fromSchedule > 0 && m.fromManualUpdate > 0 ? '📅+✏️' : m.fromSchedule > 0 ? '📅 KH' : m.fromManualUpdate > 0 ? '✏️ TT' : '—';
@@ -280,11 +280,11 @@ export function showProjectDetail(projectId) {
             </div>
             <div id="tab-schedule" class="tab-content" style="display:none;"><div id="schedule-view-container"></div></div>
             <div id="tab-history" class="tab-content" style="display:none;">
-                <div class="tbl-wrap"><table style="min-width:900px;"><thead><tr><th>Thời gian</th><th>Loại</th><th>Vật tư</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+                <div class="tbl-wrap"><table style="min-width:900px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th></tr></thead>
                 <tbody>${allTxns.map(t => {
                     const mat = state.data.materials.find(m=>m.id===t.mid);
                     const isRet = t.type === 'return';
-                    return `<tr><td style="white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td></tr>`;
+                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td></tr>`;
                 }).join('') || '<tr><td colspan="7">📭 Chưa có giao dịch</td></tr>'}</tbody></table></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">

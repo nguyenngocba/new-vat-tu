@@ -450,7 +450,7 @@ window.showMaterialDetail = function(mid) {
             <div class="sec-title">📥 LỊCH SỬ NHẬP KHO (${purchaseTxns.length} giao dịch)</div>
             <div class="tbl-wrap" style="margin-bottom: 20px;">
                 <table style="min-width: 750px;">
-                    <thead><tr><th>Thời gian</th><th>Nhà cung cấp</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+                    <thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:left;">Nhà cung cấp</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:center;">VAT</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th></tr></thead>
                     <tbody>
                         ${purchaseTxns.length > 0 ? purchaseTxns.map(t => {
                             const sup = state.data.suppliers.find(s => s.id === t.supplierId);
@@ -471,7 +471,7 @@ window.showMaterialDetail = function(mid) {
             <div class="sec-title">📤 LỊCH SỬ XUẤT KHO (${exportTxns.length} giao dịch)</div>
             <div class="tbl-wrap">
                 <table style="min-width: 750px;">
-                    <thead><tr><th>Thời gian</th><th>Loại</th><th>Công trình</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th><th>Ghi chú</th></tr></thead>
+                    <thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Công trình</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th></tr></thead>
                     <tbody>
                         ${exportTxns.length > 0 ? exportTxns.map(t => {
                             const proj = state.data.projects.find(p => p.id === t.projectId);

@@ -66,10 +66,10 @@ function renderSupplierHistory() {
         const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
         
         return `<tr>
-            <td style="white-space: nowrap;">${displayDateTime}</td>
+            <td style="text-align:left;white-space:nowrap;">${displayDateTime}</td>
             <td style="text-align:left;"><strong>${escapeHtml(supplier?.name || 'N/A')}</strong></td>
             <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
-            <td style="text-align: right;">${displayQty} ${mat?.unit || ''}</td>
+            <td style="text-align:right;white-space:nowrap;">${displayQty} ${mat?.unit || ''}</td>
             <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
             <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
             <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
@@ -328,14 +328,14 @@ export function showSupplierDetail(supplierId) {
             
             ${materialStatsArray.length > 0 ? `
                 <div class="sec-title">📦 TOP VẬT TƯ ĐÃ MUA</div>
-                <div class="tbl-wrap"><table style="min-width: 500px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">Số lượng</th><th style="text-align:center;">Đơn vị</th><th>Lần mua cuối</th><th style="text-align:right;">Tổng chi</th><th style="text-align:right;">Tỷ lệ</th></tr></thead>
+                <div class="tbl-wrap"><table style="min-width: 500px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">Số lượng</th><th style="text-align:left;">Đơn vị</th><th style="text-align:left;">Lần mua cuối</th><th style="text-align:right;">Tổng chi</th><th style="text-align:right;">Tỷ lệ</th></tr></thead>
                 <tbody>${materialStatsArray.slice(0, 10).map(stat => {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
                     return `<tr>
                         <td style="text-align:left;"><strong>${escapeHtml(stat.name)}</strong></td>
-                        <td style="text-align: right;">${parseFloat(stat.qty).toLocaleString('vi-VN')}</td>
-                        <td style="text-align: right;">${stat.unit}</td>
-                        <td style="text-align: right;">${formatMoneyVND(parseFloat(stat.lastPrice))}/đv</td>
+                        <td style="text-align:right;white-space:nowrap;">${parseFloat(stat.qty).toLocaleString('vi-VN')}</td>
+                        <td style="text-align:left;white-space:nowrap;">${stat.unit}</td>
+                        <td style="text-align:left;white-space:nowrap;">${formatMoneyVND(parseFloat(stat.lastPrice))}/đv</td>
                         <td class="text-warning" style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(stat.totalAmount))}</td>
                         <td style="text-align:right;white-space:nowrap;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
@@ -364,10 +364,10 @@ export function showSupplierDetail(supplierId) {
                             const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
                             const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
                             return `<tr>
-                                <td style="white-space: nowrap;">${displayDateTime}</td>
+                                <td style="text-align:left;white-space:nowrap;">${displayDateTime}</td>
                                 <td style="text-align:left;"><strong>${escapeHtml(supplier.name)}</strong></td>
                                 <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
-                                <td style="text-align: right;">${displayQty} ${mat?.unit || ''}</td>
+                                <td style="text-align:right;white-space:nowrap;">${displayQty} ${mat?.unit || ''}</td>
                                 <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
                                 <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
                                 <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
