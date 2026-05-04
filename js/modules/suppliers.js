@@ -73,7 +73,7 @@ function renderSupplierHistory() {
             <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
             <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
             <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
-            <td style="text-align:right;white-space:nowrap;">${invoiceHtml}</td>
+            <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
         </tr>`;
     }).join('');
 }
