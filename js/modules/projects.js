@@ -437,7 +437,7 @@ window.saveEditProject = function(pid) {
     const name = document.getElementById('edit-proj-name')?.value.trim();
     if (!name) return alert('Nhập tên');
     project.name = name;
-    project.budget = parseInt(document.getElementById('edit-proj-budget')?.value.replace(/[^0-9]/g, '')) || 0;
+    project.budget = parseInt(document.getElementById('edit-proj-budget')?.value.replace(/[^0-9]/g, '')) || 0; fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(project) });
     addLog('Sửa công trình', `Đã cập nhật: ${name} (${pid})`);
     saveState(); closeModal(); if(window.render) window.render();
 };

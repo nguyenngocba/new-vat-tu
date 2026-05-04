@@ -573,7 +573,7 @@ export function updateSupplier(sid) {
     supplier.name = name;
     supplier.phone = document.getElementById('sup-phone')?.value || '';
     supplier.email = document.getElementById('sup-email')?.value || '';
-    supplier.address = document.getElementById('sup-address')?.value || '';
+    supplier.address = document.getElementById('sup-address')?.value || ''; fetch('/api/suppliers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(supplier) });
     addLog('Cập nhật nhà cung cấp', `Đã cập nhật: ${name} (${sid})`);
   saveState();
     saveState(); closeModal(); if(window.render) window.render();
