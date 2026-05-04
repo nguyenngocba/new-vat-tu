@@ -67,13 +67,13 @@ function renderSupplierHistory() {
         
         return `<tr>
             <td style="white-space: nowrap;">${displayDateTime}</td>
-            <td><strong>${escapeHtml(supplier?.name || 'N/A')}</strong></td>
-            <td>${escapeHtml(mat?.name || 'N/A')}</td>
+            <td style="text-align:left;"><strong>${escapeHtml(supplier?.name || 'N/A')}</strong></td>
+            <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
             <td style="text-align: right;">${displayQty} ${mat?.unit || ''}</td>
             <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
-            <td style="text-align: center;">${t.vatRate || 0}%</td>
+            <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
             <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
-            <td style="text-align: center;">${invoiceHtml}</td>
+            <td style="text-align:right;white-space:nowrap;">${invoiceHtml}</td>
         </tr>`;
     }).join('');
 }
@@ -332,12 +332,12 @@ export function showSupplierDetail(supplierId) {
                 <tbody>${materialStatsArray.slice(0, 10).map(stat => {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
                     return `<tr>
-                        <td><strong>${escapeHtml(stat.name)}</strong></td>
+                        <td style="text-align:left;"><strong>${escapeHtml(stat.name)}</strong></td>
                         <td style="text-align: right;">${parseFloat(stat.qty).toLocaleString('vi-VN')}</td>
                         <td style="text-align: right;">${stat.unit}</td>
                         <td style="text-align: right;">${formatMoneyVND(parseFloat(stat.lastPrice))}/đv</td>
-                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(parseFloat(stat.totalAmount))}</td>
-                        <td style="text-align: center;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
+                        <td class="text-warning" style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(stat.totalAmount))}</td>
+                        <td style="text-align:right;white-space:nowrap;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
                 }).join('')}</tbody></table></div>
             ` : '<div class="metric-card"><div class="metric-sub">📭 Chưa có giao dịch nhập hàng nào</div></div>'}
@@ -365,13 +365,13 @@ export function showSupplierDetail(supplierId) {
                             const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
                             return `<tr>
                                 <td style="white-space: nowrap;">${displayDateTime}</td>
-                                <td><strong>${escapeHtml(supplier.name)}</strong></td>
-                                <td>${escapeHtml(mat?.name || 'N/A')}</td>
+                                <td style="text-align:left;"><strong>${escapeHtml(supplier.name)}</strong></td>
+                                <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
                                 <td style="text-align: right;">${displayQty} ${mat?.unit || ''}</td>
                                 <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
-                                <td style="text-align: center;">${t.vatRate || 0}%</td>
+                                <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
                                 <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
-                                <td style="text-align: center;">${invoiceHtml}</td>
+                                <td style="text-align:right;white-space:nowrap;">${invoiceHtml}</td>
                             </tr>`;
                         }).join('')}
                     </tbody>
@@ -609,12 +609,12 @@ export function viewSupplierHistory(sid) {
         const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank">📄 Xem</a>` : '—';
         return `<tr>
           <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-          <td>${mat?.name || 'N/A'}</td>
-          <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
-          <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
+          <td style="text-align:left;">${mat?.name || 'N/A'}</td>
+          <td style="text-align:right;white-space:nowrap;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
+          <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
           <td style="text-align:center;">${t.vatRate || 0}%</td>
           <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
-          <td>${escapeHtml(t.note || '—')}</td>
+          <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
           <td style="text-align:center;">${invoiceHtml}</td>
         </tr>`;
     }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody></table></div>

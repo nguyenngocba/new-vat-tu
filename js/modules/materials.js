@@ -456,12 +456,12 @@ window.showMaterialDetail = function(mid) {
                             const sup = state.data.suppliers.find(s => s.id === t.supplierId);
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-                                <td><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
+                                <td style="text-align:left;"><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
                                 <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
-                                <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
-                                <td style="text-align:center;">${t.vatRate||0}%</td>
+                                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
+                                <td style="text-align:center;">${parseFloat(t.vatRate||0)}%</td>
                                 <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
-                                <td>${escapeHtml(t.note || '—')}</td>
+                                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
                             </tr>`;
                         }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>'}
                     </tbody>
@@ -479,11 +479,11 @@ window.showMaterialDetail = function(mid) {
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
-                                <td><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
+                                <td style="text-align:left;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
                                 <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
-                                <td style="text-align:right;">${formatMoneyVND(t.unitPrice)}</td>
+                                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
                                 <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
-                                <td>${escapeHtml(t.note || '—')}</td>
+                                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
                             </tr>`;
                         }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch xuất</td></tr>'}
                     </tbody>

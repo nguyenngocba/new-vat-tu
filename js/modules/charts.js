@@ -461,16 +461,16 @@ function renderTabContent(tab) {
                 <div class="sec-title">🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</div>
                 <div class="tbl-wrap">
                     <table style="min-width:900px;">
-                        <thead><tr><th>Mã</th><th>Tên</th><th>Ngân sách</th><th>Đã chi</th><th>Còn lại</th><th>%</th><th>Tiến độ</th></tr></thead>
+                        <thead><tr><th style="text-align:left;">Mã</th><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
                         <tbody>
                             ${projects.map(p => `
                                 <tr style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
-                                    <td>${p.id}</td>
-                                    <td><strong>${escapeHtml(p.name)}</strong></td>
-                                    <td style="text-align:right;">${formatMoneyVND(p.budget)}</td>
-                                    <td style="text-align:right;" class="text-warning">${formatMoneyVND(p.spent)}</td>
-                                    <td style="text-align:right;color:var(--success-text);">${formatMoneyVND(p.budget-p.spent)}</td>
-                                    <td style="text-align:center;font-weight:bold;">${p.pct.toFixed(1)}%</td>
+                                    <td style="text-align:left;white-space:nowrap;">${p.id}</td>
+                                    <td style="text-align:left;white-space:nowrap;"><strong>${escapeHtml(p.name)}</strong></td>
+                                    <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(p.budget))}</td>
+                                    <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(parseFloat(p.spent))}</td>
+                                    <td style="text-align:right;white-space:nowrap;color:var(--success-text);">${formatMoneyVND(parseFloat(p.budget)-parseFloat(p.spent))}</td>
+                                    <td style="text-align:center;font-weight:bold;">${parseFloat(p.pct).toFixed(1)}%</td>
                                     <td><div class="progress-bar" style="width:120px;"><div class="progress-fill" style="width:${(p.pct/maxPct)*100}%;background:${p.pct>90?'#A32D2D':'#378ADD'};"></div></div></td>
                                 </tr>
                             `).join('')}
@@ -492,17 +492,17 @@ function renderTabContent(tab) {
                 <div class="sec-title">🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</div>
                 <div class="tbl-wrap">
                     <table style="min-width:800px;">
-                        <thead><tr><th>Mã</th><th>Tên</th><th>SĐT</th><th>Email</th><th>Tổng chi</th><th>Số lần</th><th>TB/Lần</th></tr></thead>
+                        <thead><tr><th style="text-align:left;">Mã</th><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
                         <tbody>
                             ${suppliers.map(s => `
                                 <tr style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
-                                    <td>${s.id}</td>
-                                    <td><strong>${escapeHtml(s.name)}</strong></td>
-                                    <td>${s.phone||'—'}</td>
-                                    <td>${s.email||'—'}</td>
-                                    <td style="text-align:right;" class="text-warning">${formatMoneyVND(s.total)}</td>
+                                    <td style="text-align:left;">${s.id}</td>
+                                    <td style="text-align:left;"><strong>${escapeHtml(s.name)}</strong></td>
+                                    <td style="text-align:left;">${s.phone||'—'}</td>
+                                    <td style="text-align:left;">${s.email||'—'}</td>
+                                    <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(s.total)}</td>
                                     <td style="text-align:center;">${s.count}</td>
-                                    <td style="text-align:right;">${s.count>0?formatMoneyVND(s.total/s.count):'0 ₫'}</td>
+                                    <td style="text-align:right;white-space:nowrap;">${s.count>0?formatMoneyVND(s.total/s.count):'0 ₫'}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
