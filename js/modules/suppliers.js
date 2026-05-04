@@ -354,7 +354,7 @@ export function showSupplierDetail(supplierId) {
                             <th style="text-align:right;">Đơn giá</th>
                             <th style="text-align:center;">VAT</th>
                             <th style="text-align:right;">Thành tiền</th>
-                            <th style="text-align:center;">Hóa đơn</th>
+                            <th style="text-align:center;">File</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -371,7 +371,7 @@ export function showSupplierDetail(supplierId) {
                                 <td style="text-align: right;">${formatMoneyVND(t.unitPrice)}</td>
                                 <td style="text-align:right;white-space:nowrap;">${t.vatRate || 0}%</td>
                                 <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
-                                <td style="text-align:right;white-space:nowrap;">${invoiceHtml}</td>
+                                <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
                             </tr>`;
                         }).join('')}
                     </tbody>
@@ -511,7 +511,7 @@ export function renderSuppliers() {
                                     <th style="text-align:right;">Đơn giá</th>
                                     <th style="text-align:center;">VAT</th>
                                     <th style="text-align:right;">Thành tiền</th>
-                                    <th style="text-align:center;">Hóa đơn</th>
+                                    <th style="text-align:center;">File</th>
                                 </tr>
                             </thead>
                             <tbody id="supplier-history-tbody">
@@ -615,7 +615,7 @@ export function viewSupplierHistory(sid) {
           <td style="text-align:center;">${t.vatRate || 0}%</td>
           <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
           <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
-          <td style="text-align:center;">${invoiceHtml}</td>
+          <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
         </tr>`;
     }).join('') || '<tr><td colspan="8">Chưa có giao dịch nào</td></tr>'}</tbody></table></div>
     </div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>`);
