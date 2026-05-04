@@ -51,7 +51,7 @@ export function openPurchaseModal() {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (state.data.suppliers.length === 0) return alert('Chưa có nhà cung cấp');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
     const optsSup = state.data.suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     const currentDateTime = getCurrentDateTime();
 
@@ -123,7 +123,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
     const supplier = supplierById(supplierId);
     if (!supplier) return alert('Không tìm thấy nhà cung cấp');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
     const currentDateTime = getCurrentDateTime();
 
     const html = `
@@ -209,7 +209,7 @@ export function savePurchase() {
     const vatAmount = subtotal * vatRate / 100;
     const totalAmount = subtotal + vatAmount;
     const oldQty = mat.qty, oldValue = oldQty * mat.cost;
-    mat.qty += qty;
+    mat.qty = parseFloat(mat.qty||0) + parseFloat(qty||0);
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
@@ -241,7 +241,7 @@ export function savePurchaseWithSupplier(supplierId) {
 
     const subtotal = qty * unitPrice, vatAmount = subtotal * vatRate / 100, totalAmount = subtotal + vatAmount;
     const oldQty = mat.qty, oldValue = oldQty * mat.cost;
-    mat.qty += qty;
+    mat.qty = parseFloat(mat.qty||0) + parseFloat(qty||0);
     if (mat.qty > 0) mat.cost = Math.round((oldValue + totalAmount) / mat.qty);
 
     state.data.transactions.unshift({
@@ -264,7 +264,7 @@ export function openTxnModal(type, preselectedProjectId = null) {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư');
     if (state.data.projects.length === 0) return alert('Chưa có công trình');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${m.qty.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
     const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId===p.id?'selected':''}>${escapeHtml(p.name)} (NS: ${formatMoneyVND(p.budget)})</option>`).join('');
 
     const html = `
@@ -318,7 +318,7 @@ export function saveExport() {
     if (mat.qty < qty) return alert(`Không đủ tồn! Còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
 
     const total = qty * mat.cost;
-    mat.qty -= qty;
+    mat.qty = parseFloat(mat.qty||0) - parseFloat(qty||0);
     const proj = projectById(pid);
     if (proj) proj.spent = (proj.spent || 0) + total;
 
@@ -428,7 +428,7 @@ export function saveReturn() {
     if (!mat) return alert('Không tìm thấy vật tư');
 
     const total = qty * up;
-    mat.qty += qty;
+    mat.qty = parseFloat(mat.qty||0) + parseFloat(qty||0);
     const proj = projectById(pid);
     if (proj) proj.spent = Math.max(0, (proj.spent || 0) - total);
 

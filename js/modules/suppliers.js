@@ -328,15 +328,15 @@ export function showSupplierDetail(supplierId) {
             
             ${materialStatsArray.length > 0 ? `
                 <div class="sec-title">📦 TOP VẬT TƯ ĐÃ MUA</div>
-                <div class="tbl-wrap"><table style="min-width: 500px;"><thead><tr><th>Vật tư</th><th>Số lượng</th><th>Đơn vị</th><th>Lần mua cuối</th><th>Tổng chi</th><th>Tỷ lệ</th></tr></thead>
+                <div class="tbl-wrap"><table style="min-width: 500px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">Số lượng</th><th style="text-align:center;">Đơn vị</th><th>Lần mua cuối</th><th style="text-align:right;">Tổng chi</th><th style="text-align:right;">Tỷ lệ</th></tr></thead>
                 <tbody>${materialStatsArray.slice(0, 10).map(stat => {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
                     return `<tr>
                         <td><strong>${escapeHtml(stat.name)}</strong></td>
-                        <td style="text-align: right;">${stat.qty.toLocaleString('vi-VN')}</td>
+                        <td style="text-align: right;">${parseFloat(stat.qty).toLocaleString('vi-VN')}</td>
                         <td style="text-align: right;">${stat.unit}</td>
-                        <td style="text-align: right;">${formatMoneyVND(stat.lastPrice)}/đv</td>
-                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(Number(stat.totalAmount))}</td>
+                        <td style="text-align: right;">${formatMoneyVND(parseFloat(stat.lastPrice))}/đv</td>
+                        <td class="text-warning" style="text-align: right;">${formatMoneyVND(parseFloat(stat.totalAmount))}</td>
                         <td style="text-align: center;"><div class="progress-bar" style="width: 100px; display: inline-block;"><div class="progress-fill" style="width: ${percentOfTotal}%; background: var(--accent);"></div></div> ${percentOfTotal.toFixed(1)}%</td>
                     </tr>`;
                 }).join('')}</tbody></table></div>
