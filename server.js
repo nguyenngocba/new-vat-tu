@@ -33,3 +33,34 @@ app.listen(PORT, '0.0.0.0', () => console.log('OK'));
 app.delete('/api/projects/:id', async (req, res) => { await pool.query('DELETE FROM projects WHERE id=$1',[req.params.id]); res.json({success:true}); });
 app.delete('/api/suppliers/:id', async (req, res) => { await pool.query('DELETE FROM suppliers WHERE id=$1',[req.params.id]); res.json({success:true}); });
 app.delete('/api/materials/:id', async (req, res) => { await pool.query('DELETE FROM materials WHERE id=$1',[req.params.id]); res.json({success:true}); });
+
+// ========== UPLOAD FILE ==========
+const multer = require('multer');
+const fs = require('fs');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const type = req.params.type || 'purchase';
+        const dir = `/var/www/steeltrack/uploads/${type}`;
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const { id } = req.params;
+        const ext = require('path').extname(file.originalname);
+        cb(null, `${id}${ext}`);
+    }
+});
+const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
+
+app.post('/api/upload/:type/:id', upload.single('file'), (req, res) => {
+    if (!req.file) return res.json({ success: false, error: 'No file' });
+    res.json({ success: true, filename: req.file.filename, path: `/uploads/${req.params.type}/${req.file.filename}` });
+});
+
+app.get('/uploads/:type/:filename', (req, res) => {
+    const fp = `/var/www/steeltrack/uploads/${req.params.type}/${req.params.filename}`;
+    if (fs.existsSync(fp)) res.sendFile(fp);
+    else res.status(404).send('Not found');
+});
+
