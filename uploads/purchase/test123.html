@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrivietSteel Pro - Quản lý kho & Công trình & Nhà cung cấp</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            if (typeof XLSX === 'undefined') {
+                console.log('Đang tải XLSX từ CDN dự phòng...');
+                var script = document.createElement('script');
+                script.src = 'https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js';
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+<script>
+window._upPaths = {};
+function upFiles(input, type) {
+    if (!window._upPaths[type]) window._upPaths[type] = [];
+    var list = document.getElementById((type==="usage"?"usage":type) + "-file-list");
+    for (var i = 0; i < input.files.length; i++) {
+        var f = input.files[i];
+        var fd = new FormData();
+        fd.append("file", f);
+        var id = (type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4));
+        fetch("/api/upload/" + type + "/" + id, { method: "POST", body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    window._upPaths[type].push(d.path);
+                    if (list) list.innerHTML += "<a href=\"" + d.path + "\" target=\"_blank\" style=\"color:var(--accent);margin-right:6px;\">📎 " + d.filename + "</a> ";
+                }
+            });
+    }
+}
+</script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

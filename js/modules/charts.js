@@ -123,7 +123,6 @@ export function checkAutoBackup() {
                 nextId: { nextMid: state.data.nextMid, nextTid: state.data.nextTid, nextPid: state.data.nextPid, nextSid: state.data.nextSid, nextLogId: state.data.nextLogId }
             }
         };
-        localStorage.setItem('steeltrack_auto_backup', JSON.stringify(backupData));
         localStorage.setItem(lastBackupKey, today);
     }
 }

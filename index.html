@@ -22,7 +22,8 @@
     <div id="root"></div>
 <script>
 window._upPaths = {};
-function upFiles(input, type) {
+window.upFiles = function upFiles(input, type) {
+    console.log("upFiles called!", type, input.files.length);
     if (!window._upPaths[type]) window._upPaths[type] = [];
     var list = document.getElementById((type==="usage"?"usage":type) + "-file-list");
     for (var i = 0; i < input.files.length; i++) {
@@ -31,11 +32,15 @@ function upFiles(input, type) {
         fd.append("file", f);
         var id = (type + "_" + Date.now() + "_" + Math.random().toString(36).substr(2,4));
         fetch("/api/upload/" + type + "/" + id, { method: "POST", body: fd })
-            .then(r => r.json())
+            .then(function(r) { console.log("Upload status:", r.status); return r.json(); })
             .then(d => {
                 if (d.success) {
                     window._upPaths[type].push(d.path);
+    console.log("List element:", list, "Path:", d.path);
                     if (list) list.innerHTML += "<a href=\"" + d.path + "\" target=\"_blank\" style=\"color:var(--accent);margin-right:6px;\">📎 " + d.filename + "</a> ";
+    console.log("After innerHTML:", list.innerHTML);
+    console.log("After innerHTML:", list.innerHTML);
+    console.log("After innerHTML:", list.innerHTML);
                 }
             });
     }

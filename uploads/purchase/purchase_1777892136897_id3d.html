@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SteelTrack Pro - Quản lý Kho & Công trình</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#181c25;--surface2:#1f2435;--surface3:#252a3a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#e8eaf0;--muted:#7a8099;--hint:#4a5068;
+  --accent:#378ADD;--accent-bg:rgba(55,138,221,0.15);--accent-text:#85B7EB;
+  --warn:#BA7517;--warn-bg:rgba(186,117,23,0.15);--warn-text:#FAC775;
+  --danger:#A32D2D;--danger-bg:rgba(163,45,45,0.15);--danger-text:#F09595;
+  --success:#3B6D11;--success-bg:rgba(59,109,17,0.15);--success-text:#97C459;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--rl:12px;
+}
+[data-theme="light"]{
+  --bg:#f0f0ed;--surface:#ffffff;--surface2:#f4f4f1;--surface3:#eaeae6;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1c24;--muted:#6b6f80;--hint:#a0a4b4;
+  --accent:#185FA5;--accent-bg:#E6F1FB;--accent-text:#0C447C;
+  --warn:#854F0B;--warn-bg:#FAEEDA;--warn-text:#633806;
+  --danger:#A32D2D;--danger-bg:#FCEBEB;--danger-text:#791F1F;
+  --success:#3B6D11;--success-bg:#EAF3DE;--success-text:#27500A;
+}
+body{font-family:var(--sans);font-size:14px;color:var(--text);background:var(--bg);overflow:hidden;}
+button{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r);padding:7px 14px;color:var(--text);cursor:pointer;font-weight:500;}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.sm{padding:4px 9px;font-size:12px;}
+input,select,textarea{background:var(--surface2);border:0.5px solid var(--border2);border-radius:var(--r);padding:8px 10px;color:var(--text);outline:none;width:100%;}
+input:focus{border-color:var(--accent);}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:16px 18px;margin-bottom:15px;}
+.sidebar{width:240px;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;}
+.nav-item{padding:12px 20px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:10px;}
+.nav-item.active{background:var(--accent-bg);color:var(--accent);border-left:3px solid var(--accent);}
+.topbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:15px;}
+.search-box{background:var(--surface2);border:0.5px solid var(--border2);padding:6px 12px;border-radius:20px;width:250px;color:var(--text);}
+.pane{padding:24px;overflow-y:auto;flex:1;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th{text-align:left;padding:10px;font-size:11px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border2);}
+td{padding:12px 10px;border-bottom:1px solid var(--border);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.modal{background:var(--surface);width:100%;max-width:650px;border-radius:var(--rl);max-height:90vh;overflow-y:auto;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+.full{grid-column:1/-1;}
+.img-preview{width:100%;max-height:150px;object-fit:contain;margin-top:10px;border:1px dashed var(--border2);border-radius:var(--r);}
+.history-table{font-size:12px;margin-top:8px;background:rgba(0,0,0,0.2);border-radius:var(--r);}
+.history-table td{padding:6px 8px;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const STORAGE_KEY = 'steel_track_v8';
+let state = {
+    theme: 'dark',
+    currentUser: null,
+    currentPane: 'entry',
+    searchQuery: '',
+    tempImg: null,
+    data: {
+        materials: [], transactions: [], projects: [], suppliers: [], logs: [],
+        categories: ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Vật tư tiêu hao'],
+        units: ['tấn', 'kg', 'cái', 'mét'],
+        nextMid: 1, nextTid: 1, nextPid: 1, nextSid: 1
+    }
+};
+
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data)); }
+function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state.data = JSON.parse(saved);
+    if (state.data.projects.length === 0) {
+        state.data.projects = [{id:'P001', name:'Nhà kho A', budget:100000000}];
+        state.data.nextPid = 2;
+    }
+    if (state.data.suppliers.length === 0) {
+        state.data.suppliers = [{id:'S001', name:'Thép Việt Đức', phone:'0912345678'}];
+        state.data.nextSid = 2;
+    }
+    render();
+}
+
+function formatMoney(v) { return new Intl.NumberFormat('vi-VN').format(v || 0) + ' ₫'; }
+
+// --- LOGIC TÌM KIẾM ---
+function handleSearch(e) {
+    state.searchQuery = e.target.value.toLowerCase();
+    render();
+}
+
+// --- LOGIC TÍNH TIỀN TỰ ĐỘNG TRONG MODAL ---
+function updatePurchaseCalc() {
+    const qty = parseFloat(document.getElementById('txn-qty')?.value) || 0;
+    const price = parseFloat(document.getElementById('txn-price')?.value) || 0;
+    const vat = parseFloat(document.getElementById('txn-vat')?.value) || 0;
+    const total = (qty * price) * (1 + vat / 100);
+    const el = document.getElementById('calc-total');
+    if (el) el.innerText = formatMoney(total);
+}
+
+function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            state.tempImg = event.target.result;
+            document.getElementById('preview-img').src = state.tempImg;
+            document.getElementById('preview-img').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// --- RENDER FUNCTIONS ---
+function render() {
+    const root = document.getElementById('root');
+    root.innerHTML = `
+        <div style="display:flex; height:100vh;">
+            ${renderSidebar()}
+            <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+                ${renderTopbar()}
+                <div class="pane">
+                    ${renderContent()}
+                </div>
+            </div>
+        </div>
+        <div id="modal-root"></div>
+    `;
+}
+
+function renderSidebar() {
+    const menu = [
+        {id:'entry', lbl:'📦 Kho vật tư', icon:'📦'},
+        {id:'projects', lbl:'🏗️ Công trình', icon:'🏗️'},
+        {id:'suppliers', lbl:'🏭 Nhà cung cấp', icon:'🏭'},
+    ];
+    return `
+        <div class="sidebar">
+            <div style="padding:20px; font-weight:bold; color:var(--accent); border-bottom:1px solid var(--border)">STEELTRACK PRO</div>
+            ${menu.map(m => `<div class="nav-item ${state.currentPane===m.id?'active':''}" onclick="state.currentPane='${m.id}'; render();">${m.icon} ${m.lbl}</div>`).join('')}
+        </div>
+    `;
+}
+
+function renderTopbar() {
+    let actions = '';
+    if (state.currentPane === 'entry') {
+        actions = `<button class="primary" onclick="openTxnModal('purchase')">📥 Nhập kho</button>
+                   <button onclick="openTxnModal('usage')">📤 Xuất kho</button>`;
+    } else if (state.currentPane === 'projects') {
+        actions = `<button class="primary" onclick="openProjectModal()">+ Thêm công trình</button>`;
+    } else if (state.currentPane === 'suppliers') {
+        actions = `<button class="primary" onclick="openSupplierModal()">+ Thêm nhà cung cấp</button>`;
+    }
+
+    return `
+        <div class="topbar">
+            <h2 style="flex:1">${state.currentPane.toUpperCase()}</h2>
+            <input type="text" class="search-box" placeholder="Tìm kiếm..." oninput="handleSearch(event)" value="${state.searchQuery}">
+            ${actions}
+        </div>
+    `;
+}
+
+function renderContent() {
+    if (state.currentPane === 'entry') return renderStock();
+    if (state.currentPane === 'projects') return renderProjects();
+    if (state.currentPane === 'suppliers') return renderSuppliers();
+}
+
+function renderStock() {
+    const filtered = state.data.materials.filter(m => m.name.toLowerCase().includes(state.searchQuery));
+    return `
+        <div class="card">
+            <table>
+                <thead><tr><th>Mã</th><th>Tên vật tư</th><th>Loại</th><th>Tồn kho</th><th>Giá nhập gần nhất</th></tr></thead>
+                <tbody>
+                    ${filtered.map(m => `<tr>
+                        <td>${m.id}</td>
+                        <td><b>${m.name}</b></td>
+                        <td>${m.cat}</td>
+                        <td style="color:${m.qty<5?'var(--danger-text)':'var(--success-text)'}">${m.qty} ${m.unit}</td>
+                        <td>${formatMoney(m.cost)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+function renderProjects() {
+    const filtered = state.data.projects.filter(p => p.name.toLowerCase().includes(state.searchQuery));
+    return filtered.map(p => {
+        const txns = state.data.transactions.filter(t => t.projectId === p.id);
+        const totalSpent = txns.reduce((sum, t) => sum + t.totalCost, 0);
+        return `
+            <div class="card">
+                <div style="display:flex; justify-content:space-between">
+                    <h3>🏗️ ${p.name}</h3>
+                    <span>Chi phí đã xuất: <b>${formatMoney(totalSpent)}</b></span>
+                </div>
+                <div class="history-table">
+                    <table>
+                        ${txns.map(t => `<tr>
+                            <td>${t.date}</td>
+                            <td>${state.data.materials.find(m=>m.id===t.mid)?.name}</td>
+                            <td>${t.qty}</td>
+                            <td>${formatMoney(t.totalCost)}</td>
+                        </tr>`).join('')}
+                    </table>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderSuppliers() {
+    const filtered = state.data.suppliers.filter(s => s.name.toLowerCase().includes(state.searchQuery));
+    return filtered.map(s => {
+        const txns = state.data.transactions.filter(t => t.supplierId === s.id);
+        const totalBought = txns.reduce((sum, t) => sum + t.totalCost, 0);
+        return `
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <div>
+                        <h3>🏭 ${s.name}</h3>
+                        <div style="font-size:12px; color:var(--muted)">📞 ${s.phone || 'N/A'}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:11px; color:var(--muted)">TỔNG TIỀN ĐÃ MUA</div>
+                        <div style="font-size:18px; color:var(--accent-text); font-weight:bold">${formatMoney(totalBought)}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:15px">
+                    <div style="font-size:11px; color:var(--muted); margin-bottom:5px">LỊCH SỬ NHẬP HÀNG</div>
+                    <table class="history-table">
+                        <thead><tr><th>Ngày</th><th>Vật tư</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Tổng</th><th>HĐ</th></tr></thead>
+                        <tbody>
+                            ${txns.map(t => `<tr>
+                                <td>${t.date}</td>
+                                <td>${state.data.materials.find(m=>m.id===t.mid)?.name}</td>
+                                <td>${t.qty}</td>
+                                <td>${formatMoney(t.unitPrice)}</td>
+                                <td>${t.vat}%</td>
+                                <td style="font-weight:bold">${formatMoney(t.totalCost)}</td>
+                                <td>${t.img ? `<button class="sm" onclick="showImg('${t.img}')">👁️</button>` : '—'}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// --- MODALS ---
+function openTxnModal(type) {
+    state.tempImg = null;
+    const isPurchase = type === 'purchase';
+    const modalRoot = document.getElementById('modal-root');
+    
+    let extraFields = '';
+    if (isPurchase) {
+        extraFields = `
+            <div class="form-group full"><label>Nhà cung cấp</label>
+                <select id="txn-supplier">${state.data.suppliers.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>
+            </div>
+            <div class="form-group"><label>Đơn giá nhập (VNĐ)</label><input type="number" id="txn-price" oninput="updatePurchaseCalc()"></div>
+            <div class="form-group"><label>VAT (%)</label><input type="number" id="txn-vat" value="10" oninput="updatePurchaseCalc()"></div>
+            <div class="form-group full">
+                <label>Hình ảnh hóa đơn</label>
+                <input type="file" accept="image/*" onchange="handleFileSelect(event)">
+                <img id="preview-img" class="img-preview" style="display:none">
+            </div>
+        `;
+    } else {
+        extraFields = `
+            <div class="form-group full"><label>Công trình nhận</label>
+                <select id="txn-project">${state.data.projects.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select>
+            </div>
+        `;
+    }
+
+    modalRoot.innerHTML = `
+        <div class="modal-overlay">
+            <div class="modal">
+                <div style="padding:20px; border-bottom:1px solid var(--border)"><h3>${isPurchase?'📥 NHẬP KHO':'📤 XUẤT KHO'}</h3></div>
+                <div style="padding:20px" class="form-grid">
+                    <div class="form-group full">
+                        <label>Vật tư</label>
+                        <input list="mat-list" id="txn-mat-name" placeholder="Gõ tên vật tư...">
+                        <datalist id="mat-list">${state.data.materials.map(m=>`<option value="${m.name}">`).join('')}</datalist>
+                    </div>
+                    <div class="form-group"><label>Số lượng</label><input type="number" id="txn-qty" value="1" oninput="updatePurchaseCalc()"></div>
+                    <div class="form-group"><label>Đơn vị</label><select id="txn-unit">${state.data.units.map(u=>`<option>${u}</option>`).join('')}</select></div>
+                    ${extraFields}
+                    <div class="form-group full" style="background:var(--surface2); padding:15px; border-radius:var(--r); text-align:right">
+                        <span style="color:var(--muted)">Thành tiền: </span>
+                        <h2 id="calc-total" style="color:var(--accent-text)">0 ₫</h2>
+                    </div>
+                </div>
+                <div style="padding:20px; border-top:1px solid var(--border); text-align:right">
+                    <button onclick="closeModal()">Hủy</button>
+                    <button class="primary" onclick="confirmTxn('${type}')">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function confirmTxn(type) {
+    const name = document.getElementById('txn-mat-name').value;
+    const qty = parseFloat(document.getElementById('txn-qty').value);
+    const unit = document.getElementById('txn-unit').value;
+    
+    if(!name || qty <= 0) return alert("Kiểm tra lại dữ liệu!");
+
+    // Tìm hoặc tạo vật tư mới
+    let mat = state.data.materials.find(m => m.name === name);
+    if (!mat) {
+        mat = { id: 'M' + state.data.nextMid++, name: name, qty: 0, cost: 0, unit: unit, cat: 'Khác' };
+        state.data.materials.push(mat);
+    }
+
+    const txn = {
+        id: 'T' + state.data.nextTid++,
+        mid: mat.id,
+        qty: qty,
+        date: new Date().toLocaleDateString('vi-VN'),
+        type: type,
+        img: state.tempImg
+    };
+
+    if (type === 'purchase') {
+        txn.supplierId = document.getElementById('txn-supplier').value;
+        txn.unitPrice = parseFloat(document.getElementById('txn-price').value) || 0;
+        txn.vat = parseFloat(document.getElementById('txn-vat').value) || 0;
+        txn.totalCost = (txn.qty * txn.unitPrice) * (1 + txn.vat/100);
+        mat.qty += qty;
+        mat.cost = txn.unitPrice; // Cập nhật giá nhập mới nhất
+    } else {
+        if (mat.qty < qty) return alert("Không đủ hàng trong kho!");
+        txn.projectId = document.getElementById('txn-project').value;
+        txn.unitPrice = mat.cost;
+        txn.totalCost = txn.qty * mat.cost;
+        mat.qty -= qty;
+    }
+
+    state.data.transactions.unshift(txn);
+    saveState();
+    closeModal();
+    render();
+}
+
+function showImg(base64) {
+    const modalRoot = document.getElementById('modal-root');
+    modalRoot.innerHTML = `
+        <div class="modal-overlay" onclick="closeModal()">
+            <img src="${base64}" style="max-width:90%; max-height:90%; border-radius:10px">
+        </div>
+    `;
+}
+
+function openSupplierModal() {
+    const modalRoot = document.getElementById('modal-root');
+    modalRoot.innerHTML = `
+        <div class="modal-overlay">
+            <div class="modal" style="max-width:400px">
+                <div style="padding:20px"><h3>Thêm Nhà cung cấp</h3></div>
+                <div style="padding:20px">
+                    <label>Tên nhà cung cấp</label><input id="new-s-name" style="margin-bottom:10px">
+                    <label>Điện thoại</label><input id="new-s-phone">
+                </div>
+                <div style="padding:20px; text-align:right">
+                    <button onclick="closeModal()">Hủy</button>
+                    <button class="primary" onclick="saveSupplier()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function saveSupplier() {
+    const name = document.getElementById('new-s-name').value;
+    if(!name) return;
+    state.data.suppliers.push({ id: 'S' + state.data.nextSid++, name: name, phone: document.getElementById('new-s-phone').value });
+    saveState(); closeModal(); render();
+}
+
+function openProjectModal() {
+    const modalRoot = document.getElementById('modal-root');
+    modalRoot.innerHTML = `
+        <div class="modal-overlay">
+            <div class="modal" style="max-width:400px">
+                <div style="padding:20px"><h3>Thêm Công trình</h3></div>
+                <div style="padding:20px">
+                    <label>Tên công trình</label><input id="new-p-name">
+                </div>
+                <div style="padding:20px; text-align:right">
+                    <button onclick="closeModal()">Hủy</button>
+                    <button class="primary" onclick="saveProject()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function saveProject() {
+    const name = document.getElementById('new-p-name').value;
+    if(!name) return;
+    state.data.projects.push({ id: 'P' + state.data.nextPid++, name: name });
+    saveState(); closeModal(); render();
+}
+
+function closeModal() { document.getElementById('modal-root').innerHTML = ''; state.tempImg = null; }
+
+// Khởi chạy
+loadState();
+</script>
+</body>
+</html>

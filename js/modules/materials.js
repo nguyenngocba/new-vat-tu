@@ -461,7 +461,7 @@ window.showMaterialDetail = function(mid) {
                                 <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
                                 <td style="text-align:center;">${parseFloat(t.vatRate||0)}%</td>
                                 <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
-                                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
+				<td style="text-align:left;">${escapeHtml(t.note || '—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>                              	
                             </tr>`;
                         }).join('') : '<tr><td colspan="7" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>'}
                     </tbody>

@@ -71,7 +71,7 @@ export function openPurchaseModal() {
                 <div class="metric-sub">🧾 Tiền VAT: <strong id="preview-vat">0 ₫</strong></div>
                 <div class="metric-val" style="font-size:18px">💵 Tổng thanh toán: <strong id="preview-total">0 ₫</strong></div>
             </div>
-            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="window.upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchase()">Xác nhận nhập kho</button></div>`;
@@ -141,7 +141,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
                 <div class="metric-sub">🧾 Tiền VAT: <strong id="preview-vat">0 ₫</strong></div>
                 <div class="metric-val" style="font-size:18px">💵 Tổng thanh toán: <strong id="preview-total">0 ₫</strong></div>
             </div>
-            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="purchase-files" multiple onchange="window.upFiles(this,'purchase')"><div id="purchase-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="purchase-note" placeholder="Mã hóa đơn, số chứng từ..."></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.savePurchaseWithSupplier('${supplierId}')">Xác nhận nhập kho</button></div>`;
@@ -283,7 +283,7 @@ export function openTxnModal(type, preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="txn-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
             </div>
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-export-total">0 ₫</strong></div></div>
-            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="export-files" multiple onchange="upFiles(this,'usage')"><div id="usage-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="export-files" multiple onchange="window.upFiles(this,'usage')"><div id="usage-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="txn-note"></div>
         </div>
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveExport()">Xác nhận</button></div>`;
@@ -366,7 +366,7 @@ export function openReturnModal(preselectedProjectId = null) {
                 <div class="form-group"><label class="form-label">🔢 Số lượng</label><input type="text" id="return-qty" value="1" style="text-align:right;" dir="ltr" autocomplete="off"></div>
                 <div class="form-group"><label class="form-label">💰 Đơn giá</label><input type="text" id="return-price" readonly style="background:var(--surface3);text-align:right;" dir="ltr"></div>
             </div>
-            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="return-files" multiple onchange="upFiles(this,'return')"><div id="return-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">📎 File đính kèm</label><input type="file" id="return-files" multiple onchange="window.upFiles(this,'return')"><div id="return-file-list" style="margin-top:4px;font-size:11px;"></div></div>
             <div class="form-group"><label class="form-label">📝 Ghi chú</label><input type="text" id="return-note">
             <div class="metric-card"><div class="metric-sub">💰 Thành tiền: <strong id="preview-return-total">0 ₫</strong></div></div>
         </div>
