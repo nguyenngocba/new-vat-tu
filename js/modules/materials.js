@@ -394,6 +394,7 @@ export function deleteMaterial(mid) {
     const mat = matById(mid);
     if (!confirm(`⚠️ Xóa vật tư "${mat?.name}"?`)) return;
     state.data.materials = state.data.materials.filter(m => m.id !== mid);
+  fetch("/api/materials/" + mid, { method: "DELETE" });
   fetch('/api/materials/' + mid, { method: 'DELETE' }).catch(function(){});
     state.data.transactions = state.data.transactions.filter(t => t.mid !== mid);
     addLog('Xóa vật tư', `Đã xóa: ${mat?.name} (${mid})`);

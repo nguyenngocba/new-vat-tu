@@ -20,6 +20,7 @@ export async function loadState() {
     if (res.success && res.data) {
       if (res.data.materials?.length) state.data.materials = res.data.materials;
       if (res.data.transactions?.length) state.data.transactions = res.data.transactions.map(t => ({ ...t, supplierId: t.supplier_id, projectId: t.project_id, unitPrice: t.unit_price, vatRate: t.vat_rate, totalAmount: t.total_amount, vatAmount: t.vat_amount, invoiceImage: t.invoice_image }));
+      state.data.transactions = state.data.transactions.map(t => ({ ...t, supplierId: t.supplier_id, projectId: t.project_id, unitPrice: t.unit_price, vatRate: t.vat_rate, totalAmount: t.total_amount, vatAmount: t.vat_amount, invoiceImage: t.invoice_image }));
       if (res.data.projects?.length) state.data.projects = res.data.projects;
       if (res.data.suppliers?.length) state.data.suppliers = res.data.suppliers;
       if (res.data.users?.length) state.data.users = res.data.users;
@@ -28,6 +29,20 @@ export async function loadState() {
       if (res.data.units?.length) state.data.units = res.data.units;
     }
   } catch(e) {}
+  fetch("/api/data").then(r => r.json()).then(res => {
+    if (res.success && res.data) {
+      if (res.data.materials?.length) state.data.materials = res.data.materials;
+      if (res.data.transactions?.length) state.data.transactions = res.data.transactions;
+      state.data.transactions = state.data.transactions.map(t => ({ ...t, supplierId: t.supplier_id, projectId: t.project_id, unitPrice: t.unit_price, vatRate: t.vat_rate, totalAmount: t.total_amount, vatAmount: t.vat_amount, invoiceImage: t.invoice_image }));
+      if (res.data.projects?.length) state.data.projects = res.data.projects;
+      if (res.data.suppliers?.length) state.data.suppliers = res.data.suppliers;
+      if (res.data.users?.length) state.data.users = res.data.users;
+      if (res.data.logs?.length) state.data.logs = res.data.logs;
+      if (res.data.categories?.length) state.data.categories = res.data.categories;
+      if (res.data.units?.length) state.data.units = res.data.units;
+    }
+    if (window.render) window.render();
+  });
   applyTheme(state.theme);
 }
 
@@ -46,12 +61,20 @@ export function addLog(action, details) {
 }
 
 export function applyTheme(t) { state.theme = t; document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : ''); localStorage.setItem('steel_theme', t); }
+  setTimeout(() => { loadState(); }, 1000);
+  setTimeout(() => {
+    state.data.projects.forEach(p => fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) }));
+    state.data.suppliers.forEach(s => fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(s) }));
+    state.data.users.forEach(u => fetch("/api/users-table", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(u) }));
+    fetch("/api/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categories: state.data.categories }) });
+    fetch("/api/units", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ units: state.data.units }) });
+  }, 500);
 export function isAdmin() { return state.currentUser?.role === 'admin'; }
 export function hasPermission(p) { return state.currentUser?.permissions?.[p] || state.currentUser?.role === 'admin'; }
-export function genMid() { return 'M' + String(state.data.nextMid++).padStart(3,'0'); }
-export function genTid() { return 'T' + String(state.data.nextTid++).padStart(3,'0'); }
-export function genPid() { return 'P' + String(state.data.nextPid++).padStart(3,'0'); }
-export function genSid() { return 'S' + String(state.data.nextSid++).padStart(3,'0'); }
+export function genMid() { return "M" + Date.now() + Math.random().toString(36).substr(2,5); }
+export function genTid() { return "T" + Date.now() + Math.random().toString(36).substr(2,5); }
+export function genPid() { return "P" + Date.now() + Math.random().toString(36).substr(2,5); }
+export function genSid() { return "S" + Date.now() + Math.random().toString(36).substr(2,5); }
 export function matById(id) { return state.data.materials.find(m => m.id === id); }
 export function projectById(id) { return state.data.projects.find(p => p.id === id); }
 export function supplierById(id) { return state.data.suppliers.find(s => s.id === id); }

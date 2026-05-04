@@ -585,6 +585,7 @@ export function deleteSupplier(sid) {
     if (!supplier) return;
     if (!confirm(`⚠️ Xóa nhà cung cấp "${supplier.name}"?`)) return;
     state.data.suppliers = state.data.suppliers.filter(s => s.id !== sid);
+  fetch("/api/suppliers/" + sid, { method: "DELETE" });
   fetch('/api/suppliers/' + sid, { method: 'DELETE' }).catch(function(){}); fetch('/api/suppliers/' + sid, { method: 'DELETE' });
   fetch("/api/suppliers/" + sid, { method: "DELETE" }).catch(function(){});
     state.data.transactions = state.data.transactions.filter(t => t.supplierId !== sid);

@@ -447,6 +447,7 @@ export function deleteProject(pid) {
     if (!p) return;
     if (!confirm(`Xóa "${p.name}"?`)) return;
     state.data.projects = state.data.projects.filter(x => x.id !== pid);
+  fetch("/api/projects/" + pid, { method: "DELETE" });
   fetch('/api/projects/' + pid, { method: 'DELETE' }).catch(function(){}); fetch('/api/projects/' + pid, { method: 'DELETE' });
     state.data.transactions = state.data.transactions.filter(x => x.projectId !== pid);
     if (state.data.projectSchedules) state.data.projectSchedules = state.data.projectSchedules.filter(x => x.projectId !== pid);

@@ -40,9 +40,11 @@ export async function importMaterialsFromExcel(file) {
                 if (!name) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: Thiếu tên vật tư`); continue; }
                 
                 const exists = state.data.materials.some(m => m.name.toLowerCase() === name.toLowerCase());
-                if (exists) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: Vật tư "${name}" đã tồn tại`); continue; }
+                // Allow duplicate names - skip existence check
                 
                 state.data.materials.push({ id: genMid(), name, cat, unit, qty, cost, low, note });
+          fetch("/api/materials", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({id: genMid(), name, cat, unit, qty, cost, low, note}) });
+                fetch("/api/materials", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: genMid(), name, cat, unit, qty, cost, low, note }) });
                 successCount++;
             } catch (err) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: ${err.message}`); }
         }
@@ -70,6 +72,7 @@ export async function importProjectsFromExcel(file) {
                 const exists = state.data.projects.some(p => p.name.toLowerCase() === name.toLowerCase());
                 if (exists) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: Công trình "${name}" đã tồn tại`); continue; }
                 
+                fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: genPid(), name, budget, spent: 0 }) });
                 state.data.projects.push({ id: genPid(), name, budget, spent: 0 });
                 successCount++;
             } catch (err) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: ${err.message}`); }
@@ -99,6 +102,7 @@ export async function importSuppliersFromExcel(file) {
                 
                 const exists = state.data.suppliers.some(s => s.name.toLowerCase() === name.toLowerCase());
                 if (exists) { errorCount++; errors.push(`Dòng ${data.indexOf(row) + 2}: Nhà cung cấp "${name}" đã tồn tại`); continue; }
+                fetch("/api/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: genSid(), name, phone, email, address }) });
                 
                 state.data.suppliers.push({ id: genSid(), name, phone, email, address });
                 successCount++;
