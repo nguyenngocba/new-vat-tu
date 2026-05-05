@@ -30,8 +30,22 @@ function getMaterialsExportedToProject(projectId) {
             .filter(t => t.mid === mid)
             .reduce((sum, t) => sum + (t.qty || 0), 0);
         
-        const netAvailable = totalExported - totalReturned;
-        
+// Tính số đã sử dụng từ projectMaterialUsage và schedules
+const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId && u.materialId === mid) || [];
+const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
+let usedQty = 0;
+usageRecords.forEach(r => { usedQty = Math.max(usedQty, r.usedQty || 0); });
+if (schedule?.tasks?.length > 0) {
+    function getAllTasksFlat(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(getAllTasksFlat(t.subTasks)); } return r; }
+    for (const task of getAllTasksFlat(schedule.tasks)) {
+        if (task.materials?.length > 0) {
+            for (const mat of task.materials) {
+                if (mat.materialId === mid) usedQty = Math.max(usedQty, mat.quantity || 0);
+            }
+        }
+    }
+}
+const netAvailable = totalExported - totalReturned - usedQty;        
         return {
             id: mat.id,
             name: mat.name,

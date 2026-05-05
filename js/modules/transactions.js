@@ -412,9 +412,27 @@ export function openReturnModal(preselectedProjectId = null) {
                 if (m) { if(!map.has(t.mid)) map.set(t.mid,{id:t.mid,name:m.name,unit:m.unit,rec:0,ret:0,up:t.unitPrice}); map.get(t.mid).rec+=t.qty; }
             });
             rT.forEach(t => { if(map.has(t.mid)) map.get(t.mid).ret+=t.qty; });
-            const list = Array.from(map.values()).map(i=>({...i,avail:i.rec-i.ret})).filter(i=>i.avail>0);
+const list = Array.from(map.values()).map(i=>{
+    // Tính số đã sử dụng từ projectMaterialUsage và schedules
+    const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === pid && u.materialId === i.id) || [];
+    const schedule = state.data.projectSchedules?.find(s => s.projectId === pid);
+    let usedQty = 0;
+    usageRecords.forEach(r => { usedQty = Math.max(usedQty, r.usedQty || 0); });
+    if (schedule?.tasks?.length > 0) {
+        function getAllTasksFlat(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(getAllTasksFlat(t.subTasks)); } return r; }
+        for (const task of getAllTasksFlat(schedule.tasks)) {
+            if (task.materials?.length > 0) {
+                for (const mat of task.materials) {
+                    if (mat.materialId === i.id) usedQty = Math.max(usedQty, mat.quantity || 0);
+                }
+            }
+        }
+    }
+    i.avail = i.rec - i.ret - usedQty;
+    return i;
+}).filter(i => i.avail > 0);           
             if(list.length===0){ms.innerHTML='<option value="">✅ Hết</option>';return;}
-            ms.innerHTML = list.map(m=>`<option value="${m.id}" data-up="${m.up}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit})</option>`).join('');
+ms.innerHTML = list.map(m=>`<option value="${m.id}" data-up="${m.up}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
             upd();
         }
 
@@ -442,7 +460,7 @@ const received = state.data.transactions
 const returned = state.data.transactions
     .filter(t => t.projectId === pid && t.mid === mid && t.type === 'return')
     .reduce((s, t) => s + Number(t.qty||0), 0);
-const available = received - returned;
+const available = received - returned - usedQty;
 if (qty > available) {
     return alert(`Không thể trả ${qty} ${mat.unit}! Công trình này chỉ có ${available} ${mat.unit} có thể trả.`);
 }

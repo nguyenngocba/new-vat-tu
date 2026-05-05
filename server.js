@@ -60,7 +60,9 @@ app.get('/api/data', async (req, res) => {
         const c = await pool.query('SELECT name FROM categories ORDER BY name');
         const un = await pool.query('SELECT name FROM units ORDER BY name');
         
-        const result = { success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name) }};
+	const ps = await pool.query('SELECT * FROM project_schedules');
+	const pmu = await pool.query('SELECT * FROM project_material_usage');
+	const result = { success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name), projectSchedules: ps.rows, projectMaterialUsage: pmu.rows }};
         await setCache('api_data', JSON.stringify(result), 30);
         res.json(result);
     } catch (err) { res.json({ success: false, error: err.message }); }
@@ -156,5 +158,16 @@ app.post('/api/upload/:type/:id', upload.single('file'), (req, res) => {
     res.json({ success: true, filename: req.file.filename, path: '/uploads/' + req.params.type + '/' + req.file.filename });
 });
 app.use('/uploads', express.static('/var/www/steeltrack/uploads'));
+app.post('/api/project-schedules', async (req, res) => {
+    const s = req.body;
+    await pool.query('INSERT INTO project_schedules (project_id, data) VALUES ($1, $2) ON CONFLICT (project_id) DO UPDATE SET data=$2', [s.projectId, JSON.stringify(s)]);
+    res.json({success:true});
+});
+
+app.post('/api/project-material-usage', async (req, res) => {
+    const u = req.body;
+    await pool.query('INSERT INTO project_material_usage (project_id, material_id, used_qty) VALUES ($1, $2, $3) ON CONFLICT (project_id, material_id) DO UPDATE SET used_qty=$3', [u.projectId, u.materialId, u.usedQty]);
+    res.json({success:true});
+});
 
 server.listen(PORT, '0.0.0.0', () => console.log('OK'));

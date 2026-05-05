@@ -37,14 +37,27 @@ export async function loadState() {
       if (res.data.logs?.length) state.data.logs = res.data.logs;
       if (res.data.categories?.length) state.data.categories = res.data.categories;
       if (res.data.units?.length) state.data.units = res.data.units;
+      if (res.data.projectSchedules?.length) state.data.projectSchedules = res.data.projectSchedules.map(s => ({...s, ...(typeof s.data === 'string' ? JSON.parse(s.data) : s.data)}));
+      if (res.data.projectMaterialUsage?.length) state.data.projectMaterialUsage = res.data.projectMaterialUsage;
     }
   } catch(e) {}
   applyTheme(state.theme);
 }
 
+
 export function saveState() {
   fetch("/api/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categories: state.data.categories }) }).catch(function(){});
   fetch("/api/units", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ units: state.data.units }) }).catch(function(){});
+  if (state.data.projectSchedules?.length) {
+    state.data.projectSchedules.forEach(s => {
+      fetch("/api/project-schedules", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(s) }).catch(function(){});
+    });
+  }
+  if (state.data.projectMaterialUsage?.length) {
+    state.data.projectMaterialUsage.forEach(u => {
+      fetch("/api/project-material-usage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(u) }).catch(function(){});
+    });
+  }
 }
 
 export function addLog(action, details) {
