@@ -455,7 +455,17 @@ function renderTabContent(tab) {
         
         const maxPct = Math.max(...projects.map(p=>p.pct), 1);
         
-        return filters + `
+        const totalProjects = projects.length;
+        const totalBudget = projects.reduce((s, p) => s + Number(p.budget||0), 0);
+        const totalSpentAll = projects.reduce((s, p) => s + Number(p.spent||0), 0);
+        const avgPct = totalBudget > 0 ? (totalSpentAll / totalBudget * 100) : 0;
+        const projectKPIs = `<div class="kpi-grid" style="margin-bottom:16px;">
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(55,138,221,0.15)">🏗️</div><div class="kpi-info"><div class="kpi-label">TỔNG CÔNG TRÌNH</div><div class="kpi-value">${totalProjects}</div><div class="kpi-sub">Đang theo dõi</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(151,196,89,0.15)">💰</div><div class="kpi-info"><div class="kpi-label">TỔNG NGÂN SÁCH</div><div class="kpi-value">${formatMoneyVND(totalBudget)}</div><div class="kpi-sub">Tất cả công trình</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(240,149,149,0.15)">💸</div><div class="kpi-info"><div class="kpi-label">ĐÃ SỬ DỤNG</div><div class="kpi-value">${formatMoneyVND(totalSpentAll)}</div><div class="kpi-sub">${avgPct.toFixed(1)}% ngân sách</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(250,199,117,0.15)">📊</div><div class="kpi-info"><div class="kpi-label">CÒN LẠI</div><div class="kpi-value">${formatMoneyVND(totalBudget - totalSpentAll)}</div><div class="kpi-sub">${(100 - avgPct).toFixed(1)}% còn lại</div></div></div>
+        </div>`;
+        return filters + projectKPIs + `
             <div class="card">
                 <div class="sec-title">🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</div>
                 <div class="tbl-wrap">
@@ -486,7 +496,17 @@ function renderTabContent(tab) {
             return { ...s, total: txns.reduce((sum,t)=>sum+(parseFloat(parseFloat(t.totalAmount))||0),0), count: txns.length };
         }).sort((a,b)=>b.total-a.total);
         
-        return filters + `
+        const totalSuppliers = suppliers.length;
+        const totalSpentAll = suppliers.reduce((s, p) => s + Number(p.total||0), 0);
+        const totalOrders = suppliers.reduce((s, p) => s + Number(p.count||0), 0);
+        const topSup = suppliers[0];
+        const supplierKPIs = `<div class="kpi-grid" style="margin-bottom:16px;">
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(55,138,221,0.15)">🏭</div><div class="kpi-info"><div class="kpi-label">TỔNG NHÀ CUNG CẤP</div><div class="kpi-value">${totalSuppliers}</div><div class="kpi-sub">Đang hợp tác</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(240,149,149,0.15)">💸</div><div class="kpi-info"><div class="kpi-label">TỔNG CHI TIÊU</div><div class="kpi-value">${formatMoneyVND(totalSpentAll)}</div><div class="kpi-sub">Tất cả NCC</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(151,196,89,0.15)">📦</div><div class="kpi-info"><div class="kpi-label">SỐ LẦN NHẬP</div><div class="kpi-value">${totalOrders}</div><div class="kpi-sub">Tổng giao dịch</div></div></div>
+            <div class="kpi-card"><div class="kpi-icon" style="background:rgba(250,199,117,0.15)">⭐</div><div class="kpi-info"><div class="kpi-label">NCC LỚN NHẤT</div><div class="kpi-value" style="font-size:14px">${topSup?.name||'—'}</div><div class="kpi-sub">${topSup ? formatMoneyVND(topSup.total) : '0 ₫'}</div></div></div>
+        </div>`;
+        return filters + supplierKPIs + `
             <div class="card">
                 <div class="sec-title">🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</div>
                 <div class="tbl-wrap">
