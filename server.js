@@ -1,14 +1,56 @@
 const express = require('express');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 const { Pool } = require('pg');
+const redis = require('redis');
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://vattu.trivietsteel.local", "http://vattu.trivietsteel.com"],
+    methods: ["GET", "POST"]
+  }
+});
 const PORT = 3000;
+// THÊM 3 DÒNG NÀY:
+const { createClient } = require('redis');
+const pubClient = createClient();
+const subClient = pubClient.duplicate();
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+  io.adapter(require('@socket.io/redis-adapter').createAdapter(pubClient, subClient));
+});
+
+
+// Redis
+const redisClient = redis.createClient();
+redisClient.on('error', () => console.log('Redis: offline'));
+redisClient.connect().catch(() => {});
+
+// PostgreSQL
 const pool = new Pool({ host: '/var/run/postgresql', database: 'steeltrack', user: 'postgres', port: 5432 });
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
+// Cache helpers
+async function getCache(k) { try { return await redisClient.get(k); } catch(e) { return null; } }
+async function setCache(k, v, t=30) { try { await redisClient.set(k, v, { EX: t }); } catch(e) {} }
+async function clearCache() { try { await redisClient.del('api_data'); } catch(e) {} }
+
+// WebSocket
+io.on('connection', (socket) => {
+    console.log('🔗 User connected:', socket.id);
+});
+function notifyAll(event, data) {
+    io.emit(event, data);
+}
+
+// API
 app.get('/api/data', async (req, res) => {
     try {
+        const cached = await getCache('api_data');
+        if (cached) return res.json(JSON.parse(cached));
+        
         const m = await pool.query('SELECT * FROM materials');
         const t = await pool.query('SELECT * FROM transactions');
         const p = await pool.query('SELECT * FROM projects');
@@ -17,32 +59,96 @@ app.get('/api/data', async (req, res) => {
         const l = await pool.query('SELECT * FROM logs ORDER BY timestamp DESC LIMIT 200');
         const c = await pool.query('SELECT name FROM categories ORDER BY name');
         const un = await pool.query('SELECT name FROM units ORDER BY name');
-        res.json({ success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name) }});
+        
+        const result = { success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name) }};
+        await setCache('api_data', JSON.stringify(result), 30);
+        res.json(result);
     } catch (err) { res.json({ success: false, error: err.message }); }
 });
-app.post('/api/materials', async (req, res) => { const m=req.body; await pool.query('INSERT INTO materials VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (id) DO UPDATE SET name=$2,cat=$3,unit=$4,qty=$5,cost=$6,low=$7,note=$8',[m.id,m.name,m.cat,m.unit,m.qty,m.cost,m.low,m.note||'']); res.json({success:true}); });
-app.delete('/api/materials/:id', async (req, res) => { await pool.query('DELETE FROM materials WHERE id=$1',[req.params.id]); res.json({success:true}); });
-app.post('/api/transactions', async (req, res) => { const t=req.body; await pool.query('INSERT INTO transactions VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)',[t.id,t.mid,t.supplierId||'',t.projectId||'',t.date,t.datetime,t.type,t.qty,t.unitPrice,t.vatRate,t.subtotal,t.vatAmount,t.totalAmount,t.note,t.attachment,t.invoiceImage]); if(t.type==='purchase') await pool.query('UPDATE materials SET qty=qty+$1 WHERE id=$2',[t.qty,t.mid]); else if(t.type==='usage') await pool.query('UPDATE materials SET qty=qty-$1 WHERE id=$2',[t.qty,t.mid]); else if(t.type==='return') await pool.query('UPDATE materials SET qty=qty+$1 WHERE id=$2',[t.qty,t.mid]); res.json({success:true}); });
-app.post('/api/projects', async (req, res) => { const p=req.body; await pool.query('INSERT INTO projects VALUES ($1,$2,$3,$4) ON CONFLICT (id) DO UPDATE SET name=$2,budget=$3,spent=$4',[p.id,p.name,p.budget,p.spent]); res.json({success:true}); });
-app.delete('/api/projects/:id', async (req, res) => { await pool.query('DELETE FROM projects WHERE id=$1',[req.params.id]); res.json({success:true}); });
-app.post('/api/suppliers', async (req, res) => { const s=req.body; await pool.query('INSERT INTO suppliers VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET name=$2,phone=$3,email=$4,address=$5',[s.id,s.name,s.phone,s.email,s.address]); res.json({success:true}); });
-app.delete('/api/suppliers/:id', async (req, res) => { await pool.query('DELETE FROM suppliers WHERE id=$1',[req.params.id]); res.json({success:true}); });
-app.post('/api/users-table', async (req, res) => { const u=req.body; await pool.query('INSERT INTO users_table VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO UPDATE SET name=$2,username=$3,password=$4,role=$5,permissions=$6',[u.id,u.name,u.username,u.password,u.role,u.permissions]); res.json({success:true}); });
-app.post('/api/users-table/delete', async (req, res) => { await pool.query('DELETE FROM users_table WHERE id=$1',[req.body.id]); res.json({success:true}); });
-app.post('/api/categories', async (req, res) => { await pool.query('DELETE FROM categories'); for(const c of (req.body.categories||[])){await pool.query('INSERT INTO categories (name) VALUES ($1)',[c]);} res.json({success:true}); });
-app.post('/api/units', async (req, res) => { await pool.query('DELETE FROM units'); for(const u of (req.body.units||[])){await pool.query('INSERT INTO units (name) VALUES ($1)',[u]);} res.json({success:true}); });
+
+app.post('/api/materials', async (req, res) => { 
+    const m=req.body; 
+    await pool.query('INSERT INTO materials VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (id) DO UPDATE SET name=$2,cat=$3,unit=$4,qty=$5,cost=$6,low=$7,note=$8',[m.id,m.name,m.cat,m.unit,m.qty,m.cost,m.low,m.note||'']); 
+    await clearCache();
+    notifyAll('dataChanged', { type: 'material', id: m.id });
+    res.json({success:true}); 
+});
+app.delete('/api/materials/:id', async (req, res) => { 
+    await pool.query('DELETE FROM materials WHERE id=$1',[req.params.id]); 
+    await clearCache();
+    notifyAll('dataChanged', { type: 'material_deleted' });
+    res.json({success:true}); 
+});
+
+app.post('/api/transactions', async (req, res) => { 
+    const t=req.body; 
+    try {
+        await pool.query('BEGIN');
+        if (t.type === 'usage') {
+            const stock = await pool.query('SELECT qty FROM materials WHERE id=$1 FOR UPDATE', [t.mid]);
+            if (stock.rows[0] && parseFloat(stock.rows[0].qty) < parseFloat(t.qty)) {
+                await pool.query('ROLLBACK');
+                return res.json({ success: false, error: 'Không đủ tồn kho!' });
+            }
+        }
+        await pool.query('INSERT INTO transactions VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)',[t.id,t.mid,t.supplierId||'',t.projectId||'',t.date,t.datetime,t.type,t.qty,t.unitPrice,t.vatRate,t.subtotal,t.vatAmount,t.totalAmount,t.note,t.attachment,t.invoiceImage]); 
+        if(t.type==='purchase') await pool.query('UPDATE materials SET qty=qty+$1 WHERE id=$2',[t.qty,t.mid]); 
+        else if(t.type==='usage') await pool.query('UPDATE materials SET qty=qty-$1 WHERE id=$2',[t.qty,t.mid]); 
+        else if(t.type==='return') await pool.query('UPDATE materials SET qty=qty+$1 WHERE id=$2',[t.qty,t.mid]); 
+        await pool.query('COMMIT');
+        await clearCache();
+        notifyAll('dataChanged', { type: 'transaction', id: t.id });
+        res.json({success:true}); 
+    } catch(err) { 
+        await pool.query('ROLLBACK');
+        res.json({ success: false, error: err.message }); 
+    }
+});
+
+app.post('/api/projects', async (req, res) => { const p=req.body; await pool.query('INSERT INTO projects VALUES ($1,$2,$3,$4) ON CONFLICT (id) DO UPDATE SET name=$2,budget=$3,spent=$4',[p.id,p.name,p.budget,p.spent]); await clearCache(); notifyAll('dataChanged', {}); res.json({success:true}); });
+app.delete('/api/projects/:id', async (req, res) => { await pool.query('DELETE FROM projects WHERE id=$1',[req.params.id]); await clearCache(); notifyAll('dataChanged', {}); res.json({success:true}); });
+app.post('/api/suppliers', async (req, res) => { const s=req.body; await pool.query('INSERT INTO suppliers VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET name=$2,phone=$3,email=$4,address=$5',[s.id,s.name,s.phone,s.email,s.address]); await clearCache(); notifyAll('dataChanged', {}); res.json({success:true}); });
+app.delete('/api/suppliers/:id', async (req, res) => { await pool.query('DELETE FROM suppliers WHERE id=$1',[req.params.id]); await clearCache(); notifyAll('dataChanged', {}); res.json({success:true}); });
+app.post('/api/users-table', async (req, res) => { const u=req.body; await pool.query('INSERT INTO users_table VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO UPDATE SET name=$2,username=$3,password=$4,role=$5,permissions=$6',[u.id,u.name,u.username,u.password,u.role,u.permissions]); await clearCache(); res.json({success:true}); });
+app.post('/api/users-table/delete', async (req, res) => { await pool.query('DELETE FROM users_table WHERE id=$1',[req.body.id]); await clearCache(); res.json({success:true}); });
+app.post('/api/categories', async (req, res) => {
+    try {
+        await pool.query('BEGIN');
+        await pool.query('DELETE FROM categories');
+        for(const c of (req.body.categories||[])){
+            await pool.query('INSERT INTO categories (name) VALUES ($1)',[c]);
+        }
+        await pool.query('COMMIT');
+        await clearCache();
+        res.json({success:true});
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        res.json({success:false});
+    }
+});
+
+app.post('/api/units', async (req, res) => {
+    try {
+        await pool.query('BEGIN');
+        await pool.query('DELETE FROM units');
+        for(const u of (req.body.units||[])){
+            await pool.query('INSERT INTO units (name) VALUES ($1)',[u]);
+        }
+        await pool.query('COMMIT');
+        await clearCache();
+        res.json({success:true});
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        res.json({success:false});
+    }
+});
 app.post('/api/logs', async (req, res) => { const l=req.body; await pool.query('INSERT INTO logs (id,user_id,user_name,action,details) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO UPDATE SET user_id=$2,user_name=$3,action=$4,details=$5',[l.id,l.userId,l.userName,l.action,l.details]); res.json({success:true}); });
-app.listen(PORT, '0.0.0.0', () => console.log('OK'));
 
 // Upload file
 const multer = require('multer');
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const dir = '/var/www/steeltrack/uploads/' + (req.params.type || 'purchase');
-        require('fs').mkdirSync(dir, { recursive: true });
-        cb(null, dir);
-    },
-    filename: (req, file, cb) => cb(null, req.params.id + require('path').extname(file.originalname))
+    destination: (req, file, cb) => { const dir = '/var/www/steeltrack/uploads/' + (req.params.type||'purchase'); require('fs').mkdirSync(dir, { recursive: true }); cb(null, dir); },
+    filename: (req, file, cb) => cb(null, req.params.id + '_' + Date.now() + require('path').extname(file.originalname))
 });
 const upload = multer({ storage, limits: { fileSize: 10*1024*1024 } });
 app.post('/api/upload/:type/:id', upload.single('file'), (req, res) => {
@@ -50,3 +156,5 @@ app.post('/api/upload/:type/:id', upload.single('file'), (req, res) => {
     res.json({ success: true, filename: req.file.filename, path: '/uploads/' + req.params.type + '/' + req.file.filename });
 });
 app.use('/uploads', express.static('/var/www/steeltrack/uploads'));
+
+server.listen(PORT, '0.0.0.0', () => console.log('OK'));

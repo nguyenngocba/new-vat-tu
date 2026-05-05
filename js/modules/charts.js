@@ -1,5 +1,5 @@
 import { state, formatMoney, escapeHtml } from './state.js';
-import { formatMoneyVND } from './utils.js';
+import { formatMoneyVND } from './utils.js?v=1777963068';
 
 let stockChart = null;
 let monthlyChart = null;
@@ -401,7 +401,7 @@ export function renderDashboard() {
                     <tbody>
                         ${recentTxns.map(t => {
                             const mat = state.data.materials.find(m=>m.id===t.mid);
-                            const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN') : t.date;
+                            const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) : t.date;
                             let icon = '📥', label = 'Nhập kho', target = '';
                             if (t.type === 'usage') { icon = '📤'; label = 'Xuất kho'; target = state.data.projects.find(p=>p.id===t.projectId)?.name || ''; }
                             else if (t.type === 'return') { icon = '🔄'; label = 'Trả hàng'; target = state.data.projects.find(p=>p.id===t.projectId)?.name || ''; }
@@ -410,7 +410,7 @@ export function renderDashboard() {
                                 <td style="white-space:nowrap;">${dt}</td>
                                 <td>${icon} ${label}</td>
                                 <td>${escapeHtml(mat?.name||'N/A')}</td>
-                                <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
+				<td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit||''}</td>	                                
                                 <td style="text-align:right;font-weight:500;">${formatMoneyVND(parseFloat(parseFloat(t.totalAmount)))}</td>
                                 <td>${escapeHtml(target)}</td>
                             </tr>`;

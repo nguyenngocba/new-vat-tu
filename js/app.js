@@ -1,6 +1,8 @@
 import { state, saveState, loadState, addLog } from './modules/state.js';
 window.state = state;
 window.saveState = saveState;
+window.loadState = loadState;  // THÊM DÒNG NÀY
+window.addLog = addLog;        // THÊM DÒNG NÀY (nếu cần)
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, openMatModal, editMaterial, updateMaterial, deleteMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, openProjectModal, saveProject, deleteProject, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
@@ -62,5 +64,6 @@ window.toggleSidebar = function() {
   if (s) s.classList.toggle("collapsed");
   localStorage.setItem("steeltrack_sidebar_collapsed", s?.classList.contains("collapsed"));
 };
+window.render = render;
     render();
 });

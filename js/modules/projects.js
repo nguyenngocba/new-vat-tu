@@ -101,7 +101,7 @@ function renderProjectHistory() {
             <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
             <td style="text-align:left;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
             <td style="text-align:left;">${escapeHtml(mat?.name || 'N/A')}</td>
-            <td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
+            <td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
             <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
             <td class="amount" style="text-align:right;white-space:nowrap;" ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
             <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
@@ -275,7 +275,7 @@ export function showProjectDetail(projectId) {
                 <tbody>${matUsage.map(m => {
                     const cls = m.usagePercentage > 90 ? 'text-danger' : m.usagePercentage > 70 ? 'text-warning' : 'text-success';
                     let src = m.fromSchedule > 0 && m.fromManualUpdate > 0 ? '📅+✏️' : m.fromSchedule > 0 ? '📅 KH' : m.fromManualUpdate > 0 ? '✏️ TT' : '—';
-                    return `<tr><td style="text-align:left;"><strong>${escapeHtml(m.name)}</strong></td><td style="text-align:right;">${m.totalReceived.toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;font-weight:bold;">${m.totalUsed.toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;color:var(--success-text);">${m.totalReturned.toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;color:var(--accent);">${m.remainingAtSite.toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:center;"><span class="badge ${cls}">${m.usagePercentage.toFixed(1)}%</span></td><td style="font-size:11px;">${src}</td><td style="text-align:left;"><button class="sm" onclick="window.openMaterialUsageModal('${projectId}','${m.id}')">✏️</button></td></tr>`;
+                    return `<tr><td style="text-align:left;"><strong>${escapeHtml(m.name)}</strong></td><td style="text-align:right;">${Number(m.totalReceived).toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;font-weight:bold;">${Number(m.totalUsed).toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;color:var(--success-text);">${Number(m.totalReturned).toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:right;color:var(--accent);">${Number(m.remainingAtSite).toLocaleString('vi-VN')} ${m.unit}</td><td style="text-align:center;"><span class="badge ${cls}">${m.usagePercentage.toFixed(1)}%</span></td><td style="font-size:11px;">${src}</td><td style="text-align:left;"><button class="sm" onclick="window.openMaterialUsageModal('${projectId}','${m.id}')">✏️</button></td></tr>`;
                 }).join('') || '<tr><td colspan="8">📭 Chưa có vật tư</td></tr>'}</tbody></table></div>
             </div>
             <div id="tab-schedule" class="tab-content" style="display:none;"><div id="schedule-view-container"></div></div>
@@ -284,7 +284,7 @@ export function showProjectDetail(projectId) {
                 <tbody>${allTxns.map(t => {
                     const mat = state.data.materials.find(m=>m.id===t.mid);
                     const isRet = t.type === 'return';
-                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td></tr>`;
+                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td></tr>`;
                 }).join('') || '<tr><td colspan="7">📭 Chưa có giao dịch</td></tr>'}</tbody></table></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">

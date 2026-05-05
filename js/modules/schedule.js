@@ -1,5 +1,5 @@
 import { state, saveState, addLog, escapeHtml, showModal, closeModal } from './state.js';
-import { formatMoneyVND, setupNumberInput, parseNumber } from './utils.js';
+import { formatMoneyVND, setupNumberInput, parseNumber } from './utils.js?v=1777963068';
 
 // ========== HELPER: LẤY VẬT TƯ ĐÃ XUẤT CHO CÔNG TRÌNH ==========
 
@@ -252,9 +252,9 @@ export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
                 // Kiểm tra không vượt quá số lượng đã xuất
                 if (newTotalAssigned > exportedMat.netAvailable) {
                     alert(`Không thể gán ${quantity} ${material.unit} ${material.name}.\n` +
-                          `Đã gán cho các công việc khác: ${totalAssigned.toLocaleString('vi-VN')} ${material.unit}\n` +
-                          `Có sẵn từ xuất kho: ${exportedMat.netAvailable.toLocaleString('vi-VN')} ${material.unit}\n` +
-                          `Còn có thể gán: ${(exportedMat.netAvailable - totalAssigned).toLocaleString('vi-VN')} ${material.unit}`);
+                          `Đã gán cho các công việc khác: ${totalAssigned.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${material.unit}\n` +
+                          `Có sẵn từ xuất kho: ${exportedMat.netAvailable.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${material.unit}\n` +
+                          `Còn có thể gán: ${(exportedMat.netAvailable - totalAssigned).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${material.unit}`);
                     return null;
                 }
                 
@@ -388,7 +388,7 @@ export function openTaskDetailModal(projectId, taskId) {
         <div class="material-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 0.5px solid var(--border);">
             <div>
                 <strong>${escapeHtml(m.materialName)}</strong>
-                <span class="metric-sub">${m.quantity.toLocaleString('vi-VN')} ${m.unit} x ${formatMoneyVND(m.unitPrice)}</span>
+                <span class="metric-sub">${m.quantity.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit} x ${formatMoneyVND(m.unitPrice)}</span>
             </div>
             <div>
                 <span class="text-warning">${formatMoneyVND(m.totalAmount)}</span>
@@ -400,7 +400,7 @@ export function openTaskDetailModal(projectId, taskId) {
     // Tạo dropdown từ vật tư đã xuất
     const materialOptions = exportedMaterials.length > 0 
         ? exportedMaterials.map(m => 
-            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN')} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
+            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
           ).join('')
         : '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
     
@@ -523,7 +523,7 @@ export function openAssignMaterialModal(projectId, taskId) {
     
     const materialOptions = exportedMaterials.length > 0 
         ? exportedMaterials.map(m => 
-            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN')} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
+            `<option value="${m.id}">${escapeHtml(m.name)} (Đã xuất: ${m.netAvailable.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit} | Giá: ${formatMoneyVND(m.cost)})</option>`
           ).join('')
         : '<option value="">⚠️ Chưa có vật tư nào được xuất cho công trình này</option>';
     

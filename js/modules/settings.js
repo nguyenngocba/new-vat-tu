@@ -75,8 +75,8 @@ window.applyProfile = function(uid, profileId) {
     alert('✅ Đã áp profile: ' + p.name);
 };
 
-export function addCategory() { var i = document.getElementById('newCat'); if (i && i.value.trim()) { state.data.categories.push(i.value.trim()); saveState(); i.value = ''; window.render(); } }
-export function addUnit() { var i = document.getElementById('newUnit'); if (i && i.value.trim()) { state.data.units.push(i.value.trim()); saveState(); i.value = ''; window.render(); } }
+export function addCategory() { var i = document.getElementById('newCat'); if (i && i.value.trim()) { state.data.categories.push(i.value.trim()); addLog('Thêm danh mục', i.value.trim()); saveState(); i.value = ''; window.render(); } }
+export function addUnit() { var i = document.getElementById('newUnit'); if (i && i.value.trim()) { state.data.units.push(i.value.trim()); addLog('Thêm đơn vị', i.value.trim()); saveState(); i.value = ''; window.render(); } }
 export function toggleTheme() { applyTheme(state.theme === 'dark' ? 'light' : 'dark'); window.render(); }
 
 export function addUser() {

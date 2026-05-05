@@ -3,14 +3,14 @@ import {
     handleIntegerInput, getNumberFromInput, formatMoneyVND, setupNumberInput,
     getColumnConfig, saveColumnConfig, updateColumnWidth, toggleColumnVisibility, setSortConfig,
     getSortedData, DEFAULT_COLUMNS, getFavorites, toggleFavorite, isFavorite
-} from './utils.js';
+} from './utils.js?v=1777963068';
 
 let materialFilters = { keyword: '', category: '', minStock: '', maxStock: '', showFavoritesOnly: false };
 let materialListContainer = null;
 
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
-    return new Date(dateTimeStr).toLocaleString('vi-VN');
+    return new Date(dateTimeStr).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
 }
 
 function getFilteredMaterials() {
@@ -44,7 +44,7 @@ function updateMaterialList() {
     if (!materialListContainer) return;
     const filtered = getFilteredMaterials();
     const config = getColumnConfig();
-    const sorted = getSortedData(filtered, config.sortColumn, config.sortDirection);
+    const sorted = getSortedData(filtered, config.sortColumn, config.sortDirection).slice(0, 200);
     const favorites = getFavorites();
     
     if (sorted.length === 0) {
@@ -74,7 +74,7 @@ function updateMaterialList() {
                 </thead>
                 <tbody>
                     ${sorted.map(m => {
-                        const displayQty = typeof m.qty === 'number' ? parseFloat(m.qty).toLocaleString('vi-VN') : parseFloat(m.qty || 0).toLocaleString('vi-VN');
+                        const displayQty = typeof m.qty === 'number' ? parseFloat(m.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) : parseFloat(m.qty || 0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
                         const displayCost = formatMoneyVND(m.cost);
                         const totalValue = (typeof m.qty === 'number' ? m.qty : parseFloat(m.qty || 0)) * (typeof m.cost === 'number' ? m.cost : parseFloat(m.cost || 0));
                         const displayTotal = formatMoneyVND(totalValue);
@@ -125,6 +125,7 @@ function updateMaterialList() {
         </div>
     `;
     
+    if (filtered.length > 200) { materialListContainer.innerHTML += `<div class="metric-sub" style="text-align:center;padding:8px;background:var(--warn-bg);border-radius:4px;margin-top:8px;">⚠️ Đang hiển thị 200 / ${filtered.length} kết quả. Vui lòng lọc thêm!</div>`; }
     attachResizeEvents();
     attachSortEvents();
 }
@@ -234,7 +235,7 @@ function bindMaterialSearchEvents() {
         updateMaterialList();
     };
     
-    if (keywordInput) keywordInput.oninput = updateFilters;
+    if (keywordInput) { let t; keywordInput.oninput = function() { clearTimeout(t); t = setTimeout(updateFilters, 300); }; }
     if (categorySelect) categorySelect.onchange = updateFilters;
     if (minInput) { minInput.addEventListener('input', updateFilters); }
     if (maxInput) { maxInput.addEventListener('input', updateFilters); }
@@ -357,8 +358,8 @@ export function editMaterial(mid) {
       <div class="form-group form-full"><label class="form-label">Tên vật tư *</label><input id="mn-name" value="${escapeHtml(mat.name)}"></div>
       <div class="form-group"><label class="form-label">Danh mục</label><select id="mn-cat">${state.data.categories.map(c => `<option ${mat.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
       <div class="form-group"><label class="form-label">Đơn vị tính</label><select id="mn-unit">${state.data.units.map(u => `<option ${mat.unit === u ? 'selected' : ''}>${u}</option>`).join('')}</select></div>
-      <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="${mat.cost.toLocaleString('vi-VN')}" dir="ltr"></div>
-      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="${parseFloat(mat.low).toLocaleString('vi-VN')}" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">Đơn giá (VNĐ)</label><input type="text" id="mn-cost" value="${parseFloat(mat.cost).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:2})}" dir="ltr"></div>
+      <div class="form-group"><label class="form-label">Ngưỡng cảnh báo tồn</label><input type="text" id="mn-low" value="${parseFloat(mat.low).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})}" dir="ltr"></div>
       <div class="form-group form-full"><label class="form-label">Ghi chú</label><textarea id="mn-note" rows="2">${escapeHtml(mat.note || '')}</textarea></div>
     </div></div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="updateMaterial('${mid}')">Cập nhật</button></div>`);
@@ -431,7 +432,7 @@ window.showMaterialDetail = function(mid) {
             <div class="grid4" style="margin-bottom: 20px;">
                 <div class="metric-card">
                     <div class="metric-label">📦 TỒN KHO</div>
-                    <div class="metric-val" style="font-size:18px;">${parseFloat(mat.qty).toLocaleString('vi-VN')} ${mat.unit}</div>
+                    <div class="metric-val" style="font-size:18px;">${parseFloat(mat.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">💰 ĐƠN GIÁ</div>
@@ -457,7 +458,7 @@ window.showMaterialDetail = function(mid) {
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td style="text-align:left;"><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
-                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
                                 <td style="text-align:center;">${parseFloat(t.vatRate||0)}%</td>
                                 <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
@@ -480,7 +481,7 @@ window.showMaterialDetail = function(mid) {
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
                                 <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
                                 <td style="text-align:left;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
-                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN')} ${mat.unit}</td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
                                 <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
                                 <td style="text-align:left;">${escapeHtml(t.note || '—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>

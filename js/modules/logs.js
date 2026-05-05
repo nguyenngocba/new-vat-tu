@@ -5,7 +5,7 @@ export function renderLogs() {
     return `<div class="card"><div class="sec-title">📋 NHẬT KÝ HỆ THỐNG (${logs.length})</div>
         <div class="tbl-wrap" style="max-height:70vh;overflow-y:auto">
             ${logs.length > 0 ? logs.map(log => {
-                const time = log.timeStr || new Date(log.timestamp).toLocaleString('vi-VN');
+                const time = log.timeStr || new Date(log.timestamp).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
                 return `<div class="log-entry">
                     <span class="log-time">[${time}]</span> 
                     <span class="log-user">👤 ${escapeHtml(log.userName || 'System')}</span> 

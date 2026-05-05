@@ -43,14 +43,14 @@ export async function loadState() {
 }
 
 export function saveState() {
-  fetch("/api/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categories: state.data.categories }) });
-  fetch("/api/units", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ units: state.data.units }) });
+  fetch("/api/categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ categories: state.data.categories }) }).catch(function(){});
+  fetch("/api/units", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ units: state.data.units }) }).catch(function(){});
 }
 
 export function addLog(action, details) {
-  if (!state.currentUser) return;
+  if (!state.currentUser) state.currentUser = { id: "system", name: "System" };
   const id = 'LOG' + timeCode() + String(state.data.nextLogId++).padStart(3,'0');
-  state.data.logs.unshift({ id, timestamp: new Date().toISOString(), timeStr: new Date().toLocaleString('vi-VN'), userId: state.currentUser.id, userName: state.currentUser.name, action, details });
+  state.data.logs.unshift({ id, timestamp: new Date().toISOString(), timeStr: new Date().toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}), userId: state.currentUser.id, userName: state.currentUser.name, action, details });
   fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.logs[0]) });
 }
 
@@ -67,7 +67,7 @@ export function hasPermission(p) { return state.currentUser?.permissions?.[p] ||
 export function matById(id) { return state.data.materials.find(m => m.id === id); }
 export function projectById(id) { return state.data.projects.find(p => p.id === id); }
 export function supplierById(id) { return state.data.suppliers.find(s => s.id === id); }
-export function formatMoney(v) { let n = parseFloat(v)||0; return n.toLocaleString('vi-VN') + ' ₫'; }
+export function formatMoney(v) { let n = parseFloat(v)||0; return n.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) + ' ₫'; }
 export function escapeHtml(s) { return s ? s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]) : ''; }
 
 let modalCb = null;

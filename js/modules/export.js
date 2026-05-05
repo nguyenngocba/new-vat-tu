@@ -1,5 +1,5 @@
 import { state, addLog, formatMoney } from './state.js';
-import { formatMoneyVND } from './utils.js';
+import { formatMoneyVND } from './utils.js?v=1777963068';
 
 export function exportToExcel(type) {
     try {

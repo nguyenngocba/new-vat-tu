@@ -1,5 +1,5 @@
 import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal, genSid, supplierById, hasPermission } from './state.js';
-import { debounce, formatMoneyVND, setupNumberInput } from './utils.js';
+import { debounce, formatMoneyVND, setupNumberInput } from './utils.js?v=1777963068';
 
 let supplierFilters = { keyword: '', phone: '', minPurchase: '', maxPurchase: '' };
 let supplierListContainer = null;
@@ -12,7 +12,7 @@ if (savedView) supplierViewMode = savedView;
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
     const date = new Date(dateTimeStr);
-    return date.toLocaleString('vi-VN');
+    return date.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
 }
 
 function getFilteredSuppliers() {
@@ -63,7 +63,7 @@ function renderSupplierHistory() {
         const supplier = supplierById(t.supplierId);
         const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
         const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
-        const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+        const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) : parseFloat(t.qty || 0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
         
         return `<tr>
             <td style="text-align:left;white-space:nowrap;">${displayDateTime}</td>
@@ -333,7 +333,7 @@ export function showSupplierDetail(supplierId) {
                     const percentOfTotal = totalSpent > 0 ? (stat.totalAmount / totalSpent) * 100 : 0;
                     return `<tr>
                         <td style="text-align:left;"><strong>${escapeHtml(stat.name)}</strong></td>
-                        <td style="text-align:right;white-space:nowrap;">${parseFloat(stat.qty).toLocaleString('vi-VN')}</td>
+                        <td style="text-align:right;white-space:nowrap;">${parseFloat(stat.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})}</td>
                         <td style="text-align:left;white-space:nowrap;">${stat.unit}</td>
                         <td style="text-align:left;white-space:nowrap;">${formatMoneyVND(parseFloat(stat.lastPrice))}/đv</td>
                         <td class="text-warning" style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(stat.totalAmount))}</td>
@@ -362,7 +362,7 @@ export function showSupplierDetail(supplierId) {
                             const mat = state.data.materials.find(m => m.id === t.mid);
                             const displayDateTime = t.datetime ? formatDateTime(t.datetime) : t.date;
                             const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank" style="color: var(--accent);">📄 Xem</a>` : '—';
-                            const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN') : parseFloat(t.qty || 0).toLocaleString('vi-VN');
+                            const displayQty = typeof t.qty === 'number' ? t.qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) : parseFloat(t.qty || 0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
                             return `<tr>
                                 <td style="text-align:left;white-space:nowrap;">${displayDateTime}</td>
                                 <td style="text-align:left;"><strong>${escapeHtml(supplier.name)}</strong></td>
@@ -610,7 +610,7 @@ export function viewSupplierHistory(sid) {
         return `<tr>
           <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
           <td style="text-align:left;">${mat?.name || 'N/A'}</td>
-          <td style="text-align:right;white-space:nowrap;">${(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit || ''}</td>
+          <td style="text-align:right;white-space:nowrap;">${(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit || ''}</td>
           <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
           <td style="text-align:center;">${t.vatRate || 0}%</td>
           <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>

@@ -1,5 +1,5 @@
 import { state, saveState, addLog, showModal, closeModal, genTid, matById, projectById, supplierById, hasPermission, escapeHtml } from './state.js';
-import { getNumberFromInput, formatMoneyVND, setupNumberInput } from './utils.js';
+import { getNumberFromInput, formatMoneyVND, setupNumberInput } from './utils.js?v=1777963068';
 
 let currentInvoiceBase64 = null;
 let currentExportAttachmentBase64 = null;
@@ -18,7 +18,7 @@ function getCurrentDateTime() {
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
     const date = new Date(dateTimeStr);
-    return date.toLocaleString('vi-VN');
+    return date.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
 }
 
 function calculatePurchaseTotal() {
@@ -51,7 +51,7 @@ export function openPurchaseModal() {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư trong kho');
     if (state.data.suppliers.length === 0) return alert('Chưa có nhà cung cấp');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit})</option>`).join('');
     const optsSup = state.data.suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     const currentDateTime = getCurrentDateTime();
 
@@ -80,7 +80,7 @@ export function openPurchaseModal() {
 
     setTimeout(() => {
         const qtyInput = document.getElementById('purchase-qty');
-        const priceInput = document.getElementById('purchase-price');
+        const priceInput = document.getElementById('purchase-price'); if (priceInput) { setupNumberInput(priceInput, { isInteger: false, decimals: 2 }); priceInput.addEventListener('change', calculatePurchaseTotal); }
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
@@ -107,7 +107,7 @@ export function openPurchaseModal() {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput) {
-                priceInput.value = mat.cost.toLocaleString('vi-VN');
+                priceInput.value = Number(mat.cost).toLocaleString('vi-VN', {minimumFractionDigits: 0, maximumFractionDigits: 2});                
             }
             calculatePurchaseTotal();
         };
@@ -122,7 +122,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
     const supplier = supplierById(supplierId);
     if (!supplier) return alert('Không tìm thấy nhà cung cấp');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit})</option>`).join('');
     const currentDateTime = getCurrentDateTime();
 
     const html = `
@@ -150,7 +150,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
 
     setTimeout(() => {
         const qtyInput = document.getElementById('purchase-qty');
-        const priceInput = document.getElementById('purchase-price');
+        const priceInput = document.getElementById('purchase-price'); if (priceInput) { setupNumberInput(priceInput, { isInteger: false, decimals: 2 }); priceInput.addEventListener('change', calculatePurchaseTotal); }
         const vatInput = document.getElementById('purchase-vat');
         const midSelect = document.getElementById('purchase-mid');
         const fileInput = document.getElementById('purchase-invoice');
@@ -177,7 +177,7 @@ export function openPurchaseModalWithSupplier(supplierId) {
             const mid = midSelect?.value;
             const mat = matById(mid);
             if (mat && priceInput) {
-                priceInput.value = mat.cost.toLocaleString('vi-VN');
+                priceInput.value = mat.cost.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
             }
             calculatePurchaseTotal();
         };
@@ -222,7 +222,7 @@ export function savePurchase() {
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     window._upPaths = {};
     window._upPaths = {};
-    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
+    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} - ${formatMoneyVND(totalAmount)} - NCC: ${supplierById(supplierId)?.name}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
@@ -258,7 +258,7 @@ export function savePurchaseWithSupplier(supplierId) {
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     window._upPaths = {};
     window._upPaths = {};
-    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(totalAmount)}`);
+    addLog('Nhập kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} - ${formatMoneyVND(totalAmount)}`);
     saveState(); closeModal(); currentInvoiceBase64 = null;
     if (window.render) window.render();
     alert('✅ Nhập kho thành công!');
@@ -270,7 +270,7 @@ export function openTxnModal(type, preselectedProjectId = null) {
     if (state.data.materials.length === 0) return alert('Chưa có vật tư');
     if (state.data.projects.length === 0) return alert('Chưa có công trình');
 
-    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+    const optsMat = state.data.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (Tồn: ${parseFloat(m.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit})</option>`).join('');
     const optsProj = state.data.projects.map(p => `<option value="${p.id}" ${preselectedProjectId===p.id?'selected':''}>${escapeHtml(p.name)} (NS: ${formatMoneyVND(p.budget)})</option>`).join('');
 
     const html = `
@@ -320,7 +320,7 @@ export function saveExport() {
     if (!pid || !mid || !qty || qty <= 0) return alert('Thiếu thông tin');
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
-    if (mat.qty < qty) return alert(`Không đủ tồn! Còn ${mat.qty.toLocaleString('vi-VN')} ${mat.unit}`);
+    if (mat.qty < qty) return alert(`Không đủ tồn! Còn ${mat.qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}`);
 
     const total = qty * mat.cost;
     mat.qty = parseFloat(mat.qty||0) - parseFloat(qty||0);
@@ -338,7 +338,7 @@ export function saveExport() {
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     window._upPaths = {};
     window._upPaths = {};
-    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
+    addLog('Xuất kho', `${mat.name} - SL: ${qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentExportAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Xuất kho thành công!');
@@ -397,7 +397,7 @@ export function openReturnModal(preselectedProjectId = null) {
             const o = ms?.options[ms.selectedIndex];
             const q = getNumberFromInput(qty);
             let up = 0;
-            if (o?.value) { up = parseFloat(o.dataset.up) || 0; if (prc) prc.value = up.toLocaleString('vi-VN'); }
+            if (o?.value) { up = parseFloat(o.dataset.up) || 0; if (prc) prc.value = up.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}); }
             const el = document.getElementById('preview-return-total');
             if (el) el.innerText = formatMoneyVND(up * q);
         }
@@ -414,7 +414,7 @@ export function openReturnModal(preselectedProjectId = null) {
             rT.forEach(t => { if(map.has(t.mid)) map.get(t.mid).ret+=t.qty; });
             const list = Array.from(map.values()).map(i=>({...i,avail:i.rec-i.ret})).filter(i=>i.avail>0);
             if(list.length===0){ms.innerHTML='<option value="">✅ Hết</option>';return;}
-            ms.innerHTML = list.map(m=>`<option value="${m.id}" data-up="${m.up}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN')} ${m.unit})</option>`).join('');
+            ms.innerHTML = list.map(m=>`<option value="${m.id}" data-up="${m.up}">${escapeHtml(m.name)} (Có thể trả: ${m.avail.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${m.unit})</option>`).join('');
             upd();
         }
 
@@ -435,7 +435,17 @@ export function saveReturn() {
     if (!pid || !mid || !qty || qty <= 0 || !up) return alert('Thiếu thông tin');
     const mat = matById(mid);
     if (!mat) return alert('Không tìm thấy vật tư');
-
+// Kiểm tra số lượng đã nhận của công trình
+const received = state.data.transactions
+    .filter(t => t.projectId === pid && t.mid === mid && t.type === 'usage')
+    .reduce((s, t) => s + Number(t.qty||0), 0);
+const returned = state.data.transactions
+    .filter(t => t.projectId === pid && t.mid === mid && t.type === 'return')
+    .reduce((s, t) => s + Number(t.qty||0), 0);
+const available = received - returned;
+if (qty > available) {
+    return alert(`Không thể trả ${qty} ${mat.unit}! Công trình này chỉ có ${available} ${mat.unit} có thể trả.`);
+}
     const total = qty * up;
     mat.qty = parseFloat(mat.qty||0) + parseFloat(qty||0);
     const proj = projectById(pid);
@@ -452,7 +462,7 @@ export function saveReturn() {
     fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.transactions[0]) });
     window._upPaths = {};
     window._upPaths = {};
-    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN')} - ${formatMoneyVND(total)}`);
+    addLog('Trả hàng', `${mat.name} - SL: ${qty.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} - ${formatMoneyVND(total)}`);
     saveState(); closeModal(); currentReturnAttachmentBase64 = null;
     if (window.render) window.render();
     alert('✅ Đã nhập lại kho!');

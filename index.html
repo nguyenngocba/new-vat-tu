@@ -46,6 +46,14 @@ window.upFiles = function upFiles(input, type) {
     }
 }
 </script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  socket.on("dataChanged", function(data) {
+    console.log("🔄 Data changed:", data);
+    if (window.loadState) loadState().then(function() { if (window.render) window.render(); });
+  });
+</script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>

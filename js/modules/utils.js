@@ -22,18 +22,31 @@ export function getIntegerFromInput(inputElement) {
 }
 
 export function formatMoneyVND(value) {
-    let num = typeof value === 'string' ? parseNumber(value) : value;
+    let num = Number(value);
     if (isNaN(num)) num = 0;
-    let integerPart = Math.round(num).toString();
+    
+    let parts = num.toString().split('.');
+    let integerPart = parts[0];
+    let decimalPart = parts[1] || '';
+    
     let formatted = '', count = 0;
     for (let i = integerPart.length - 1; i >= 0; i--) {
         formatted = integerPart[i] + formatted;
         count++;
         if (count % 3 === 0 && i > 0) formatted = '.' + formatted;
     }
-    return formatted + ' ₫';
+    
+    // Chỉ hiện thập phân nếu có giá trị != 0
+    if (decimalPart && parseFloat('0.' + decimalPart) > 0) {
+        // Cắt bỏ số 0 thừa ở cuối
+        decimalPart = decimalPart.replace(/0+$/, '');
+        if (decimalPart) {
+            formatted += ',' + decimalPart;
+        }
+    }
+    
+    return formatted + ' ₫';    
 }
-
 export function formatRawToDisplay(rawValue) {
     if (!rawValue || rawValue === '') return '';
     let isNegative = rawValue.startsWith('-');
@@ -120,13 +133,13 @@ export function handleQuantityInput(event) { handleIntegerInput(event); }
 
 export function setInputValue(inputElement, value) {
     if (!inputElement) return;
-    let num = typeof value === 'string' ? parseNumber(value) : value;
+    let num = typeof value === 'string' ? parseFloat(value) : value;   
     if (isNaN(num)) num = 0;
     inputElement.value = formatRawToDisplay(num.toString().replace('.', ','));
 }
 
 export function formatNumberVN(value, decimalPlaces = 0) {
-    let num = typeof value === 'string' ? parseNumber(value) : value;
+    let num = Number(value);
     if (isNaN(num)) num = 0;
     let intPart = Math.round(num).toString();
     let formatted = '', count = 0;
