@@ -105,6 +105,7 @@ function renderProjectHistory() {
             <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
             <td class="amount" style="text-align:right;white-space:nowrap;" ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
             <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
+            <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
         </tr>`;
     }).join('');
 }
@@ -280,11 +281,11 @@ export function showProjectDetail(projectId) {
             </div>
             <div id="tab-schedule" class="tab-content" style="display:none;"><div id="schedule-view-container"></div></div>
             <div id="tab-history" class="tab-content" style="display:none;">
-                <div class="tbl-wrap"><table style="min-width:900px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th></tr></thead>
+                <div class="tbl-wrap"><table style="min-width:900px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th><th style="text-align:center;">File</th></tr></thead>
                 <tbody>${allTxns.map(t => {
                     const mat = state.data.materials.find(m=>m.id===t.mid);
                     const isRet = t.type === 'return';
-                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td></tr>`;
+                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td></tr>`;
                 }).join('') || '<tr><td colspan="7">📭 Chưa có giao dịch</td></tr>'}</tbody></table></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
@@ -376,7 +377,7 @@ export function renderProjects() {
                                     <th style="text-align:right;">SL</th>
                                     <th style="text-align:right;">Đơn giá</th>
                                     <th style="text-align:right;">Thành tiền</th>
-                                    <th style="text-align:center;">Loại</th>
+                                    <th style="text-align:center;">Loại</th><th style="text-align:center;">File</th>
                                 </tr>
                             </thead>
                             <tbody id="project-history-tbody">${renderProjectHistory()}</tbody>
