@@ -36,12 +36,17 @@ export function renderStructures() {
     }
     
     html += `</tbody></table></div></div>`;
+html += '<div class="card" style="margin-top:16px;"><div class="sec-title" style="display:flex;justify-content:space-between;"><span>📦 KHO CẤU KIỆN</span><button class="sm" onclick="window.openTransferToSW()">+ Nhập từ kho chính</button></div><div class="tbl-wrap"><table style="min-width:650px;"><thead><tr><th>STT</th><th>Tên vật tư</th><th>Loại</th><th style="text-align:right;">Tồn CK</th><th>ĐVT</th><th style="text-align:right;">Tồn kho chính</th><th>TT</th><th>Thao tác</th></tr></thead><tbody id="sw-table-body"><tr><td colspan="8">Đang tải...</td></tr></tbody></table></div></div>';
+    setTimeout(function(){
+fetch('/api/structure-warehouse').then(function(r){return r.json();}).then(function(d){var tb=document.getElementById('sw-table-body');if(tb&&d.success)tb.innerHTML=d.data.length===0?'<tr><td colspan="8">Kho rỗng</td></tr>':d.data.map(function(m,i){var cat=(state.data.materials.find(function(x){return x.id===m.material_id;})||{}).cat||'—';var mainQty=(state.data.materials.find(function(x){return x.id===m.material_id;})||{}).qty||0;var sc=Number(m.qty)<=5?'b-low':'b-ok';var st=Number(m.qty)<=5?'⚠️':'✅';var name=m.material_name.replace(/ \\(Tồn:.*\\)/,'');return '<tr><td>'+(i+1)+'</td><td><strong style="cursor:pointer;color:var(--accent);" onclick="showSWDetail(\''+m.material_id+'\')">'+name+'</strong></td><td>'+cat+'</td><td style="text-align:right;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td>'+m.unit+'</td><td style="text-align:right;">'+Number(mainQty).toLocaleString('vi-VN')+' '+m.unit+'</td><td><span class="badge '+sc+'">'+st+'</span></td><td><button class="sm" onclick="returnToMainWarehouse(\''+m.material_id+'\')">🔄 Trả lại</button></td></tr>';}).join('');});},100);
     return html;
 }
 
 window.openStructureModal = function(sid = null) {
     const s = sid ? (state.data.structures||[]).find(x => x.id === sid) : null;
-    const materialOpts = state.data.materials.map(m => 
+    let materialOpts = '<option value="">Đang tải...</option>';
+    fetch('/api/sw-options').then(r=>r.text()).then(html => { materialOpts = html; document.querySelectorAll('.bom-mat').forEach(s => s.innerHTML = html); });
+    const materialOptsDummy = state.data.materials.map(m => 
         `<option value="${m.id}" data-unit="${m.unit}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`
     ).join('');
     const existingMats = s?.materials || [];
@@ -76,17 +81,25 @@ window.openStructureModal = function(sid = null) {
         </div>
     `);
     
-    setTimeout(() => { window.updateBomCost(); }, 100);
+    setTimeout(() => {
+        window.updateBomCost();
+        // Load options từ kho CK
+        fetch('/api/sw-options').then(r=>r.text()).then(html => {
+            document.querySelectorAll('.bom-mat').forEach(s => s.innerHTML = html);
+        });
+    }, 200);
 };
 
 window.addBomRow = function() {
-    const materialOpts = state.data.materials.map(m => 
+    let materialOpts = '<option value="">Đang tải...</option>';
+    fetch('/api/sw-options').then(r=>r.text()).then(html => { materialOpts = html; document.querySelectorAll('.bom-mat').forEach(s => s.innerHTML = html); });
+    const materialOptsDummy = state.data.materials.map(m => 
         `<option value="${m.id}" data-unit="${m.unit}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`
     ).join('');
     const div = document.createElement('div');
     div.className = 'bom-row';
     div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
-    div.innerHTML = `<select class="bom-mat" style="flex:2;" onchange="window.updateBomCost()">${materialOpts}</select><input type="text" class="bom-qty" value="1" style="width:80px;" dir="ltr" oninput="window.updateBomCost()"><button class="sm danger-btn" onclick="this.parentElement.remove();window.updateBomCost()">✕</button>`;
+    div.innerHTML = `<select class="bom-mat" style="flex:2;" onchange="window.updateBomCost()">${materialOptsDummy}</select><input type="text" class="bom-qty" value="1" style="width:80px;" dir="ltr" oninput="window.updateBomCost()"><button class="sm danger-btn" onclick="this.parentElement.remove();window.updateBomCost()">✕</button>`;
     document.getElementById('bom-list').appendChild(div);
     window.updateBomCost();
 };
@@ -173,6 +186,7 @@ window.exportStructure = function(sid) {
         <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.confirmExportStructure('${sid}')">Xác nhận xuất</button></div>
     `);
     setTimeout(function(){
+        console.log('Loading SW...');
         var qtyInput = document.getElementById('exp-qty');
         if (qtyInput) {
             qtyInput.addEventListener('input', function(){
@@ -340,4 +354,59 @@ window.showStructureDetail = function(sid) {
     <div class="modal-ft"><button onclick="closeModal()">Đóng</button><button class="primary" onclick="closeModal();window.produceStructure('${sid}')">🏭 Sản xuất</button></div>`;
     
     showModal(html, null);
+};
+
+export function renderStructureWarehouse() {
+    let html = `<div class="card">
+        <div class="sec-title" style="display:flex;justify-content:space-between;">
+            <span>📦 KHO CẤU KIỆN (Vật tư chờ sản xuất)</span>
+            <button class="sm primary" onclick="window.openTransferToSW()">+ Nhập từ kho chính</button>
+        </div>
+        <div class="tbl-wrap"><table style="min-width:700px;">
+            <thead><tr><th>Vật tư</th><th style="text-align:right;">Tồn kho</th><th>ĐVT</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th></tr></thead>
+            <tbody id="sw-table-body"><tr><td colspan="5">Đang tải...</td></tr></tbody>
+        </table></div></div>`;
+    
+    setTimeout(function(){
+        console.log('Loading SW...');
+        fetch('/api/structure-warehouse').then(r=>r.json()).then(d=>{
+            var tb = document.getElementById('sw-table-body');
+            if(tb && d.success){
+                if(d.data.length === 0) tb.innerHTML = '<tr><td colspan="5">Kho rỗng</td></tr>';
+                else tb.innerHTML = d.data.map(function(m){
+                    var total = parseFloat(m.qty||0) * parseFloat(m.cost||0);
+                    return '<tr><td>'+m.material_name+'</td><td style="text-align:right;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td>'+m.unit+'</td><td style="text-align:right;">'+Number(m.cost||0).toLocaleString('vi-VN')+' ₫</td><td style="text-align:right;">'+Number(total).toLocaleString('vi-VN')+' ₫</td></tr>';
+                }).join('');
+            }
+        });
+    }, 100);
+    
+    return html;
+}
+
+window.showSWDetail = function(mid) {
+    fetch('/api/sw-logs/' + mid).then(r=>r.json()).then(d=>{
+        if(!d.success || d.data.length===0) { alert('Chưa có lịch sử chuyển kho!'); return; }
+        var item = d.data[0];
+        var html = '<div class="modal-hd"><span class="modal-title">📦 Chi tiết Kho CK: '+item.material_name+'</span><button class="xbtn" onclick="closeModal()">✕</button></div>';
+        html += '<div class="modal-bd"><div class="tbl-wrap"><table><thead><tr><th>Thời gian</th><th style="text-align:right;">SL</th><th>ĐVT</th><th style="text-align:right;">Đơn giá</th><th>Ghi chú</th><th>File</th></tr></thead><tbody>';
+        d.data.forEach(function(l){
+            var dt = new Date(l.created_at).toLocaleString('vi-VN');
+            var files = '';
+            try { var att = JSON.parse(l.attachment||'[]'); att.forEach(function(f){ files += '<a href="'+f+'" target="_blank">📎</a> '; }); } catch(e){}
+            html += '<tr><td>'+dt+'</td><td style="text-align:right;">'+Number(l.qty).toLocaleString('vi-VN')+' '+l.unit+'</td><td>'+l.unit+'</td><td style="text-align:right;">'+Number(l.cost||0).toLocaleString('vi-VN')+' ₫</td><td>'+ (l.note||'—') +'</td><td>'+(files||'—')+'</td></tr>';
+        });
+        html += '</tbody></table></div></div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>';
+        showModal(html);
+    });
+};
+
+window.returnToMainWarehouse = function(mid) {
+    var qty = prompt('Số lượng trả lại kho chính:');
+    if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
+    fetch('/api/return-from-sw', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({material_id: mid, qty: parseFloat(qty)}) })
+        .then(r=>r.json()).then(d=>{
+            if(d.success) { alert('✅ Đã trả lại kho chính!'); window.render(); }
+            else alert('❌ '+d.error);
+        });
 };

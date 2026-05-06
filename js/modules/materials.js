@@ -567,3 +567,63 @@ window.loadMoreMaterials = function() {
     updateMaterialList();
 };
 export const getMaterials = () => state.data.materials;
+
+window.openTransferToSW = function() {
+    const matOpts = state.data.materials.filter(m => parseFloat(m.qty) > 0).map(m => 
+        `<option value="${m.id}" data-unit="${m.unit}" data-cost="${m.cost}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`
+    ).join('');
+    
+    showModal(`
+        <div class="modal-hd"><span class="modal-title">📦 Chuyển vật tư sang KHO CẤU KIỆN</span><button class="xbtn" onclick="closeModal()">✕</button></div>
+        <div class="modal-bd">
+            <div id="sw-items">
+                <div class="sw-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                    <select class="sw-mat" style="flex:2;">${matOpts}</select>
+                    <input type="text" class="sw-qty" value="1" style="width:100px;" dir="ltr" placeholder="SL">
+                    <button class="sm danger-btn" onclick="this.parentElement.remove()">✕</button>
+                </div>
+            </div>
+            <button class="sm" onclick="window.addSWRow()">+ Thêm vật tư</button>
+            <div class="form-group" style="margin-top:12px;"><label class="form-label">📎 File đính kèm</label><input type="file" id="sw-files" multiple onchange="window.upFiles(this,'transfer_sw')"><div id="transfer_sw-file-list" style="margin-top:4px;font-size:11px;"></div></div>
+            <div class="form-group"><label class="form-label">Ghi chú</label><input id="sw-note" placeholder="Ghi chú..."></div>
+        </div>
+        <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.confirmTransferSW()">Xác nhận chuyển</button></div>
+    `);
+};
+
+window.addSWRow = function() {
+    const matOpts = state.data.materials.filter(m => parseFloat(m.qty) > 0).map(m => 
+        `<option value="${m.id}" data-unit="${m.unit}" data-cost="${m.cost}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`
+    ).join('');
+    const div = document.createElement('div');
+    div.className = 'sw-row';
+    div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+    div.innerHTML = `<select class="sw-mat" style="flex:2;">${matOpts}</select><input type="text" class="sw-qty" value="1" style="width:100px;" dir="ltr"><button class="sm danger-btn" onclick="this.parentElement.remove()">✕</button>`;
+    document.getElementById('sw-items').appendChild(div);
+};
+
+window.confirmTransferSW = function() {
+    const items = [];
+    document.querySelectorAll('.sw-row').forEach(row => {
+        const sel = row.querySelector('.sw-mat');
+        const qty = parseFloat(row.querySelector('.sw-qty')?.value?.replace(/\./g,'').replace(',','.')) || 0;
+        if (sel?.value && qty > 0) {
+            items.push({ mid: sel.value, name: sel.selectedOptions[0]?.text||'', unit: sel.selectedOptions[0]?.dataset?.unit||'', qty, cost: parseFloat(sel.selectedOptions[0]?.dataset?.cost||0) || parseFloat(state.data.materials.find(m=>m.id===sel.value)?.cost||0) });
+        }
+    });
+    if (items.length === 0) return alert('Chưa có vật tư nào!');
+    const note = document.getElementById('sw-note')?.value || '';
+    const attachment = JSON.stringify(window._upPaths?.transfer_sw || []);
+    
+    fetch('/api/transfer-to-structure-warehouse', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({items, note, attachment}) })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) { 
+                window._upPaths = {};
+                alert('✅ Đã chuyển sang kho cấu kiện!'); 
+                closeModal(); 
+                window.loadState().then(()=>window.render()); 
+            }
+            else alert('❌ ' + d.error);
+        });
+};
