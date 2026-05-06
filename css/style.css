@@ -608,3 +608,30 @@ input[type=text][dir=ltr] {
 .status-good { background: var(--success-bg); color: var(--success-text); }
 .status-warn { background: var(--warn-bg); color: var(--warn-text); }
 .status-danger { background: var(--danger-bg); color: var(--danger-text); }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .sidebar, .topbar, .modal-overlay, button, .xbtn,
+    .resize-handle, .panel-resize-handle, .view-toggle, 
+    .favorite-filter, .resize-icon, select, input[type=text],
+    input[type=date], #mat-search-keyword, #mat-search-category,
+    #mat-search-min, #mat-search-max, #mat-clear-filters,
+    .dashboard-tabs, #advanced-filters-content,
+    .column-toggle-panel, .column-toggle-dropdown,
+    .sort-icon, .resize-handle, .panel-resize-handle,
+    .pane:not(.active) { display: none !important; }
+    
+    #app-layout { display: block !important; }
+    .main-content { margin-left: 0 !important; height: auto !important; overflow: visible !important; }
+    .pane.active { display: block !important; padding: 10px !important; overflow: visible !important; height: auto !important; }
+    body { background: white !important; color: black !important; font-size: 12px; }
+    .card { border: 1px solid #ddd !important; background: white !important; break-inside: avoid; margin-bottom: 12px !important; }
+    table { font-size: 10px !important; }
+    th, td { padding: 4px 6px !important; }
+    .metric-val { font-size: 16px !important; }
+    .metric-card { break-inside: avoid; }
+    .chart-container { max-height: 200px !important; }
+    .tbl-wrap { overflow: visible !important; }
+    .tbl-wrap table { min-width: auto !important; }
+    @page { margin: 0.8cm; size: A4 landscape; }
+}
