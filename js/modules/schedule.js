@@ -511,6 +511,39 @@ export function saveTaskDetail(projectId, taskId) {
     
     if (completed) progress = 100;
     
+    // Validate ngày: task con không vượt task cha
+    const schedule = getProjectSchedule(projectId);
+    const findParentTask = (tasks, targetId, parent = null) => {
+        for (const t of tasks) {
+            if (t.id === targetId) return parent;
+            if (t.subTasks?.length > 0) {
+                const found = findParentTask(t.subTasks, targetId, t);
+                if (found !== undefined) return found;
+            }
+        }
+        return undefined;
+    };
+    const parentTask = findParentTask(schedule.tasks, taskId);
+    if (parentTask) {
+        if (startDate && parentTask.startDate && startDate < parentTask.startDate) {
+            alert('Ngay bat dau cua task con khong duoc som hon task cha: ' + parentTask.startDate);
+            return;
+        }
+        if (endDate && parentTask.endDate && endDate > parentTask.endDate) {
+            alert('Ngay ket thuc cua task con khong duoc vuot qua task cha: ' + parentTask.endDate);
+            return;
+        }
+    }
+    // Validate không vượt quá tiến độ tổng
+    if (startDate && schedule.startDate && startDate < schedule.startDate) {
+        alert('Ngay bat dau khong duoc som hon ngay bat dau cua cong trinh: ' + schedule.startDate);
+        return;
+    }
+    if (endDate && schedule.endDate && endDate > schedule.endDate) {
+        alert('Ngay ket thuc khong duoc vuot qua ngay ket thuc cua cong trinh: ' + schedule.endDate);
+        return;
+    }
+    
     updateTask(projectId, taskId, {
         name,
         description,
