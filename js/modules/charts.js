@@ -298,6 +298,43 @@ function renderKPICards() {
             </div>
         </div>
     `;
+    // Danh sách sắp hết
+    const lowStockItems = state.data.materials.filter(m => parseFloat(m.qty) <= parseFloat(m.low || 0));
+    let lowStockHTML = '';
+    if (lowStockItems.length > 0) {
+        lowStockHTML = `<div class="card" style="margin-bottom:18px;border-left:3px solid var(--danger);">
+            <div class="sec-title" style="color:var(--danger-text);">⚠️ SẮP HẾT HÀNG (${lowStockItems.length} mặt hàng)</div>
+            <div class="tbl-wrap"><table class="dashboard-table" style="min-width:600px;">
+                <thead><tr><th>Tên vật tư</th><th style="text-align:right;">Tồn kho</th><th style="text-align:right;">Ngưỡng</th><th style="text-align:right;">Cần nhập</th></tr></thead>
+                <tbody>${lowStockItems.slice(0,10).map(m => {
+                    const need = parseFloat(m.low) - parseFloat(m.qty);
+                    return `<tr style="cursor:pointer;" onclick="window.showMaterialDetail('${m.id}')">
+                        <td><strong>${escapeHtml(m.name)}</strong></td>
+                        <td style="text-align:right;color:var(--danger-text);font-weight:bold;">${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</td>
+                        <td style="text-align:right;">${Number(m.low).toLocaleString('vi-VN')} ${m.unit}</td>
+                        <td style="text-align:right;color:var(--accent);">${Number(need).toLocaleString('vi-VN')} ${m.unit}</td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table></div>
+            ${lowStockItems.length > 10 ? `<div class="metric-sub" style="text-align:center;">Còn ${lowStockItems.length - 10} mặt hàng khác...</div>` : ''}
+        </div>`;
+    }
+}
+
+function getLowStockHTML() {
+    const lowStockItems = state.data.materials.filter(m => parseFloat(m.qty) <= parseFloat(m.low || 0));
+    if (lowStockItems.length === 0) return '';
+    return `<div class="card" style="margin-bottom:18px;border-left:3px solid var(--danger);">
+        <div class="sec-title" style="color:var(--danger-text);">⚠️ SẮP HẾT HÀNG (${lowStockItems.length} mặt hàng)</div>
+        <div class="tbl-wrap"><table class="dashboard-table" style="min-width:600px;">
+            <thead><tr><th>Tên vật tư</th><th style="text-align:right;">Tồn kho</th><th style="text-align:right;">Ngưỡng</th><th style="text-align:right;">Cần nhập</th></tr></thead>
+            <tbody>${lowStockItems.slice(0,10).map(m => {
+                const need = parseFloat(m.low) - parseFloat(m.qty);
+                return '<tr style="cursor:pointer;" onclick="window.showMaterialDetail(\''+m.id+'\')"><td><strong>'+escapeHtml(m.name)+'</strong></td><td style="text-align:right;color:var(--danger-text);font-weight:bold;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;">'+Number(m.low).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;color:var(--accent);">'+Number(need).toLocaleString('vi-VN')+' '+m.unit+'</td></tr>';
+            }).join('')}</tbody>
+        </table></div>
+        ${lowStockItems.length > 10 ? '<div class="metric-sub" style="text-align:center;">Còn '+(lowStockItems.length-10)+' mặt hàng khác...</div>' : ''}
+    </div>`;
 }
 
 // ========== RENDER DASHBOARD ==========
@@ -345,6 +382,7 @@ export function renderDashboard() {
     return `
         ${renderFiltersAndTabs()}
         ${renderKPICards()}
+        ${getLowStockHTML()}
         
         <!-- Biểu đồ chính -->
         <div class="grid2" style="margin-bottom: 18px;">

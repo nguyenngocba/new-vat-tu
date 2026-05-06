@@ -25,7 +25,7 @@ window.doLogin = function() {
 
 document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.getElementById('login-username')) window.doLogin(); });
 
-export function login(uid) { state.currentUser = state.data.users.find(u => u.id === uid); addLog('Đăng nhập', 'Đăng nhập thành công'); state.currentPane = 'entry'; if (window.render) window.render(); }
+export function login(uid) { state.currentUser = state.data.users.find(u => u.id === uid); addLog('Đăng nhập', 'Đăng nhập thành công'); state.currentPane = 'dashboard'; if (window.render) window.render(); }
 export function logout() { addLog('Đăng xuất', 'Đăng xuất'); state.currentUser = null; if (window.render) window.render(); }
 export function switchPane(pane) { state.currentPane = pane; if (window.render) window.render(); }
 export function setCurrentUser(user) { state.currentUser = user; }
@@ -41,8 +41,8 @@ export function renderSidebar() {
     </div>
     <div class="sidebar-user"><div class="uname">${escapeHtml(state.currentUser.name)}</div><div class="urole">${state.currentUser.role === 'admin' ? 'Quản trị viên' : 'Nhân viên kho'}</div></div>
     <div class="sidebar-nav">
-        <div class="nav-item ${state.currentPane === 'entry' ? 'active' : ''}" onclick="switchPane('entry')"><img src="/images/logo-qlk.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-qlk.png" class="nav-icon" style="width:20px;height:20px;display:none;">📦 <span>Quản lý kho</span></div>
         <div class="nav-item ${state.currentPane === 'dashboard' ? 'active' : ''}" onclick="switchPane('dashboard')"><img src="/images/logo-tk.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-tk.png" class="nav-icon" style="width:20px;height:20px;display:none;">📊 <span>Thống kê</span></div>
+        <div class="nav-item ${state.currentPane === 'entry' ? 'active' : ''}" onclick="switchPane('entry')"><img src="/images/logo-qlk.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-qlk.png" class="nav-icon" style="width:20px;height:20px;display:none;">📦 <span>Quản lý kho</span></div>
         <div class="nav-item ${state.currentPane === 'projects' ? 'active' : ''}" onclick="switchPane('projects')"><img src="/images/logo-ct.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-ct.png" class="nav-icon" style="width:20px;height:20px;display:none;">🏗️ <span>Công trình</span></div>
         <div class="nav-item ${state.currentPane === 'suppliers' ? 'active' : ''}" onclick="switchPane('suppliers')"><img src="/images/logo-ncc.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-ncc.png" class="nav-icon" style="width:20px;height:20px;display:none;">🏭 <span>Nhà cung cấp</span></div>
         <div class="nav-item ${state.currentPane === 'logs' ? 'active' : ''}" onclick="switchPane('logs')"><img src="/images/logo-nk.png" class="nav-icon" style="width:20px;height:20px;display:none;"><img src="/images/logo-nk.png" class="nav-icon" style="width:20px;height:20px;display:none;">📋 <span>Nhật ký</span></div>
