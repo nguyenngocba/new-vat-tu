@@ -470,11 +470,11 @@ function renderTabContent(tab) {
                 <div class="sec-title">🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</div>
                 <div class="tbl-wrap">
                     <table style="min-width:900px;">
-                        <thead><tr><th style="text-align:left;">Mã</th><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
+                        <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
                         <tbody>
                             ${projects.map(p => `
                                 <tr style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
-                                    <td style="text-align:left;white-space:nowrap;">${p.id}</td>
+                                    
                                     <td style="text-align:left;white-space:nowrap;"><strong>${escapeHtml(p.name)}</strong></td>
                                     <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(p.budget))}</td>
                                     <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(parseFloat(p.spent))}</td>
@@ -511,11 +511,11 @@ function renderTabContent(tab) {
                 <div class="sec-title">🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</div>
                 <div class="tbl-wrap">
                     <table style="min-width:800px;">
-                        <thead><tr><th style="text-align:left;">Mã</th><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
+                        <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
                         <tbody>
                             ${suppliers.map(s => `
                                 <tr style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
-                                    <td style="text-align:left;">${s.id}</td>
+                                    
                                     <td style="text-align:left;"><strong>${escapeHtml(s.name)}</strong></td>
                                     <td style="text-align:left;">${s.phone||'—'}</td>
                                     <td style="text-align:left;">${s.email||'—'}</td>

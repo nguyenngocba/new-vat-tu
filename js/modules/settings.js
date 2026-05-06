@@ -17,7 +17,18 @@ export function renderSettings() {
     for (let i = 0; i < state.data.users.length; i++) {
         let u = state.data.users[i];
         let avatar = u.name.charAt(0).toUpperCase();
-        let permHtml = u.role === 'admin' ? '🔓 Toàn quyền' : (u.permissions?.canImport ? '📥 ' : '') + (u.permissions?.canExport ? '📤 ' : '') + (u.permissions?.canCreateMaterial ? '➕ ' : '');
+        let permHtml = u.role === 'admin' ? '🔓 Toàn quyền' : '';
+        if (u.permissions && u.role !== 'admin') {
+            if (u.permissions.canImport) permHtml += '📥 Nhập ';
+            if (u.permissions.canExport) permHtml += '📤 Xuất ';
+            if (u.permissions.canCreateMaterial) permHtml += '➕ Thêm VT ';
+            if (u.permissions.canEditMaterial) permHtml += '✏️ Sửa VT ';
+            if (u.permissions.canDeleteMaterial) permHtml += '🗑️ Xóa VT ';
+            if (u.permissions.canManageSupplier) permHtml += '🏭 NCC ';
+            if (u.permissions.canDeleteProject) permHtml += '🏗️ Xóa CT ';
+            if (u.permissions.canAccessSettings) permHtml += '⚙️ Cài đặt ';
+        }
+        if (!permHtml) permHtml = '🔒 Không quyền';
         userHtml += '<div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;">' +
             '<div style="width:40px;height:40px;border-radius:50%;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--accent);">' + avatar + '</div>' +
             '<div style="flex:1;"><strong>' + escapeHtml(u.name) + '</strong> <span style="font-size:11px;color:var(--muted);">@' + u.username + '</span><br><span style="font-size:11px;">' + permHtml + '</span></div>' +
@@ -52,7 +63,7 @@ export function renderSettings() {
         '<div class="sec-title">👥 NGƯỜI DÙNG</div>' +
         '<button class="sm primary" style="margin-bottom:16px" onclick="window.addUser()">+ Thêm người dùng</button>' +
         userHtml +
-        '<div style="margin-top:24px"><div class="sec-title">📋 PROFILES</div>' + profileHtml + '</div>' +
+        '<div style="margin-top:24px"><div class="sec-title">📋 PROFILES</div><button class="sm primary" style="margin-bottom:8px" onclick="window.createProfile()">+ Tạo Profile mới</button>' + profileHtml + '</div>' +
         '<div style="margin-top:24px"><div class="sec-title">📂 DANH MỤC</div>' +
         state.data.categories.map(function(c, i) { return '<div class="setting-item"><span>📌 ' + escapeHtml(c) + '</span><button class="sm danger-btn" onclick="if(confirm(\'Xóa?\')){state.data.categories.splice(' + i + ',1);saveState();window.render();}">Xóa</button></div>'; }).join('') +
         '<div style="display:flex;gap:8px;margin-top:12px"><input id="newCat" style="flex:1"><button class="sm primary" onclick="addCategory()">+ Thêm</button></div></div>' +
@@ -116,5 +127,23 @@ export function changePassword(uid) {
         saveState(); window.render(); alert('✅ OK');
     }
 }
+
+window.createProfile = function() {
+    var name = prompt('Tên Profile:');
+    if (!name) return;
+    var perms = {};
+    perms.canImport = confirm('Cho phép NHẬP KHO?');
+    perms.canExport = confirm('Cho phép XUẤT KHO?');
+    perms.canCreateMaterial = confirm('Cho phép THÊM vật tư?');
+    perms.canEditMaterial = confirm('Cho phép SỬA vật tư?');
+    perms.canDeleteMaterial = confirm('Cho phép XÓA vật tư?');
+    perms.canManageSupplier = confirm('Cho phép QUẢN LÝ nhà cung cấp?');
+    perms.canDeleteProject = confirm('Cho phép XÓA công trình?');
+    perms.canAccessSettings = confirm('Cho phép TRUY CẬP cài đặt?');
+    profiles.push({ id: 'profile_' + Date.now(), name: name, perms: perms });
+    saveState();
+    window.render();
+    alert('Đã tạo profile: ' + name);
+};
 
 export function toggleUserPermission(uid, perm) {}

@@ -105,7 +105,7 @@ function updateSupplierList() {
     if (supplierViewMode === 'small') {
         supplierListContainer.innerHTML = `<div class="supplier-grid-small">${data.map(s => `
             <div class="metric-card" onclick="window.showSupplierDetail('${s.id}')" style="cursor:pointer;">
-                <div style="display:flex;justify-content:space-between;"><strong>${escapeHtml(s.name)}</strong><span class="tag">${s.id}</span></div>
+                <div style="display:flex;justify-content:space-between;"><strong>${escapeHtml(s.name)}</strong></div>
                 <div style="font-size:16px;color:var(--success-text);margin-top:4px;font-weight:bold;">${formatMoneyVND(s.total)}</div>
                 <div class="metric-sub">📞 ${s.phone||'—'}</div>
                 <div class="metric-sub">📦 ${s.count} lần nhập</div>
@@ -113,7 +113,7 @@ function updateSupplierList() {
     } else if (supplierViewMode === 'list') {
         supplierListContainer.innerHTML = `<div class="supplier-list">${data.map(s => `
             <div class="supplier-list-item" onclick="window.showSupplierDetail('${s.id}')">
-                <span class="tag">${s.id}</span>
+                
                 <strong style="flex:1;">${escapeHtml(s.name)}</strong>
                 <span>📞 ${s.phone||'—'}</span>
                 <span>✉️ ${s.email||'—'}</span>
@@ -129,7 +129,7 @@ function updateSupplierList() {
             <div class="metric-card" onclick="window.showSupplierDetail('${s.id}')" style="cursor:pointer;">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <strong style="font-size: 16px;">🏭 ${escapeHtml(s.name)}</strong> 
-                    <span class="tag">${s.id}</span>
+                    
                 </div>
                 <div class="metric-sub" style="margin-top: 8px;">📞 ${s.phone || 'Chưa có'}</div>
                 <div class="metric-sub">✉️ ${s.email || 'Chưa có'}</div>

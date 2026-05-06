@@ -141,7 +141,7 @@ function updateProjectListDisplay() {
     if (projectViewMode === 'small') {
         projectListContainer.innerHTML = `<div class="project-grid-small">${projectsData.map(p => `
             <div class="metric-card" onclick="window.showProjectDetail('${p.id}')" style="cursor:pointer;">
-                <div style="display:flex;justify-content:space-between;"><strong>${escapeHtml(p.name)}</strong><span class="tag">${p.id}</span></div>
+                <div style="display:flex;justify-content:space-between;"><strong>${escapeHtml(p.name)}</strong></div>
                 <div style="font-size:18px;margin-top:6px;color:var(--accent);">${formatMoneyVND(p.net)}</div>
                 <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
                 <div class="metric-sub">${p.pct.toFixed(1)}% | NS: ${formatMoneyVND(p.budget)}</div>
@@ -153,7 +153,7 @@ function updateProjectListDisplay() {
     } else if (projectViewMode === 'list') {
         projectListContainer.innerHTML = `<div class="project-list">${projectsData.map(p => `
             <div class="project-list-item" onclick="window.showProjectDetail('${p.id}')">
-                <span class="tag">${p.id}</span>
+                
                 <strong style="flex:1;">${escapeHtml(p.name)}</strong>
                 <span style="color:var(--accent);font-weight:bold;">${formatMoneyVND(p.net)}</span>
                 <div class="progress-bar" style="width:100px;"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
@@ -165,7 +165,7 @@ function updateProjectListDisplay() {
     } else {
         projectListContainer.innerHTML = `<div class="project-grid-large">${projectsData.map(p => `
             <div class="metric-card" onclick="window.showProjectDetail('${p.id}')" style="cursor:pointer;">
-                <div style="display:flex;justify-content:space-between;"><div class="metric-label">🏗️ ${escapeHtml(p.name)}</div><div class="tag">${p.id}</div></div>
+                <div style="display:flex;justify-content:space-between;"><div class="metric-label">🏗️ ${escapeHtml(p.name)}</div></div>
                 <div class="metric-val" style="font-size:28px;color:var(--accent)">${formatMoneyVND(p.net)}</div>
                 <div class="metric-sub">💰 NS: ${formatMoneyVND(p.budget)} | Còn: ${formatMoneyVND(p.rem)}</div>
                 <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,p.pct)}%;background:${p.pct>90?'#A32D2D':'#378ADD'}"></div></div>
