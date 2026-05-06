@@ -21,10 +21,8 @@ function getFilteredSuppliers() {
     
     if (f.keyword) {
         const kw = f.keyword.toLowerCase();
-        result = result.filter(s => s.name.toLowerCase().includes(kw) || s.id.toLowerCase().includes(kw));
-    }
-    if (f.phone) {
-        result = result.filter(s => s.phone && s.phone.includes(f.phone));
+        const st = document.getElementById('sup-search-type')?.value || 'all';
+        result = result.filter(s => { if (st==='name') return s.name.toLowerCase().includes(kw); if (st==='id') return s.id.toLowerCase().includes(kw); if (st==='address') return (s.address||'').toLowerCase().includes(kw); if (st==='email') return (s.email||'').toLowerCase().includes(kw); return s.name.toLowerCase().includes(kw) || s.id.toLowerCase().includes(kw); });
     }
     if (f.minPurchase !== '' && f.minPurchase !== null && f.minPurchase !== undefined) {
         const min = Number(f.minPurchase);
@@ -162,14 +160,10 @@ function renderSupplierSearchBar() {
         <div class="card" style="margin-bottom: 16px;">
             <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;"><span>🔍 TÌM KIẾM NÂNG CAO - NHÀ CUNG CẤP</span><select id="sup-sort-by" onchange="updateSupplierList()" style="width:140px;font-size:12px;"><option value="name_asc">Tên A→Z</option><option value="name_desc">Tên Z→A</option><option value="total_desc">Tổng chi ↓</option><option value="total_asc">Tổng chi ↑</option><option value="count_desc">Số lần ↓</option><option value="count_asc">Số lần ↑</option></select></div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-                <input type="text" id="sup-search-keyword" placeholder="Tên hoặc mã..." 
-                       value="${escapeHtml(supplierFilters.keyword)}" style="flex: 2; min-width: 180px;">
-                <input type="text" id="sup-search-phone" placeholder="Số điện thoại..." 
-                       value="${escapeHtml(supplierFilters.phone)}" style="width: 140px;">
-                <input type="text" id="sup-search-min" placeholder="Tổng chi ≥" 
-                       value="${supplierFilters.minPurchase || ''}" style="width: 130px;" dir="ltr">
-                <input type="text" id="sup-search-max" placeholder="Tổng chi ≤" 
-                       value="${supplierFilters.maxPurchase || ''}" style="width: 130px;" dir="ltr">
+                <input type="text" id="sup-search-keyword" placeholder="Từ khóa..." value="${escapeHtml(supplierFilters.keyword)}" style="flex: 2; min-width: 180px;">
+                <input type="text" id="sup-search-min" placeholder="Tổng chi ≥" value="${supplierFilters.minPurchase || ''}" style="width: 130px;" dir="ltr">
+                <input type="text" id="sup-search-max" placeholder="Tổng chi ≤" value="${supplierFilters.maxPurchase || ''}" style="width: 130px;" dir="ltr">
+                <select id="sup-search-type" style="width:120px;"><option value="all">📂 Tất cả</option><option value="name">📋 Tên</option><option value="id">🔢 Mã</option><option value="address">📍 Địa chỉ</option><option value="email">📧 Email</option></select>
                 <button id="sup-clear-filters" class="sm">🗑️ Xóa bộ lọc</button>
             </div>
         </div>
@@ -178,15 +172,13 @@ function renderSupplierSearchBar() {
 
 function bindSupplierSearchEvents() {
     const keywordInput = document.getElementById('sup-search-keyword');
-    const phoneInput = document.getElementById('sup-search-phone');
-    const minInput = document.getElementById('sup-search-min');
+        const minInput = document.getElementById('sup-search-min');
     const maxInput = document.getElementById('sup-search-max');
     const clearBtn = document.getElementById('sup-clear-filters');
     
     const debouncedUpdate = debounce(() => {
         supplierFilters.keyword = keywordInput?.value || '';
-        supplierFilters.phone = phoneInput?.value || '';
-        supplierFilters.minPurchase = minInput?.value.replace(/[^0-9]/g, '') || '';
+                supplierFilters.minPurchase = minInput?.value.replace(/[^0-9]/g, '') || '';
         supplierFilters.maxPurchase = maxInput?.value.replace(/[^0-9]/g, '') || '';
         updateSupplierList();
         updateSupplierHistoryDisplay();
@@ -195,14 +187,12 @@ function bindSupplierSearchEvents() {
     const updateFilters = () => { debouncedUpdate(); };
     
     if (keywordInput) keywordInput.oninput = updateFilters;
-    if (phoneInput) phoneInput.oninput = updateFilters;
     if (minInput) { minInput.addEventListener('input', updateFilters); }
     if (maxInput) { maxInput.addEventListener('input', updateFilters); }
     if (clearBtn) clearBtn.onclick = () => {
         supplierFilters = { keyword: '', phone: '', minPurchase: '', maxPurchase: '' };
         if (keywordInput) keywordInput.value = '';
-        if (phoneInput) phoneInput.value = '';
-        if (minInput) minInput.value = '';
+                if (minInput) minInput.value = '';
         if (maxInput) maxInput.value = '';
         updateSupplierList();
         updateSupplierHistoryDisplay();
