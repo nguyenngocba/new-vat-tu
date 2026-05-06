@@ -94,6 +94,16 @@ function updateSupplierList() {
         return { ...s, total, count: txns.length };
     });
     
+    const sortVal = document.getElementById('sup-sort-by')?.value || 'name_asc';
+    data.sort((a, b) => {
+        if (sortVal === 'name_asc') return a.name.localeCompare(b.name);
+        if (sortVal === 'name_desc') return b.name.localeCompare(a.name);
+        if (sortVal === 'total_desc') return b.total - a.total;
+        if (sortVal === 'total_asc') return a.total - b.total;
+        if (sortVal === 'count_desc') return b.count - a.count;
+        if (sortVal === 'count_asc') return a.count - b.count;
+        return 0;
+    });
     if (supplierViewMode === 'small') {
         supplierListContainer.innerHTML = `<div class="supplier-grid-small">${data.map(s => `
             <div class="metric-card" onclick="window.showSupplierDetail('${s.id}')" style="cursor:pointer;">
@@ -150,7 +160,7 @@ function updateSupplierHistoryDisplay() {
 function renderSupplierSearchBar() {
     return `
         <div class="card" style="margin-bottom: 16px;">
-            <div class="sec-title">🔍 TÌM KIẾM NÂNG CAO - NHÀ CUNG CẤP</div>
+            <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;"><span>🔍 TÌM KIẾM NÂNG CAO - NHÀ CUNG CẤP</span><select id="sup-sort-by" onchange="updateSupplierList()" style="width:140px;font-size:12px;"><option value="name_asc">Tên A→Z</option><option value="name_desc">Tên Z→A</option><option value="total_desc">Tổng chi ↓</option><option value="total_asc">Tổng chi ↑</option><option value="count_desc">Số lần ↓</option><option value="count_asc">Số lần ↑</option></select></div>
             <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                 <input type="text" id="sup-search-keyword" placeholder="Tên hoặc mã..." 
                        value="${escapeHtml(supplierFilters.keyword)}" style="flex: 2; min-width: 180px;">
@@ -636,4 +646,4 @@ export const addSupplier = (data) => {
     return newSupplier; 
 };
 
-export const getSuppliers = () => state.data.suppliers;
+export const getSuppliers = () => state.data.suppliers;window.updateSupplierList = updateSupplierList;

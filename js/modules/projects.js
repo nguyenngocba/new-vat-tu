@@ -127,6 +127,16 @@ function updateProjectListDisplay() {
         const rem = p.budget - net;
         return { ...p, net, pct, rem };
     });
+    const sortVal = document.getElementById('proj-sort-by')?.value || 'name_asc';
+    projectsData.sort((a, b) => {
+        if (sortVal === 'name_asc') return a.name.localeCompare(b.name);
+        if (sortVal === 'name_desc') return b.name.localeCompare(a.name);
+        if (sortVal === 'budget_desc') return b.budget - a.budget;
+        if (sortVal === 'budget_asc') return a.budget - b.budget;
+        if (sortVal === 'spent_desc') return b.net - a.net;
+        if (sortVal === 'spent_asc') return a.net - b.net;
+        return 0;
+    });
     
     if (projectViewMode === 'small') {
         projectListContainer.innerHTML = `<div class="project-grid-small">${projectsData.map(p => `
@@ -176,7 +186,7 @@ function updateProjectHistoryDisplay() {
 function renderProjectSearchBar() {
     const statusOpts = [{v:'',l:'📂 Tất cả'},{v:'has_budget',l:'💰 Còn NS'},{v:'out_of_budget',l:'⚠️ Hết NS'},{v:'over_budget',l:'🔥 Quá NS'}];
     return `<div class="card" style="margin-bottom:16px;">
-        <div class="sec-title">🔍 TÌM KIẾM CÔNG TRÌNH</div>
+        <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;"><span>🔍 TÌM KIẾM CÔNG TRÌNH</span><select id="proj-sort-by" onchange="updateProjectListDisplay()" style="width:140px;font-size:12px;"><option value="name_asc">Tên A→Z</option><option value="name_desc">Tên Z→A</option><option value="budget_desc">Ngân sách ↓</option><option value="budget_asc">Ngân sách ↑</option><option value="spent_desc">Đã chi ↓</option><option value="spent_asc">Đã chi ↑</option></select></div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
             <input type="text" id="proj-search-keyword" placeholder="Tên hoặc mã..." value="${escapeHtml(projectFilters.keyword)}" style="flex:2;min-width:180px;">
             <input type="text" id="proj-search-budget-min" placeholder="NS ≥" value="${projectFilters.budgetMin||''}" style="width:120px;" dir="ltr">
@@ -211,6 +221,7 @@ function bindProjectSearchEvents() {
     };
 }
 
+document.getElementById('proj-sort-by')?.addEventListener('change', function() { updateProjectListDisplay(); });
 window.setProjectView = function(mode) {
     projectViewMode = mode;
     localStorage.setItem('steeltrack_project_view', mode);
@@ -499,4 +510,5 @@ export const addProject = (d) => { const p = { id: genPid(), name: d.name, budge
   fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }).catch(function(){}); addLog('Thêm CT', p.name); saveState(); fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); if(window.render) window.render(); return p; };
 export const getProjects = () => state.data.projects;
 export function filterProjects() {}
-export function clearProjectSearch() {}
+
+window.updateProjectListDisplay = updateProjectListDisplay;
