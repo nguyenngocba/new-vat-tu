@@ -366,7 +366,7 @@ export function renderDashboard() {
                     ${topProjects.map((p, i) => `
                         <div style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
                             <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                                <span>${i+1}. ${escapeHtml(p.name)}</span>
+                                <span><strong style="color:${i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'var(--muted)'};margin-right:6px;">#${i+1}</strong>${escapeHtml(p.name)}</span>
                                 <strong>${formatMoneyVND(p.total)}</strong>
                             </div>
                             <div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:${(p.total/maxProject)*100}%;background:${i===0?'#378ADD':i===1?'#97C459':i===2?'#FAC775':'#85B7EB'};border-radius:4px;"></div></div>
@@ -381,7 +381,7 @@ export function renderDashboard() {
                     ${topSuppliers.map((s, i) => `
                         <div style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
                             <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                                <span>${i+1}. ${escapeHtml(s.name)}</span>
+                                <span><strong style="color:${i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'var(--muted)'};margin-right:6px;">#${i+1}</strong>${escapeHtml(s.name)}</span>
                                 <strong>${formatMoneyVND(s.total)}</strong>
                             </div>
                             <div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:${(s.total/maxSupplier)*100}%;background:${i===0?'#378ADD':i===1?'#97C459':i===2?'#FAC775':'#85B7EB'};border-radius:4px;"></div></div>
@@ -396,7 +396,7 @@ export function renderDashboard() {
         <div class="card">
             <div class="sec-title" style="display:flex;justify-content:space-between;"><span>📋 GIAO DỊCH GẦN ĐÂY</span><select id="recent-limit" onchange="updateDashboardContent()" style="width:100px;"><option value="10">10</option><option value="50">50</option><option value="100">100</option></select></div>
             <div class="tbl-wrap">
-                <table style="min-width: 800px;">
+                <table class="dashboard-table" style="min-width: 800px;">
                     <thead><tr><th>Thời gian</th><th>Loại</th><th>Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Thành tiền</th><th>Đối tượng</th></tr></thead>
                     <tbody>
                         ${recentTxns.map(t => {
@@ -408,7 +408,7 @@ export function renderDashboard() {
                             else { target = state.data.suppliers.find(s=>s.id===t.supplierId)?.name || ''; }
                             return `<tr>
                                 <td style="white-space:nowrap;">${dt}</td>
-                                <td>${icon} ${label}</td>
+                                <td><span class="status-badge ${t.type==='purchase'?'status-good':t.type==='usage'?'status-warn':'status-danger'}" style="font-size:11px;">${icon} ${label}</span></td>
                                 <td>${escapeHtml(mat?.name||'N/A')}</td>
 				<td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit||''}</td>	                                
                                 <td style="text-align:right;font-weight:500;">${formatMoneyVND(parseFloat(parseFloat(t.totalAmount)))}</td>
@@ -477,7 +477,7 @@ function renderTabContent(tab) {
             <div class="card">
                 <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</span><select id="proj-limit" onchange="switchDashboardTab('projects')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
-                    <table style="min-width:900px;">
+                    <table class="dashboard-table" style="min-width:900px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
                         <tbody>
                             ${displayProjects.map(p => `
@@ -486,8 +486,8 @@ function renderTabContent(tab) {
                                     <td style="text-align:left;white-space:nowrap;"><strong>${escapeHtml(p.name)}</strong></td>
                                     <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(p.budget))}</td>
                                     <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(parseFloat(p.spent))}</td>
-                                    <td style="text-align:right;white-space:nowrap;color:var(--success-text);">${formatMoneyVND(parseFloat(p.budget)-parseFloat(p.spent))}</td>
-                                    <td style="text-align:center;font-weight:bold;">${parseFloat(p.pct).toFixed(1)}%</td>
+                                    <td style="text-align:right;white-space:nowrap;"><span class="${(parseFloat(p.budget)-parseFloat(p.spent))<0?'status-danger':'status-good'}" style="font-weight:500;">${formatMoneyVND(parseFloat(p.budget)-parseFloat(p.spent))}</span></td>
+                                    <td style="text-align:center;"><span class="status-badge ${p.pct>90?'status-danger':p.pct>70?'status-warn':'status-good'}">${parseFloat(p.pct).toFixed(1)}%</span></td>
                                     <td><div class="progress-bar" style="width:120px;"><div class="progress-fill" style="width:${(p.pct/maxPct)*100}%;background:${p.pct>90?'#A32D2D':'#378ADD'};"></div></div></td>
                                 </tr>
                             `).join('')}
@@ -519,7 +519,7 @@ function renderTabContent(tab) {
             <div class="card">
                 <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</span><select id="sup-limit" onchange="switchDashboardTab('suppliers')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
-                    <table style="min-width:800px;">
+                    <table class="dashboard-table" style="min-width:800px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
                         <tbody>
                             ${displaySuppliers.map(s => `
@@ -528,7 +528,7 @@ function renderTabContent(tab) {
                                     <td style="text-align:left;"><strong>${escapeHtml(s.name)}</strong></td>
                                     <td style="text-align:left;">${s.phone||'—'}</td>
                                     <td style="text-align:left;">${s.email||'—'}</td>
-                                    <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(s.total)}</td>
+                                    <td style="text-align:right;white-space:nowrap;"><span style="font-weight:600;color:${suppliers.indexOf(s)<3?'var(--accent)':'var(--text)'};">${formatMoneyVND(s.total)}</span></td>
                                     <td style="text-align:center;">${s.count}</td>
                                     <td style="text-align:right;white-space:nowrap;">${s.count>0?formatMoneyVND(s.total/s.count):'0 ₫'}</td>
                                 </tr>

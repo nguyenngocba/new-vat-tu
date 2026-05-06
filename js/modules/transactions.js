@@ -461,7 +461,17 @@ const received = state.data.transactions
 const returned = state.data.transactions
     .filter(t => t.projectId === pid && t.mid === mid && t.type === 'return')
     .reduce((s, t) => s + Number(t.qty||0), 0);
-const available = received - returned - usedQty;
+let usedQty2 = 0;
+    const usageRecs = state.data.projectMaterialUsage?.filter(u => u.projectId === pid && u.materialId === mid) || [];
+    const sched2 = state.data.projectSchedules?.find(s => s.projectId === pid);
+    usageRecs.forEach(r => { usedQty2 = Math.max(usedQty2, r.usedQty || 0); });
+    if (sched2?.tasks?.length > 0) {
+        function flatTasks(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(flatTasks(t.subTasks)); } return r; }
+        for (const task of flatTasks(sched2.tasks)) {
+            if (task.materials?.length > 0) { for (const mat of task.materials) { if (mat.materialId === mid) usedQty2 = Math.max(usedQty2, mat.quantity || 0); } }
+        }
+    }
+    const available = received - returned - usedQty2;
 if (qty > available) {
     return alert(`Không thể trả ${qty} ${mat.unit}! Công trình này chỉ có ${available} ${mat.unit} có thể trả.`);
 }

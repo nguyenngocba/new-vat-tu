@@ -600,3 +600,11 @@ input[type=text][dir=ltr] {
 .sidebar.collapsed .logo-mini { height: 40px !important; width: auto !important; max-width: 80px; }
 .sidebar.collapsed .logo-mini { height: 30px !important; width: auto !important; max-width: 60px; }
 .sidebar.collapsed .logo-mini { height: 30px !important; width: auto !important; max-width: 68px; }
+/* ===== BẢNG CHUYÊN NGHIỆP ===== */
+.dashboard-table tbody tr:nth-child(even) { background: var(--surface2); }
+.dashboard-table tbody tr:hover { background: var(--accent-bg) !important;  }
+.dashboard-table td { padding: 10px 12px; }
+.status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.status-good { background: var(--success-bg); color: var(--success-text); }
+.status-warn { background: var(--warn-bg); color: var(--warn-text); }
+.status-danger { background: var(--danger-bg); color: var(--danger-text); }
