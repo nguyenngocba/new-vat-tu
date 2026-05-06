@@ -63,7 +63,7 @@ export function saveState() {
 export function addLog(action, details) {
   if (!state.currentUser) state.currentUser = { id: "system", name: "System" };
   const id = 'LOG' + timeCode() + String(state.data.nextLogId++).padStart(3,'0');
-  state.data.logs.unshift({ id, timestamp: new Date().toISOString(), timeStr: new Date().toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}), userId: state.currentUser.id, userName: state.currentUser.name, action, details });
+  state.data.logs.unshift({ id, timestamp: new Date().toISOString(), timeStr: new Date().toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}), userId: state.currentUser.id, userName: state.currentUser.name, action, details });
   fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.logs[0]) });
 }
 

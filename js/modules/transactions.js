@@ -12,13 +12,14 @@ function getCurrentDateTime() {
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
     const date = new Date(dateTimeStr);
-    return date.toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
+    return date.toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'});
 }
 
 function calculatePurchaseTotal() {

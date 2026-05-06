@@ -10,7 +10,7 @@ let materialListContainer = null;
 
 function formatDateTime(dateTimeStr) {
     if (!dateTimeStr) return '';
-    return new Date(dateTimeStr).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3});
+    return new Date(dateTimeStr).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'});
 }
 
 function getFilteredMaterials() {

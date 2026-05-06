@@ -173,7 +173,7 @@ export function addTask(projectId, parentTaskId = null) {
     
     updateScheduleProgress(projectId);
     saveState();
-    addLog('Thêm công việc', `Đã thêm công việc mới vào tiến độ công trình`);
+    addLog("Thêm công việc", projectId + " - " + newTask.name);
     return newTask;
 }
 
@@ -192,7 +192,7 @@ export function updateTask(projectId, taskId, updates) {
                 }
                 updateScheduleProgress(projectId);
                 saveState();
-                addLog('Cập nhật công việc', `Đã cập nhật công việc: ${task.name}`);
+                addLog("Cập nhật công việc", projectId + " - " + task.name);
                 return true;
             }
             if (task.subTasks && findAndUpdate(task.subTasks)) return true;
@@ -215,7 +215,7 @@ export function deleteTask(projectId, taskId) {
                 tasks.splice(i, 1);
                 updateScheduleProgress(projectId);
                 saveState();
-                addLog('Xóa công việc', `Đã xóa công việc khỏi tiến độ`);
+                addLog("Xóa công việc", projectId + " - Đã xóa 1 công việc");
                 return true;
             }
             if (tasks[i].subTasks && findAndDelete(tasks[i].subTasks)) return true;

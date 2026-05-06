@@ -401,7 +401,7 @@ export function renderDashboard() {
                     <tbody>
                         ${recentTxns.map(t => {
                             const mat = state.data.materials.find(m=>m.id===t.mid);
-                            const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3}) : t.date;
+                            const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}) : t.date;
                             let icon = '📥', label = 'Nhập kho', target = '';
                             if (t.type === 'usage') { icon = '📤'; label = 'Xuất kho'; target = state.data.projects.find(p=>p.id===t.projectId)?.name || ''; }
                             else if (t.type === 'return') { icon = '🔄'; label = 'Trả hàng'; target = state.data.projects.find(p=>p.id===t.projectId)?.name || ''; }

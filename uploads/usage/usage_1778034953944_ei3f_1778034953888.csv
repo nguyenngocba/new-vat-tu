@@ -1,0 +1,3001 @@
+Ten vat tu,Loai,Don vi,So luong,Don gia,Nguong canh bao,Ghi chu
+Vat tu 1,Tam thep,tan,272.07,71331,5,Ghi chu 1
+Vat tu 2,Vat tu tieu hao,tan,176.02,77833,5,Ghi chu 2
+Vat tu 3,Dam thep,kg,65.93,78543,5,Ghi chu 3
+Vat tu 4,Vat tu tieu hao,kg,182.83,61671,5,Ghi chu 4
+Vat tu 5,Thep hop,cai,294.84,60294,5,Ghi chu 5
+Vat tu 6,Thep hinh,cuon,139.95,76119,5,Ghi chu 6
+Vat tu 7,Vat tu tieu hao,tan,16.55,57991,5,Ghi chu 7
+Vat tu 8,Tam thep,tan,149.86,69597,5,Ghi chu 8
+Vat tu 9,Thep hop,thung,328.11,54966,5,Ghi chu 9
+Vat tu 10,Dam thep,tan,72.80,59639,5,Ghi chu 10
+Vat tu 11,Thep hop,cuon,37.32,65692,5,Ghi chu 11
+Vat tu 12,Thep hinh,kg,180.45,57828,5,Ghi chu 12
+Vat tu 13,Thep hop,thung,72.07,66076,5,Ghi chu 13
+Vat tu 14,Vat tu tieu hao,met,248.56,82348,5,Ghi chu 14
+Vat tu 15,Vat tu tieu hao,tan,180.60,53694,5,Ghi chu 15
+Vat tu 16,Bu long - Oc vit,tan,224.44,75268,5,Ghi chu 16
+Vat tu 17,Thep hinh,kg,27.91,59801,5,Ghi chu 17
+Vat tu 18,Tam thep,cai,313.06,80670,5,Ghi chu 18
+Vat tu 19,Ong thep,kg,221.79,58917,5,Ghi chu 19
+Vat tu 20,Ong thep,cai,129.40,61191,5,Ghi chu 20
+Vat tu 21,Ong thep,met,318.86,50823,5,Ghi chu 21
+Vat tu 22,Bu long - Oc vit,tam,164.82,76138,5,Ghi chu 22
+Vat tu 23,Thep hinh,cuon,133.81,51762,5,Ghi chu 23
+Vat tu 24,Ong thep,met,163.52,68591,5,Ghi chu 24
+Vat tu 25,Thep hop,tam,21.35,54857,5,Ghi chu 25
+Vat tu 26,Bu long - Oc vit,cai,104.17,50408,5,Ghi chu 26
+Vat tu 27,Dam thep,tam,294.83,55100,5,Ghi chu 27
+Vat tu 28,Bu long - Oc vit,thung,259.46,53858,5,Ghi chu 28
+Vat tu 29,Ong thep,tam,122.36,63882,5,Ghi chu 29
+Vat tu 30,Thep hinh,cuon,188.53,65333,5,Ghi chu 30
+Vat tu 31,Thep hop,thung,62.32,57788,5,Ghi chu 31
+Vat tu 32,Tam thep,thung,16.60,60256,5,Ghi chu 32
+Vat tu 33,Thep hinh,tam,58.48,67870,5,Ghi chu 33
+Vat tu 34,Ong thep,cuon,146.62,69822,5,Ghi chu 34
+Vat tu 35,Vat tu tieu hao,cuon,155.35,82457,5,Ghi chu 35
+Vat tu 36,Thep hop,thung,265.29,52367,5,Ghi chu 36
+Vat tu 37,Vat tu tieu hao,thung,318.21,61679,5,Ghi chu 37
+Vat tu 38,Ong thep,tam,235.67,50750,5,Ghi chu 38
+Vat tu 39,Bu long - Oc vit,kg,110.12,66734,5,Ghi chu 39
+Vat tu 40,Ong thep,kg,318.60,71912,5,Ghi chu 40
+Vat tu 41,Tam thep,tan,28.07,51821,5,Ghi chu 41
+Vat tu 42,Ong thep,cuon,287.77,58326,5,Ghi chu 42
+Vat tu 43,Thep hinh,cuon,122.03,81511,5,Ghi chu 43
+Vat tu 44,Vat tu tieu hao,tam,69.78,53516,5,Ghi chu 44
+Vat tu 45,Thep hinh,cuon,55.51,77817,5,Ghi chu 45
+Vat tu 46,Ong thep,tam,60.21,66108,5,Ghi chu 46
+Vat tu 47,Tam thep,tam,42.23,81768,5,Ghi chu 47
+Vat tu 48,Thep hinh,cai,168.82,50233,5,Ghi chu 48
+Vat tu 49,Thep goc,thung,109.61,54407,5,Ghi chu 49
+Vat tu 50,Vat tu tieu hao,met,90.93,74618,5,Ghi chu 50
+Vat tu 51,Vat tu tieu hao,thung,35.96,81080,5,Ghi chu 51
+Vat tu 52,Bu long - Oc vit,thung,25.16,67174,5,Ghi chu 52
+Vat tu 53,Dam thep,met,20.31,77523,5,Ghi chu 53
+Vat tu 54,Dam thep,cuon,176.97,73574,5,Ghi chu 54
+Vat tu 55,Dam thep,thung,39.27,50041,5,Ghi chu 55
+Vat tu 56,Bu long - Oc vit,thung,159.81,76955,5,Ghi chu 56
+Vat tu 57,Ong thep,thung,291.12,66717,5,Ghi chu 57
+Vat tu 58,Bu long - Oc vit,tan,316.38,68654,5,Ghi chu 58
+Vat tu 59,Tam thep,cuon,288.40,63890,5,Ghi chu 59
+Vat tu 60,Thep goc,cai,62.20,52580,5,Ghi chu 60
+Vat tu 61,Thep goc,met,235.35,76848,5,Ghi chu 61
+Vat tu 62,Thep goc,tam,320.09,76152,5,Ghi chu 62
+Vat tu 63,Tam thep,tam,289.80,74546,5,Ghi chu 63
+Vat tu 64,Bu long - Oc vit,thung,18.79,73201,5,Ghi chu 64
+Vat tu 65,Vat tu tieu hao,tam,101.38,66255,5,Ghi chu 65
+Vat tu 66,Tam thep,tam,219.97,59151,5,Ghi chu 66
+Vat tu 67,Vat tu tieu hao,kg,193.44,58717,5,Ghi chu 67
+Vat tu 68,Bu long - Oc vit,tan,309.69,59389,5,Ghi chu 68
+Vat tu 69,Thep goc,met,280.15,57462,5,Ghi chu 69
+Vat tu 70,Bu long - Oc vit,tan,242.26,67661,5,Ghi chu 70
+Vat tu 71,Dam thep,cai,319.13,80850,5,Ghi chu 71
+Vat tu 72,Thep hinh,thung,153.16,52282,5,Ghi chu 72
+Vat tu 73,Thep hinh,cai,209.92,81199,5,Ghi chu 73
+Vat tu 74,Tam thep,tan,34.78,76529,5,Ghi chu 74
+Vat tu 75,Ong thep,tan,169.61,66308,5,Ghi chu 75
+Vat tu 76,Thep hinh,thung,274.58,53915,5,Ghi chu 76
+Vat tu 77,Thep goc,met,14.59,64575,5,Ghi chu 77
+Vat tu 78,Dam thep,thung,100.95,82120,5,Ghi chu 78
+Vat tu 79,Dam thep,kg,125.98,56733,5,Ghi chu 79
+Vat tu 80,Dam thep,met,247.24,73188,5,Ghi chu 80
+Vat tu 81,Bu long - Oc vit,tam,20.35,64559,5,Ghi chu 81
+Vat tu 82,Bu long - Oc vit,kg,27.46,71134,5,Ghi chu 82
+Vat tu 83,Ong thep,cuon,1.40,71901,5,Ghi chu 83
+Vat tu 84,Ong thep,tan,299.40,75788,5,Ghi chu 84
+Vat tu 85,Dam thep,tan,318.15,73197,5,Ghi chu 85
+Vat tu 86,Vat tu tieu hao,met,163.88,69856,5,Ghi chu 86
+Vat tu 87,Thep goc,thung,33.22,57326,5,Ghi chu 87
+Vat tu 88,Tam thep,cuon,324.12,53782,5,Ghi chu 88
+Vat tu 89,Thep hop,kg,111.80,65416,5,Ghi chu 89
+Vat tu 90,Thep hinh,cai,80.82,70105,5,Ghi chu 90
+Vat tu 91,Thep goc,cuon,228.31,82751,5,Ghi chu 91
+Vat tu 92,Dam thep,thung,112.62,59257,5,Ghi chu 92
+Vat tu 93,Bu long - Oc vit,thung,274.10,56797,5,Ghi chu 93
+Vat tu 94,Ong thep,tam,32.62,75700,5,Ghi chu 94
+Vat tu 95,Bu long - Oc vit,cai,22.66,53429,5,Ghi chu 95
+Vat tu 96,Thep hinh,thung,299.00,61600,5,Ghi chu 96
+Vat tu 97,Tam thep,met,38.55,79971,5,Ghi chu 97
+Vat tu 98,Dam thep,tam,221.35,54984,5,Ghi chu 98
+Vat tu 99,Bu long - Oc vit,cai,315.12,68172,5,Ghi chu 99
+Vat tu 100,Thep goc,tam,201.16,82542,5,Ghi chu 100
+Vat tu 101,Ong thep,tam,206.43,66200,5,Ghi chu 101
+Vat tu 102,Thep goc,cai,110.13,52366,5,Ghi chu 102
+Vat tu 103,Thep hinh,cuon,132.04,52789,5,Ghi chu 103
+Vat tu 104,Tam thep,thung,159.84,51432,5,Ghi chu 104
+Vat tu 105,Tam thep,tan,173.45,80805,5,Ghi chu 105
+Vat tu 106,Bu long - Oc vit,tan,93.10,80573,5,Ghi chu 106
+Vat tu 107,Bu long - Oc vit,thung,287.39,60159,5,Ghi chu 107
+Vat tu 108,Thep hinh,thung,11.60,79535,5,Ghi chu 108
+Vat tu 109,Bu long - Oc vit,met,64.02,68042,5,Ghi chu 109
+Vat tu 110,Thep hinh,met,257.42,75673,5,Ghi chu 110
+Vat tu 111,Ong thep,met,284.30,66604,5,Ghi chu 111
+Vat tu 112,Tam thep,cai,204.59,78956,5,Ghi chu 112
+Vat tu 113,Thep hop,met,172.85,80154,5,Ghi chu 113
+Vat tu 114,Tam thep,met,127.19,60565,5,Ghi chu 114
+Vat tu 115,Bu long - Oc vit,cuon,276.06,82559,5,Ghi chu 115
+Vat tu 116,Vat tu tieu hao,cuon,284.67,69027,5,Ghi chu 116
+Vat tu 117,Tam thep,thung,132.22,69619,5,Ghi chu 117
+Vat tu 118,Ong thep,thung,89.95,71934,5,Ghi chu 118
+Vat tu 119,Tam thep,met,323.62,62320,5,Ghi chu 119
+Vat tu 120,Bu long - Oc vit,met,109.77,61436,5,Ghi chu 120
+Vat tu 121,Tam thep,thung,35.36,50027,5,Ghi chu 121
+Vat tu 122,Thep goc,cai,321.27,53773,5,Ghi chu 122
+Vat tu 123,Tam thep,thung,54.93,52246,5,Ghi chu 123
+Vat tu 124,Bu long - Oc vit,kg,80.91,52228,5,Ghi chu 124
+Vat tu 125,Thep hinh,met,313.80,54242,5,Ghi chu 125
+Vat tu 126,Thep hop,tan,17.52,62738,5,Ghi chu 126
+Vat tu 127,Ong thep,cai,249.53,73772,5,Ghi chu 127
+Vat tu 128,Dam thep,cuon,41.92,68049,5,Ghi chu 128
+Vat tu 129,Dam thep,tan,215.78,79257,5,Ghi chu 129
+Vat tu 130,Dam thep,met,206.00,71428,5,Ghi chu 130
+Vat tu 131,Thep hinh,tan,172.29,72642,5,Ghi chu 131
+Vat tu 132,Dam thep,cuon,292.73,79382,5,Ghi chu 132
+Vat tu 133,Thep hinh,tam,124.18,74244,5,Ghi chu 133
+Vat tu 134,Thep hinh,cuon,311.15,73153,5,Ghi chu 134
+Vat tu 135,Tam thep,cai,175.87,77409,5,Ghi chu 135
+Vat tu 136,Thep hop,tan,316.48,60235,5,Ghi chu 136
+Vat tu 137,Thep goc,cai,96.36,78848,5,Ghi chu 137
+Vat tu 138,Ong thep,tam,289.85,68943,5,Ghi chu 138
+Vat tu 139,Dam thep,met,263.71,77939,5,Ghi chu 139
+Vat tu 140,Thep goc,cai,20.69,64705,5,Ghi chu 140
+Vat tu 141,Ong thep,kg,164.18,50488,5,Ghi chu 141
+Vat tu 142,Thep goc,cuon,99.97,52135,5,Ghi chu 142
+Vat tu 143,Dam thep,tam,175.52,65010,5,Ghi chu 143
+Vat tu 144,Thep goc,met,214.71,79391,5,Ghi chu 144
+Vat tu 145,Dam thep,kg,72.23,75763,5,Ghi chu 145
+Vat tu 146,Bu long - Oc vit,met,312.53,70760,5,Ghi chu 146
+Vat tu 147,Dam thep,tan,84.64,57618,5,Ghi chu 147
+Vat tu 148,Bu long - Oc vit,cuon,203.19,54231,5,Ghi chu 148
+Vat tu 149,Thep hinh,tam,189.01,81992,5,Ghi chu 149
+Vat tu 150,Tam thep,tan,254.05,50117,5,Ghi chu 150
+Vat tu 151,Thep hinh,thung,211.34,53690,5,Ghi chu 151
+Vat tu 152,Thep goc,met,21.35,58777,5,Ghi chu 152
+Vat tu 153,Bu long - Oc vit,met,308.50,80190,5,Ghi chu 153
+Vat tu 154,Bu long - Oc vit,tan,33.13,74743,5,Ghi chu 154
+Vat tu 155,Thep hop,cuon,229.00,61861,5,Ghi chu 155
+Vat tu 156,Ong thep,cuon,311.81,71239,5,Ghi chu 156
+Vat tu 157,Dam thep,met,221.85,73834,5,Ghi chu 157
+Vat tu 158,Thep hinh,cuon,221.62,78707,5,Ghi chu 158
+Vat tu 159,Thep hinh,cuon,172.57,68885,5,Ghi chu 159
+Vat tu 160,Thep hop,tam,118.69,72956,5,Ghi chu 160
+Vat tu 161,Tam thep,tam,101.65,54888,5,Ghi chu 161
+Vat tu 162,Tam thep,cuon,130.42,74724,5,Ghi chu 162
+Vat tu 163,Thep hop,cuon,6.58,54454,5,Ghi chu 163
+Vat tu 164,Tam thep,cuon,150.25,58771,5,Ghi chu 164
+Vat tu 165,Thep hinh,cai,111.73,76237,5,Ghi chu 165
+Vat tu 166,Thep goc,tam,97.46,57796,5,Ghi chu 166
+Vat tu 167,Ong thep,met,290.09,74496,5,Ghi chu 167
+Vat tu 168,Thep goc,thung,12.16,53059,5,Ghi chu 168
+Vat tu 169,Vat tu tieu hao,cai,293.44,73884,5,Ghi chu 169
+Vat tu 170,Thep goc,kg,316.13,76038,5,Ghi chu 170
+Vat tu 171,Bu long - Oc vit,cai,227.39,54381,5,Ghi chu 171
+Vat tu 172,Vat tu tieu hao,cai,25.23,69219,5,Ghi chu 172
+Vat tu 173,Thep hop,met,306.44,55617,5,Ghi chu 173
+Vat tu 174,Thep hop,tam,115.37,71853,5,Ghi chu 174
+Vat tu 175,Thep hinh,tan,138.93,78363,5,Ghi chu 175
+Vat tu 176,Vat tu tieu hao,tam,109.14,64208,5,Ghi chu 176
+Vat tu 177,Bu long - Oc vit,cai,246.28,55950,5,Ghi chu 177
+Vat tu 178,Ong thep,tam,64.09,67532,5,Ghi chu 178
+Vat tu 179,Dam thep,tam,231.77,52376,5,Ghi chu 179
+Vat tu 180,Dam thep,thung,30.54,59201,5,Ghi chu 180
+Vat tu 181,Thep goc,met,118.40,72134,5,Ghi chu 181
+Vat tu 182,Tam thep,tan,67.44,53279,5,Ghi chu 182
+Vat tu 183,Vat tu tieu hao,tan,277.68,82684,5,Ghi chu 183
+Vat tu 184,Vat tu tieu hao,tam,285.26,73044,5,Ghi chu 184
+Vat tu 185,Thep hinh,cai,308.56,82115,5,Ghi chu 185
+Vat tu 186,Bu long - Oc vit,cai,169.21,56911,5,Ghi chu 186
+Vat tu 187,Thep hop,cai,38.13,71779,5,Ghi chu 187
+Vat tu 188,Vat tu tieu hao,thung,33.26,76394,5,Ghi chu 188
+Vat tu 189,Tam thep,tan,9.03,79387,5,Ghi chu 189
+Vat tu 190,Thep goc,cuon,189.50,55097,5,Ghi chu 190
+Vat tu 191,Tam thep,tan,288.38,54438,5,Ghi chu 191
+Vat tu 192,Thep hop,kg,186.47,74845,5,Ghi chu 192
+Vat tu 193,Thep hinh,tam,148.07,58106,5,Ghi chu 193
+Vat tu 194,Thep goc,cai,161.28,81093,5,Ghi chu 194
+Vat tu 195,Thep hop,tan,67.79,65895,5,Ghi chu 195
+Vat tu 196,Ong thep,tan,74.92,56086,5,Ghi chu 196
+Vat tu 197,Dam thep,tam,134.16,50182,5,Ghi chu 197
+Vat tu 198,Dam thep,cai,268.74,52587,5,Ghi chu 198
+Vat tu 199,Ong thep,tan,157.10,53839,5,Ghi chu 199
+Vat tu 200,Thep goc,kg,295.83,74470,5,Ghi chu 200
+Vat tu 201,Thep hop,cai,186.98,53509,5,Ghi chu 201
+Vat tu 202,Vat tu tieu hao,thung,184.20,51279,5,Ghi chu 202
+Vat tu 203,Vat tu tieu hao,tam,39.38,79648,5,Ghi chu 203
+Vat tu 204,Vat tu tieu hao,thung,73.44,62445,5,Ghi chu 204
+Vat tu 205,Vat tu tieu hao,cuon,21.22,61770,5,Ghi chu 205
+Vat tu 206,Bu long - Oc vit,thung,269.63,76163,5,Ghi chu 206
+Vat tu 207,Dam thep,tan,304.22,65867,5,Ghi chu 207
+Vat tu 208,Tam thep,kg,279.09,71063,5,Ghi chu 208
+Vat tu 209,Tam thep,met,48.48,78933,5,Ghi chu 209
+Vat tu 210,Thep goc,met,51.50,56464,5,Ghi chu 210
+Vat tu 211,Thep hop,tam,239.86,72379,5,Ghi chu 211
+Vat tu 212,Thep hinh,cuon,169.24,81456,5,Ghi chu 212
+Vat tu 213,Thep hinh,cai,18.44,62060,5,Ghi chu 213
+Vat tu 214,Vat tu tieu hao,kg,80.23,82070,5,Ghi chu 214
+Vat tu 215,Bu long - Oc vit,tan,162.54,52719,5,Ghi chu 215
+Vat tu 216,Tam thep,tan,265.58,75574,5,Ghi chu 216
+Vat tu 217,Thep goc,thung,123.38,51566,5,Ghi chu 217
+Vat tu 218,Thep hop,cai,171.47,75723,5,Ghi chu 218
+Vat tu 219,Thep hop,cuon,240.77,55761,5,Ghi chu 219
+Vat tu 220,Thep goc,cuon,162.87,53230,5,Ghi chu 220
+Vat tu 221,Dam thep,tam,305.45,80106,5,Ghi chu 221
+Vat tu 222,Ong thep,tam,43.10,69859,5,Ghi chu 222
+Vat tu 223,Thep hinh,kg,318.92,63731,5,Ghi chu 223
+Vat tu 224,Bu long - Oc vit,thung,96.24,50422,5,Ghi chu 224
+Vat tu 225,Bu long - Oc vit,tan,9.20,56293,5,Ghi chu 225
+Vat tu 226,Dam thep,kg,303.56,82099,5,Ghi chu 226
+Vat tu 227,Thep hinh,thung,86.90,82242,5,Ghi chu 227
+Vat tu 228,Ong thep,kg,185.41,78428,5,Ghi chu 228
+Vat tu 229,Thep hop,cai,68.75,53431,5,Ghi chu 229
+Vat tu 230,Bu long - Oc vit,cai,205.65,80726,5,Ghi chu 230
+Vat tu 231,Tam thep,met,29.57,55501,5,Ghi chu 231
+Vat tu 232,Bu long - Oc vit,tam,71.14,72067,5,Ghi chu 232
+Vat tu 233,Dam thep,tam,135.86,56787,5,Ghi chu 233
+Vat tu 234,Thep hinh,met,72.08,59191,5,Ghi chu 234
+Vat tu 235,Thep goc,cuon,119.54,69628,5,Ghi chu 235
+Vat tu 236,Thep goc,tam,26.14,79284,5,Ghi chu 236
+Vat tu 237,Vat tu tieu hao,tam,123.99,69624,5,Ghi chu 237
+Vat tu 238,Thep hinh,kg,107.38,77000,5,Ghi chu 238
+Vat tu 239,Ong thep,kg,252.09,50589,5,Ghi chu 239
+Vat tu 240,Thep hinh,cai,172.35,82471,5,Ghi chu 240
+Vat tu 241,Dam thep,kg,87.20,57831,5,Ghi chu 241
+Vat tu 242,Thep hop,tam,47.65,70626,5,Ghi chu 242
+Vat tu 243,Bu long - Oc vit,cuon,261.89,56971,5,Ghi chu 243
+Vat tu 244,Bu long - Oc vit,tan,157.83,56082,5,Ghi chu 244
+Vat tu 245,Vat tu tieu hao,cuon,77.48,57172,5,Ghi chu 245
+Vat tu 246,Bu long - Oc vit,kg,2.22,60474,5,Ghi chu 246
+Vat tu 247,Ong thep,cuon,144.88,74757,5,Ghi chu 247
+Vat tu 248,Vat tu tieu hao,met,106.30,74838,5,Ghi chu 248
+Vat tu 249,Thep hinh,kg,59.30,51352,5,Ghi chu 249
+Vat tu 250,Thep hinh,tam,215.35,72128,5,Ghi chu 250
+Vat tu 251,Dam thep,tam,149.28,63538,5,Ghi chu 251
+Vat tu 252,Thep hinh,thung,9.39,74308,5,Ghi chu 252
+Vat tu 253,Vat tu tieu hao,thung,220.32,75666,5,Ghi chu 253
+Vat tu 254,Vat tu tieu hao,kg,158.43,55578,5,Ghi chu 254
+Vat tu 255,Bu long - Oc vit,thung,231.13,61450,5,Ghi chu 255
+Vat tu 256,Dam thep,tan,201.51,68012,5,Ghi chu 256
+Vat tu 257,Vat tu tieu hao,cuon,98.81,75554,5,Ghi chu 257
+Vat tu 258,Thep hop,cai,23.88,70359,5,Ghi chu 258
+Vat tu 259,Vat tu tieu hao,thung,208.68,60019,5,Ghi chu 259
+Vat tu 260,Vat tu tieu hao,cai,137.50,71484,5,Ghi chu 260
+Vat tu 261,Thep hinh,tam,266.58,74745,5,Ghi chu 261
+Vat tu 262,Ong thep,cai,63.86,56878,5,Ghi chu 262
+Vat tu 263,Tam thep,thung,15.30,70827,5,Ghi chu 263
+Vat tu 264,Dam thep,cai,40.85,65792,5,Ghi chu 264
+Vat tu 265,Thep hop,cuon,141.33,79875,5,Ghi chu 265
+Vat tu 266,Thep goc,tam,269.63,63755,5,Ghi chu 266
+Vat tu 267,Bu long - Oc vit,cuon,315.20,51257,5,Ghi chu 267
+Vat tu 268,Ong thep,cai,21.82,59584,5,Ghi chu 268
+Vat tu 269,Thep goc,tam,168.86,70775,5,Ghi chu 269
+Vat tu 270,Thep hinh,kg,240.98,67770,5,Ghi chu 270
+Vat tu 271,Thep goc,cai,69.24,55016,5,Ghi chu 271
+Vat tu 272,Thep goc,met,172.45,55014,5,Ghi chu 272
+Vat tu 273,Thep hinh,cai,293.11,72174,5,Ghi chu 273
+Vat tu 274,Tam thep,cuon,154.03,72893,5,Ghi chu 274
+Vat tu 275,Bu long - Oc vit,cai,83.77,66348,5,Ghi chu 275
+Vat tu 276,Thep hinh,met,61.18,77017,5,Ghi chu 276
+Vat tu 277,Bu long - Oc vit,cai,324.14,69184,5,Ghi chu 277
+Vat tu 278,Thep hinh,tan,106.29,52962,5,Ghi chu 278
+Vat tu 279,Tam thep,met,232.90,80423,5,Ghi chu 279
+Vat tu 280,Bu long - Oc vit,cuon,44.59,74882,5,Ghi chu 280
+Vat tu 281,Thep hinh,cuon,80.54,54387,5,Ghi chu 281
+Vat tu 282,Ong thep,tam,220.13,70722,5,Ghi chu 282
+Vat tu 283,Thep hinh,tam,114.60,77881,5,Ghi chu 283
+Vat tu 284,Thep goc,thung,103.64,66835,5,Ghi chu 284
+Vat tu 285,Dam thep,tan,87.88,70076,5,Ghi chu 285
+Vat tu 286,Thep goc,kg,59.31,59930,5,Ghi chu 286
+Vat tu 287,Tam thep,cai,300.16,68757,5,Ghi chu 287
+Vat tu 288,Tam thep,cai,86.96,78578,5,Ghi chu 288
+Vat tu 289,Dam thep,thung,69.01,75366,5,Ghi chu 289
+Vat tu 290,Dam thep,met,251.56,73304,5,Ghi chu 290
+Vat tu 291,Thep hop,cai,304.67,75275,5,Ghi chu 291
+Vat tu 292,Thep hop,met,37.14,66087,5,Ghi chu 292
+Vat tu 293,Dam thep,tan,324.91,69890,5,Ghi chu 293
+Vat tu 294,Dam thep,tam,327.78,81254,5,Ghi chu 294
+Vat tu 295,Thep hop,tam,142.57,57701,5,Ghi chu 295
+Vat tu 296,Vat tu tieu hao,kg,256.45,74266,5,Ghi chu 296
+Vat tu 297,Vat tu tieu hao,kg,182.36,51525,5,Ghi chu 297
+Vat tu 298,Dam thep,tan,294.91,60703,5,Ghi chu 298
+Vat tu 299,Thep hinh,cuon,192.05,66080,5,Ghi chu 299
+Vat tu 300,Ong thep,cai,155.74,57160,5,Ghi chu 300
+Vat tu 301,Bu long - Oc vit,kg,23.74,77852,5,Ghi chu 301
+Vat tu 302,Tam thep,tam,269.70,71309,5,Ghi chu 302
+Vat tu 303,Dam thep,met,139.53,80920,5,Ghi chu 303
+Vat tu 304,Vat tu tieu hao,tam,136.70,55586,5,Ghi chu 304
+Vat tu 305,Thep goc,tam,277.28,52552,5,Ghi chu 305
+Vat tu 306,Tam thep,kg,258.14,55277,5,Ghi chu 306
+Vat tu 307,Tam thep,kg,99.21,62007,5,Ghi chu 307
+Vat tu 308,Bu long - Oc vit,thung,38.62,63034,5,Ghi chu 308
+Vat tu 309,Thep hop,kg,139.02,62079,5,Ghi chu 309
+Vat tu 310,Thep hinh,tan,50.26,66958,5,Ghi chu 310
+Vat tu 311,Thep hop,cai,289.66,60535,5,Ghi chu 311
+Vat tu 312,Thep hop,kg,241.55,73908,5,Ghi chu 312
+Vat tu 313,Ong thep,cuon,116.73,62431,5,Ghi chu 313
+Vat tu 314,Thep goc,tan,228.05,69577,5,Ghi chu 314
+Vat tu 315,Bu long - Oc vit,cuon,58.14,56758,5,Ghi chu 315
+Vat tu 316,Ong thep,tam,235.19,63821,5,Ghi chu 316
+Vat tu 317,Dam thep,met,50.30,74905,5,Ghi chu 317
+Vat tu 318,Thep goc,tam,197.61,70288,5,Ghi chu 318
+Vat tu 319,Thep goc,tan,231.18,62401,5,Ghi chu 319
+Vat tu 320,Bu long - Oc vit,cuon,132.02,66110,5,Ghi chu 320
+Vat tu 321,Bu long - Oc vit,kg,237.14,60002,5,Ghi chu 321
+Vat tu 322,Vat tu tieu hao,met,320.03,77126,5,Ghi chu 322
+Vat tu 323,Vat tu tieu hao,tan,246.45,65234,5,Ghi chu 323
+Vat tu 324,Tam thep,kg,241.29,55065,5,Ghi chu 324
+Vat tu 325,Vat tu tieu hao,kg,184.22,78847,5,Ghi chu 325
+Vat tu 326,Dam thep,met,253.52,77441,5,Ghi chu 326
+Vat tu 327,Thep goc,tan,158.96,77298,5,Ghi chu 327
+Vat tu 328,Thep hop,kg,252.10,75959,5,Ghi chu 328
+Vat tu 329,Thep hop,met,323.74,63673,5,Ghi chu 329
+Vat tu 330,Thep hop,tan,213.06,52476,5,Ghi chu 330
+Vat tu 331,Ong thep,met,276.76,58287,5,Ghi chu 331
+Vat tu 332,Thep hinh,cai,307.79,67320,5,Ghi chu 332
+Vat tu 333,Tam thep,met,53.60,70278,5,Ghi chu 333
+Vat tu 334,Ong thep,tam,114.74,55862,5,Ghi chu 334
+Vat tu 335,Bu long - Oc vit,cai,191.09,72541,5,Ghi chu 335
+Vat tu 336,Thep goc,met,275.55,52546,5,Ghi chu 336
+Vat tu 337,Vat tu tieu hao,cai,155.81,72504,5,Ghi chu 337
+Vat tu 338,Vat tu tieu hao,kg,9.79,76741,5,Ghi chu 338
+Vat tu 339,Thep goc,tan,96.99,52295,5,Ghi chu 339
+Vat tu 340,Thep goc,cai,192.83,54789,5,Ghi chu 340
+Vat tu 341,Ong thep,tan,191.25,69829,5,Ghi chu 341
+Vat tu 342,Bu long - Oc vit,thung,314.92,62436,5,Ghi chu 342
+Vat tu 343,Thep hop,tan,29.95,68306,5,Ghi chu 343
+Vat tu 344,Thep hinh,tam,235.73,64583,5,Ghi chu 344
+Vat tu 345,Thep hop,tam,128.05,77082,5,Ghi chu 345
+Vat tu 346,Vat tu tieu hao,tam,90.22,50005,5,Ghi chu 346
+Vat tu 347,Thep goc,cai,100.78,82292,5,Ghi chu 347
+Vat tu 348,Tam thep,tam,176.20,68331,5,Ghi chu 348
+Vat tu 349,Dam thep,tan,261.58,53599,5,Ghi chu 349
+Vat tu 350,Vat tu tieu hao,thung,210.98,58609,5,Ghi chu 350
+Vat tu 351,Thep goc,tan,226.59,75685,5,Ghi chu 351
+Vat tu 352,Tam thep,tan,281.29,70893,5,Ghi chu 352
+Vat tu 353,Tam thep,kg,200.92,61440,5,Ghi chu 353
+Vat tu 354,Vat tu tieu hao,thung,231.92,52549,5,Ghi chu 354
+Vat tu 355,Tam thep,met,274.04,79247,5,Ghi chu 355
+Vat tu 356,Bu long - Oc vit,cai,185.74,51313,5,Ghi chu 356
+Vat tu 357,Ong thep,met,290.66,67841,5,Ghi chu 357
+Vat tu 358,Dam thep,cai,230.36,53773,5,Ghi chu 358
+Vat tu 359,Dam thep,met,302.36,75737,5,Ghi chu 359
+Vat tu 360,Vat tu tieu hao,thung,193.69,82042,5,Ghi chu 360
+Vat tu 361,Thep goc,cuon,218.60,68317,5,Ghi chu 361
+Vat tu 362,Thep goc,tam,119.24,77083,5,Ghi chu 362
+Vat tu 363,Tam thep,kg,52.49,71359,5,Ghi chu 363
+Vat tu 364,Tam thep,tam,7.11,82292,5,Ghi chu 364
+Vat tu 365,Dam thep,thung,130.30,50811,5,Ghi chu 365
+Vat tu 366,Tam thep,cuon,135.59,60626,5,Ghi chu 366
+Vat tu 367,Thep hinh,kg,147.19,60479,5,Ghi chu 367
+Vat tu 368,Thep hop,thung,56.07,73418,5,Ghi chu 368
+Vat tu 369,Dam thep,thung,223.75,52285,5,Ghi chu 369
+Vat tu 370,Thep hinh,kg,169.54,63426,5,Ghi chu 370
+Vat tu 371,Thep goc,kg,153.34,69619,5,Ghi chu 371
+Vat tu 372,Thep hop,tam,156.85,56669,5,Ghi chu 372
+Vat tu 373,Thep hinh,cai,111.55,50270,5,Ghi chu 373
+Vat tu 374,Bu long - Oc vit,met,56.43,80653,5,Ghi chu 374
+Vat tu 375,Dam thep,cuon,119.20,64634,5,Ghi chu 375
+Vat tu 376,Dam thep,thung,108.81,68670,5,Ghi chu 376
+Vat tu 377,Dam thep,cai,68.62,62711,5,Ghi chu 377
+Vat tu 378,Bu long - Oc vit,cuon,227.78,58305,5,Ghi chu 378
+Vat tu 379,Thep hinh,cuon,211.64,50172,5,Ghi chu 379
+Vat tu 380,Thep hinh,tam,233.84,64061,5,Ghi chu 380
+Vat tu 381,Ong thep,cai,8.26,73090,5,Ghi chu 381
+Vat tu 382,Tam thep,tan,60.97,68581,5,Ghi chu 382
+Vat tu 383,Vat tu tieu hao,cuon,207.94,62147,5,Ghi chu 383
+Vat tu 384,Thep hop,kg,65.80,70226,5,Ghi chu 384
+Vat tu 385,Thep hinh,tan,39.43,53588,5,Ghi chu 385
+Vat tu 386,Vat tu tieu hao,tam,238.98,65295,5,Ghi chu 386
+Vat tu 387,Tam thep,met,326.39,62801,5,Ghi chu 387
+Vat tu 388,Bu long - Oc vit,cai,186.74,65130,5,Ghi chu 388
+Vat tu 389,Dam thep,kg,140.69,57588,5,Ghi chu 389
+Vat tu 390,Thep hinh,tan,193.61,54305,5,Ghi chu 390
+Vat tu 391,Thep hop,tam,49.78,65575,5,Ghi chu 391
+Vat tu 392,Vat tu tieu hao,tan,273.47,61299,5,Ghi chu 392
+Vat tu 393,Bu long - Oc vit,cuon,179.82,66441,5,Ghi chu 393
+Vat tu 394,Dam thep,met,151.40,80455,5,Ghi chu 394
+Vat tu 395,Dam thep,kg,235.09,61510,5,Ghi chu 395
+Vat tu 396,Tam thep,tan,248.07,81792,5,Ghi chu 396
+Vat tu 397,Tam thep,kg,217.11,60691,5,Ghi chu 397
+Vat tu 398,Dam thep,cuon,142.70,82686,5,Ghi chu 398
+Vat tu 399,Ong thep,kg,18.56,82388,5,Ghi chu 399
+Vat tu 400,Tam thep,cai,299.39,57821,5,Ghi chu 400
+Vat tu 401,Tam thep,met,253.53,55606,5,Ghi chu 401
+Vat tu 402,Ong thep,tam,58.10,54586,5,Ghi chu 402
+Vat tu 403,Dam thep,tam,228.15,65105,5,Ghi chu 403
+Vat tu 404,Dam thep,tan,165.56,56266,5,Ghi chu 404
+Vat tu 405,Dam thep,cuon,301.34,82546,5,Ghi chu 405
+Vat tu 406,Thep hinh,met,121.50,60632,5,Ghi chu 406
+Vat tu 407,Tam thep,tam,311.75,78186,5,Ghi chu 407
+Vat tu 408,Thep hinh,thung,315.35,68413,5,Ghi chu 408
+Vat tu 409,Bu long - Oc vit,cai,53.10,66202,5,Ghi chu 409
+Vat tu 410,Ong thep,thung,91.84,70792,5,Ghi chu 410
+Vat tu 411,Dam thep,kg,136.26,68343,5,Ghi chu 411
+Vat tu 412,Thep hop,met,278.96,77893,5,Ghi chu 412
+Vat tu 413,Thep hop,kg,200.06,80421,5,Ghi chu 413
+Vat tu 414,Thep hinh,met,234.67,77578,5,Ghi chu 414
+Vat tu 415,Thep hop,cuon,90.74,63330,5,Ghi chu 415
+Vat tu 416,Thep goc,cai,170.71,62980,5,Ghi chu 416
+Vat tu 417,Vat tu tieu hao,tam,221.55,82086,5,Ghi chu 417
+Vat tu 418,Thep goc,cuon,72.25,80581,5,Ghi chu 418
+Vat tu 419,Ong thep,thung,155.81,76536,5,Ghi chu 419
+Vat tu 420,Thep hop,cai,257.23,67957,5,Ghi chu 420
+Vat tu 421,Ong thep,kg,236.78,76161,5,Ghi chu 421
+Vat tu 422,Tam thep,met,87.48,60952,5,Ghi chu 422
+Vat tu 423,Tam thep,tam,11.23,51170,5,Ghi chu 423
+Vat tu 424,Thep hinh,tan,133.17,54668,5,Ghi chu 424
+Vat tu 425,Dam thep,cai,102.81,81853,5,Ghi chu 425
+Vat tu 426,Thep goc,cai,175.47,76163,5,Ghi chu 426
+Vat tu 427,Thep goc,kg,44.56,81800,5,Ghi chu 427
+Vat tu 428,Thep hinh,kg,91.93,71939,5,Ghi chu 428
+Vat tu 429,Thep hinh,met,61.59,51580,5,Ghi chu 429
+Vat tu 430,Thep hop,tan,143.67,78959,5,Ghi chu 430
+Vat tu 431,Vat tu tieu hao,tam,277.66,61023,5,Ghi chu 431
+Vat tu 432,Thep hinh,tan,91.07,71986,5,Ghi chu 432
+Vat tu 433,Thep goc,met,125.88,59045,5,Ghi chu 433
+Vat tu 434,Thep hinh,thung,239.21,62304,5,Ghi chu 434
+Vat tu 435,Dam thep,thung,144.66,79069,5,Ghi chu 435
+Vat tu 436,Vat tu tieu hao,kg,189.26,75534,5,Ghi chu 436
+Vat tu 437,Thep hop,cuon,65.91,55262,5,Ghi chu 437
+Vat tu 438,Ong thep,tan,157.43,66693,5,Ghi chu 438
+Vat tu 439,Dam thep,tam,311.75,63774,5,Ghi chu 439
+Vat tu 440,Thep hop,kg,62.85,80114,5,Ghi chu 440
+Vat tu 441,Dam thep,thung,224.70,72384,5,Ghi chu 441
+Vat tu 442,Ong thep,thung,247.20,64272,5,Ghi chu 442
+Vat tu 443,Thep hop,kg,194.91,65587,5,Ghi chu 443
+Vat tu 444,Thep goc,cuon,286.01,55752,5,Ghi chu 444
+Vat tu 445,Thep hinh,tan,287.90,78756,5,Ghi chu 445
+Vat tu 446,Thep hinh,met,89.60,69747,5,Ghi chu 446
+Vat tu 447,Thep hinh,met,51.40,72623,5,Ghi chu 447
+Vat tu 448,Vat tu tieu hao,met,47.60,67713,5,Ghi chu 448
+Vat tu 449,Bu long - Oc vit,met,191.07,73337,5,Ghi chu 449
+Vat tu 450,Vat tu tieu hao,cuon,153.84,81466,5,Ghi chu 450
+Vat tu 451,Bu long - Oc vit,tan,275.75,60885,5,Ghi chu 451
+Vat tu 452,Vat tu tieu hao,tam,26.73,77764,5,Ghi chu 452
+Vat tu 453,Tam thep,thung,261.20,81326,5,Ghi chu 453
+Vat tu 454,Thep hinh,cuon,77.04,64367,5,Ghi chu 454
+Vat tu 455,Thep goc,met,155.41,70644,5,Ghi chu 455
+Vat tu 456,Bu long - Oc vit,thung,266.10,53196,5,Ghi chu 456
+Vat tu 457,Bu long - Oc vit,cai,273.08,66473,5,Ghi chu 457
+Vat tu 458,Ong thep,met,182.58,57101,5,Ghi chu 458
+Vat tu 459,Thep hop,cai,55.53,71553,5,Ghi chu 459
+Vat tu 460,Dam thep,tan,95.53,53535,5,Ghi chu 460
+Vat tu 461,Vat tu tieu hao,kg,50.95,55444,5,Ghi chu 461
+Vat tu 462,Ong thep,cuon,199.76,81544,5,Ghi chu 462
+Vat tu 463,Thep hinh,thung,216.59,69359,5,Ghi chu 463
+Vat tu 464,Bu long - Oc vit,cuon,316.34,67561,5,Ghi chu 464
+Vat tu 465,Ong thep,cai,15.26,71514,5,Ghi chu 465
+Vat tu 466,Thep goc,met,283.04,58744,5,Ghi chu 466
+Vat tu 467,Thep goc,kg,17.54,68944,5,Ghi chu 467
+Vat tu 468,Bu long - Oc vit,tam,42.79,61233,5,Ghi chu 468
+Vat tu 469,Thep hinh,tam,10.15,76792,5,Ghi chu 469
+Vat tu 470,Thep hinh,kg,266.97,82697,5,Ghi chu 470
+Vat tu 471,Thep hop,thung,296.26,79742,5,Ghi chu 471
+Vat tu 472,Bu long - Oc vit,cuon,323.11,50841,5,Ghi chu 472
+Vat tu 473,Tam thep,tam,266.26,60476,5,Ghi chu 473
+Vat tu 474,Vat tu tieu hao,kg,273.95,50837,5,Ghi chu 474
+Vat tu 475,Vat tu tieu hao,tan,311.32,51046,5,Ghi chu 475
+Vat tu 476,Thep hinh,cai,31.34,52881,5,Ghi chu 476
+Vat tu 477,Vat tu tieu hao,met,260.50,68134,5,Ghi chu 477
+Vat tu 478,Thep hop,met,107.03,64809,5,Ghi chu 478
+Vat tu 479,Thep hinh,kg,150.84,67822,5,Ghi chu 479
+Vat tu 480,Vat tu tieu hao,kg,219.56,62548,5,Ghi chu 480
+Vat tu 481,Vat tu tieu hao,thung,60.05,65492,5,Ghi chu 481
+Vat tu 482,Thep goc,kg,83.99,76457,5,Ghi chu 482
+Vat tu 483,Bu long - Oc vit,met,300.10,75832,5,Ghi chu 483
+Vat tu 484,Dam thep,cai,292.77,77314,5,Ghi chu 484
+Vat tu 485,Vat tu tieu hao,kg,51.58,55001,5,Ghi chu 485
+Vat tu 486,Tam thep,tam,247.76,68115,5,Ghi chu 486
+Vat tu 487,Bu long - Oc vit,tan,44.81,55115,5,Ghi chu 487
+Vat tu 488,Tam thep,tan,172.33,51036,5,Ghi chu 488
+Vat tu 489,Vat tu tieu hao,cai,177.79,51464,5,Ghi chu 489
+Vat tu 490,Thep hop,tam,65.61,57044,5,Ghi chu 490
+Vat tu 491,Dam thep,cai,99.30,63444,5,Ghi chu 491
+Vat tu 492,Thep hinh,kg,230.88,54665,5,Ghi chu 492
+Vat tu 493,Dam thep,thung,125.99,51354,5,Ghi chu 493
+Vat tu 494,Thep hinh,tam,6.38,54736,5,Ghi chu 494
+Vat tu 495,Thep hinh,tan,261.42,79441,5,Ghi chu 495
+Vat tu 496,Thep goc,met,305.95,60999,5,Ghi chu 496
+Vat tu 497,Bu long - Oc vit,kg,155.15,50627,5,Ghi chu 497
+Vat tu 498,Thep hinh,cai,295.83,53501,5,Ghi chu 498
+Vat tu 499,Thep goc,tan,120.03,77967,5,Ghi chu 499
+Vat tu 500,Thep hop,kg,241.31,76743,5,Ghi chu 500
+Vat tu 501,Ong thep,tam,26.03,54096,5,Ghi chu 501
+Vat tu 502,Bu long - Oc vit,met,70.95,59647,5,Ghi chu 502
+Vat tu 503,Ong thep,met,295.30,77888,5,Ghi chu 503
+Vat tu 504,Dam thep,tam,319.49,78643,5,Ghi chu 504
+Vat tu 505,Ong thep,met,51.99,72164,5,Ghi chu 505
+Vat tu 506,Thep goc,kg,77.64,65358,5,Ghi chu 506
+Vat tu 507,Bu long - Oc vit,met,221.33,74788,5,Ghi chu 507
+Vat tu 508,Ong thep,thung,259.90,81507,5,Ghi chu 508
+Vat tu 509,Thep hinh,tam,117.40,52270,5,Ghi chu 509
+Vat tu 510,Dam thep,cai,37.03,63889,5,Ghi chu 510
+Vat tu 511,Thep goc,cai,251.12,79868,5,Ghi chu 511
+Vat tu 512,Vat tu tieu hao,tam,210.42,74405,5,Ghi chu 512
+Vat tu 513,Bu long - Oc vit,tan,192.50,81939,5,Ghi chu 513
+Vat tu 514,Ong thep,thung,117.98,67032,5,Ghi chu 514
+Vat tu 515,Thep goc,cai,222.34,73739,5,Ghi chu 515
+Vat tu 516,Thep hinh,tam,31.24,74623,5,Ghi chu 516
+Vat tu 517,Bu long - Oc vit,thung,315.64,72874,5,Ghi chu 517
+Vat tu 518,Thep hop,kg,205.87,81940,5,Ghi chu 518
+Vat tu 519,Dam thep,kg,246.39,75286,5,Ghi chu 519
+Vat tu 520,Tam thep,tam,144.21,82672,5,Ghi chu 520
+Vat tu 521,Ong thep,cai,200.68,60123,5,Ghi chu 521
+Vat tu 522,Thep goc,met,8.83,62400,5,Ghi chu 522
+Vat tu 523,Thep goc,kg,89.31,57982,5,Ghi chu 523
+Vat tu 524,Tam thep,thung,62.27,80699,5,Ghi chu 524
+Vat tu 525,Thep goc,met,272.18,58198,5,Ghi chu 525
+Vat tu 526,Dam thep,cai,319.70,70412,5,Ghi chu 526
+Vat tu 527,Tam thep,thung,233.78,76041,5,Ghi chu 527
+Vat tu 528,Thep hop,thung,164.84,79844,5,Ghi chu 528
+Vat tu 529,Thep hop,met,281.05,58885,5,Ghi chu 529
+Vat tu 530,Bu long - Oc vit,met,272.51,51117,5,Ghi chu 530
+Vat tu 531,Thep hinh,cai,25.41,51519,5,Ghi chu 531
+Vat tu 532,Thep hop,met,169.06,71187,5,Ghi chu 532
+Vat tu 533,Ong thep,tam,179.17,70028,5,Ghi chu 533
+Vat tu 534,Thep hop,tam,304.86,50724,5,Ghi chu 534
+Vat tu 535,Ong thep,kg,202.19,54420,5,Ghi chu 535
+Vat tu 536,Thep hinh,met,37.28,59337,5,Ghi chu 536
+Vat tu 537,Bu long - Oc vit,cai,197.01,56689,5,Ghi chu 537
+Vat tu 538,Thep goc,kg,305.27,61510,5,Ghi chu 538
+Vat tu 539,Thep goc,kg,294.36,65075,5,Ghi chu 539
+Vat tu 540,Thep hop,met,138.92,52110,5,Ghi chu 540
+Vat tu 541,Thep hop,thung,242.30,81499,5,Ghi chu 541
+Vat tu 542,Tam thep,cuon,277.37,64548,5,Ghi chu 542
+Vat tu 543,Thep hinh,cuon,164.13,74392,5,Ghi chu 543
+Vat tu 544,Bu long - Oc vit,tam,213.87,52467,5,Ghi chu 544
+Vat tu 545,Thep hop,kg,111.59,75106,5,Ghi chu 545
+Vat tu 546,Bu long - Oc vit,thung,287.83,53936,5,Ghi chu 546
+Vat tu 547,Thep goc,thung,45.92,78717,5,Ghi chu 547
+Vat tu 548,Bu long - Oc vit,cuon,173.01,58930,5,Ghi chu 548
+Vat tu 549,Thep hop,tan,27.01,76904,5,Ghi chu 549
+Vat tu 550,Ong thep,tan,68.11,75237,5,Ghi chu 550
+Vat tu 551,Thep hinh,tan,106.14,63921,5,Ghi chu 551
+Vat tu 552,Vat tu tieu hao,cuon,286.70,61281,5,Ghi chu 552
+Vat tu 553,Bu long - Oc vit,tan,54.91,72166,5,Ghi chu 553
+Vat tu 554,Ong thep,thung,64.89,69235,5,Ghi chu 554
+Vat tu 555,Thep hop,tan,318.31,70628,5,Ghi chu 555
+Vat tu 556,Bu long - Oc vit,tan,247.01,62733,5,Ghi chu 556
+Vat tu 557,Dam thep,thung,143.35,74203,5,Ghi chu 557
+Vat tu 558,Thep hop,cai,258.37,51555,5,Ghi chu 558
+Vat tu 559,Dam thep,met,98.48,61812,5,Ghi chu 559
+Vat tu 560,Thep goc,tam,270.16,70049,5,Ghi chu 560
+Vat tu 561,Vat tu tieu hao,tan,283.64,62688,5,Ghi chu 561
+Vat tu 562,Dam thep,cai,288.76,79788,5,Ghi chu 562
+Vat tu 563,Ong thep,tan,44.49,59276,5,Ghi chu 563
+Vat tu 564,Ong thep,cai,224.22,81651,5,Ghi chu 564
+Vat tu 565,Vat tu tieu hao,kg,52.99,76495,5,Ghi chu 565
+Vat tu 566,Thep hop,cuon,102.84,66536,5,Ghi chu 566
+Vat tu 567,Dam thep,cuon,29.31,75774,5,Ghi chu 567
+Vat tu 568,Thep hinh,tan,70.59,72192,5,Ghi chu 568
+Vat tu 569,Bu long - Oc vit,tam,159.17,62378,5,Ghi chu 569
+Vat tu 570,Thep goc,tam,296.32,66922,5,Ghi chu 570
+Vat tu 571,Ong thep,cuon,242.63,67541,5,Ghi chu 571
+Vat tu 572,Thep goc,tam,125.33,81929,5,Ghi chu 572
+Vat tu 573,Dam thep,met,262.10,73039,5,Ghi chu 573
+Vat tu 574,Tam thep,thung,145.33,54590,5,Ghi chu 574
+Vat tu 575,Ong thep,thung,12.58,60231,5,Ghi chu 575
+Vat tu 576,Thep hinh,thung,186.06,81474,5,Ghi chu 576
+Vat tu 577,Vat tu tieu hao,kg,316.34,76037,5,Ghi chu 577
+Vat tu 578,Tam thep,kg,256.71,50471,5,Ghi chu 578
+Vat tu 579,Dam thep,kg,277.41,65917,5,Ghi chu 579
+Vat tu 580,Vat tu tieu hao,thung,151.31,81953,5,Ghi chu 580
+Vat tu 581,Thep goc,met,287.70,53403,5,Ghi chu 581
+Vat tu 582,Bu long - Oc vit,thung,26.25,56882,5,Ghi chu 582
+Vat tu 583,Tam thep,thung,126.23,60991,5,Ghi chu 583
+Vat tu 584,Thep hinh,cai,244.36,67970,5,Ghi chu 584
+Vat tu 585,Dam thep,met,37.24,65858,5,Ghi chu 585
+Vat tu 586,Dam thep,tan,167.81,56410,5,Ghi chu 586
+Vat tu 587,Thep hop,kg,115.36,53410,5,Ghi chu 587
+Vat tu 588,Ong thep,tam,186.32,72564,5,Ghi chu 588
+Vat tu 589,Thep goc,tam,67.02,72633,5,Ghi chu 589
+Vat tu 590,Ong thep,cai,220.98,69685,5,Ghi chu 590
+Vat tu 591,Thep hinh,met,7.89,73470,5,Ghi chu 591
+Vat tu 592,Thep goc,kg,310.78,82389,5,Ghi chu 592
+Vat tu 593,Ong thep,cuon,317.07,74167,5,Ghi chu 593
+Vat tu 594,Tam thep,tam,260.06,78730,5,Ghi chu 594
+Vat tu 595,Thep hop,cai,279.33,64030,5,Ghi chu 595
+Vat tu 596,Tam thep,tan,81.59,57258,5,Ghi chu 596
+Vat tu 597,Dam thep,met,27.03,75091,5,Ghi chu 597
+Vat tu 598,Vat tu tieu hao,tam,210.25,76905,5,Ghi chu 598
+Vat tu 599,Dam thep,met,281.22,66506,5,Ghi chu 599
+Vat tu 600,Vat tu tieu hao,met,271.86,66446,5,Ghi chu 600
+Vat tu 601,Bu long - Oc vit,cuon,126.51,68918,5,Ghi chu 601
+Vat tu 602,Thep goc,cai,182.53,77872,5,Ghi chu 602
+Vat tu 603,Vat tu tieu hao,kg,210.12,59614,5,Ghi chu 603
+Vat tu 604,Tam thep,cuon,234.33,68502,5,Ghi chu 604
+Vat tu 605,Thep hop,tan,77.12,80012,5,Ghi chu 605
+Vat tu 606,Ong thep,tam,259.23,69244,5,Ghi chu 606
+Vat tu 607,Thep hinh,tam,197.90,73978,5,Ghi chu 607
+Vat tu 608,Thep hinh,tan,245.73,72436,5,Ghi chu 608
+Vat tu 609,Bu long - Oc vit,tan,223.43,65823,5,Ghi chu 609
+Vat tu 610,Vat tu tieu hao,kg,14.26,80339,5,Ghi chu 610
+Vat tu 611,Thep goc,thung,22.40,78775,5,Ghi chu 611
+Vat tu 612,Tam thep,kg,132.09,74448,5,Ghi chu 612
+Vat tu 613,Thep hinh,cai,180.76,80267,5,Ghi chu 613
+Vat tu 614,Dam thep,thung,198.71,62395,5,Ghi chu 614
+Vat tu 615,Thep goc,thung,87.35,82178,5,Ghi chu 615
+Vat tu 616,Thep goc,cuon,1.64,65779,5,Ghi chu 616
+Vat tu 617,Thep hinh,kg,17.48,71180,5,Ghi chu 617
+Vat tu 618,Thep goc,cuon,22.77,54597,5,Ghi chu 618
+Vat tu 619,Ong thep,tam,208.65,62768,5,Ghi chu 619
+Vat tu 620,Dam thep,tan,316.83,70997,5,Ghi chu 620
+Vat tu 621,Thep hop,tan,255.55,72975,5,Ghi chu 621
+Vat tu 622,Thep hinh,thung,49.96,66901,5,Ghi chu 622
+Vat tu 623,Thep goc,tan,298.91,65291,5,Ghi chu 623
+Vat tu 624,Vat tu tieu hao,thung,122.51,60696,5,Ghi chu 624
+Vat tu 625,Tam thep,tam,310.93,66729,5,Ghi chu 625
+Vat tu 626,Tam thep,cai,58.69,68496,5,Ghi chu 626
+Vat tu 627,Thep hop,met,26.88,52039,5,Ghi chu 627
+Vat tu 628,Thep hinh,cai,246.00,61078,5,Ghi chu 628
+Vat tu 629,Vat tu tieu hao,tan,126.42,61806,5,Ghi chu 629
+Vat tu 630,Vat tu tieu hao,cuon,156.92,55894,5,Ghi chu 630
+Vat tu 631,Thep hinh,met,186.15,68463,5,Ghi chu 631
+Vat tu 632,Dam thep,cai,35.10,59756,5,Ghi chu 632
+Vat tu 633,Thep goc,kg,166.71,73109,5,Ghi chu 633
+Vat tu 634,Thep hop,met,300.86,62445,5,Ghi chu 634
+Vat tu 635,Dam thep,thung,243.39,69832,5,Ghi chu 635
+Vat tu 636,Thep hinh,thung,272.80,59208,5,Ghi chu 636
+Vat tu 637,Thep goc,cuon,20.08,60349,5,Ghi chu 637
+Vat tu 638,Thep goc,thung,147.50,66030,5,Ghi chu 638
+Vat tu 639,Thep hop,cai,32.68,81712,5,Ghi chu 639
+Vat tu 640,Tam thep,met,287.07,71053,5,Ghi chu 640
+Vat tu 641,Ong thep,thung,15.03,50029,5,Ghi chu 641
+Vat tu 642,Tam thep,tam,121.20,71853,5,Ghi chu 642
+Vat tu 643,Dam thep,met,119.64,63836,5,Ghi chu 643
+Vat tu 644,Ong thep,met,95.17,76643,5,Ghi chu 644
+Vat tu 645,Thep goc,met,14.68,63495,5,Ghi chu 645
+Vat tu 646,Dam thep,cai,171.23,71949,5,Ghi chu 646
+Vat tu 647,Thep hinh,met,197.47,79132,5,Ghi chu 647
+Vat tu 648,Ong thep,met,214.54,67272,5,Ghi chu 648
+Vat tu 649,Bu long - Oc vit,tan,265.72,76240,5,Ghi chu 649
+Vat tu 650,Bu long - Oc vit,tan,96.64,68621,5,Ghi chu 650
+Vat tu 651,Thep hinh,cuon,249.44,64041,5,Ghi chu 651
+Vat tu 652,Thep hinh,tam,158.18,56218,5,Ghi chu 652
+Vat tu 653,Dam thep,cuon,23.04,67476,5,Ghi chu 653
+Vat tu 654,Thep hop,thung,103.86,74008,5,Ghi chu 654
+Vat tu 655,Dam thep,kg,213.04,50065,5,Ghi chu 655
+Vat tu 656,Vat tu tieu hao,tam,164.81,58657,5,Ghi chu 656
+Vat tu 657,Bu long - Oc vit,kg,8.32,66833,5,Ghi chu 657
+Vat tu 658,Thep goc,cuon,18.44,67104,5,Ghi chu 658
+Vat tu 659,Vat tu tieu hao,tam,78.35,53837,5,Ghi chu 659
+Vat tu 660,Vat tu tieu hao,tan,97.32,54338,5,Ghi chu 660
+Vat tu 661,Thep goc,tan,13.52,73723,5,Ghi chu 661
+Vat tu 662,Dam thep,tan,260.31,70803,5,Ghi chu 662
+Vat tu 663,Thep goc,tam,90.86,61295,5,Ghi chu 663
+Vat tu 664,Dam thep,cai,134.83,67124,5,Ghi chu 664
+Vat tu 665,Vat tu tieu hao,tam,47.07,82355,5,Ghi chu 665
+Vat tu 666,Ong thep,thung,60.79,57522,5,Ghi chu 666
+Vat tu 667,Thep hop,cuon,264.27,82334,5,Ghi chu 667
+Vat tu 668,Bu long - Oc vit,cai,28.66,65899,5,Ghi chu 668
+Vat tu 669,Tam thep,thung,160.99,53596,5,Ghi chu 669
+Vat tu 670,Thep hinh,cai,50.92,66786,5,Ghi chu 670
+Vat tu 671,Ong thep,kg,264.31,58878,5,Ghi chu 671
+Vat tu 672,Thep hop,kg,167.30,80214,5,Ghi chu 672
+Vat tu 673,Ong thep,met,283.05,63820,5,Ghi chu 673
+Vat tu 674,Thep hop,met,259.96,66147,5,Ghi chu 674
+Vat tu 675,Dam thep,met,107.42,74554,5,Ghi chu 675
+Vat tu 676,Thep goc,cai,212.37,51757,5,Ghi chu 676
+Vat tu 677,Vat tu tieu hao,tan,158.37,50456,5,Ghi chu 677
+Vat tu 678,Thep goc,cai,63.39,72141,5,Ghi chu 678
+Vat tu 679,Thep hop,kg,159.49,50419,5,Ghi chu 679
+Vat tu 680,Bu long - Oc vit,met,157.72,78809,5,Ghi chu 680
+Vat tu 681,Dam thep,tan,281.55,67909,5,Ghi chu 681
+Vat tu 682,Thep hinh,thung,57.41,79389,5,Ghi chu 682
+Vat tu 683,Dam thep,tam,24.55,54146,5,Ghi chu 683
+Vat tu 684,Vat tu tieu hao,cai,279.12,59089,5,Ghi chu 684
+Vat tu 685,Thep hop,kg,101.05,54980,5,Ghi chu 685
+Vat tu 686,Tam thep,tam,120.12,63729,5,Ghi chu 686
+Vat tu 687,Thep goc,cai,247.49,61696,5,Ghi chu 687
+Vat tu 688,Bu long - Oc vit,tan,218.22,50942,5,Ghi chu 688
+Vat tu 689,Dam thep,cai,61.33,51557,5,Ghi chu 689
+Vat tu 690,Ong thep,cuon,214.05,61332,5,Ghi chu 690
+Vat tu 691,Tam thep,met,214.67,82629,5,Ghi chu 691
+Vat tu 692,Thep goc,tam,215.87,68754,5,Ghi chu 692
+Vat tu 693,Tam thep,cuon,56.22,71464,5,Ghi chu 693
+Vat tu 694,Thep goc,thung,132.31,57811,5,Ghi chu 694
+Vat tu 695,Vat tu tieu hao,tam,210.59,72281,5,Ghi chu 695
+Vat tu 696,Thep hop,thung,320.56,76382,5,Ghi chu 696
+Vat tu 697,Tam thep,cuon,198.75,55869,5,Ghi chu 697
+Vat tu 698,Ong thep,tan,46.09,73599,5,Ghi chu 698
+Vat tu 699,Bu long - Oc vit,tan,324.17,60514,5,Ghi chu 699
+Vat tu 700,Thep hinh,thung,147.03,63689,5,Ghi chu 700
+Vat tu 701,Thep hop,tam,110.00,63428,5,Ghi chu 701
+Vat tu 702,Vat tu tieu hao,thung,286.21,72109,5,Ghi chu 702
+Vat tu 703,Ong thep,tan,206.00,76795,5,Ghi chu 703
+Vat tu 704,Ong thep,kg,201.22,75567,5,Ghi chu 704
+Vat tu 705,Thep goc,thung,31.34,64217,5,Ghi chu 705
+Vat tu 706,Thep hinh,tam,102.30,76988,5,Ghi chu 706
+Vat tu 707,Thep hop,cuon,316.42,64328,5,Ghi chu 707
+Vat tu 708,Thep hinh,met,113.71,82416,5,Ghi chu 708
+Vat tu 709,Bu long - Oc vit,tan,299.96,71022,5,Ghi chu 709
+Vat tu 710,Thep hop,kg,65.24,62582,5,Ghi chu 710
+Vat tu 711,Dam thep,kg,241.03,75897,5,Ghi chu 711
+Vat tu 712,Thep goc,kg,121.60,77234,5,Ghi chu 712
+Vat tu 713,Bu long - Oc vit,cuon,96.62,82287,5,Ghi chu 713
+Vat tu 714,Ong thep,met,54.72,58034,5,Ghi chu 714
+Vat tu 715,Vat tu tieu hao,met,108.91,67394,5,Ghi chu 715
+Vat tu 716,Bu long - Oc vit,tan,193.16,71904,5,Ghi chu 716
+Vat tu 717,Vat tu tieu hao,kg,246.18,82733,5,Ghi chu 717
+Vat tu 718,Thep goc,cai,112.32,78235,5,Ghi chu 718
+Vat tu 719,Thep hop,cai,103.37,57458,5,Ghi chu 719
+Vat tu 720,Vat tu tieu hao,kg,277.60,73574,5,Ghi chu 720
+Vat tu 721,Tam thep,tam,140.25,81198,5,Ghi chu 721
+Vat tu 722,Tam thep,cuon,230.38,52470,5,Ghi chu 722
+Vat tu 723,Tam thep,thung,317.36,66924,5,Ghi chu 723
+Vat tu 724,Thep goc,kg,99.74,80709,5,Ghi chu 724
+Vat tu 725,Dam thep,cuon,268.90,70749,5,Ghi chu 725
+Vat tu 726,Ong thep,kg,105.19,65197,5,Ghi chu 726
+Vat tu 727,Ong thep,cuon,173.75,60686,5,Ghi chu 727
+Vat tu 728,Thep hop,thung,319.91,79920,5,Ghi chu 728
+Vat tu 729,Thep goc,kg,162.54,82489,5,Ghi chu 729
+Vat tu 730,Thep hinh,thung,46.60,52226,5,Ghi chu 730
+Vat tu 731,Tam thep,cai,8.37,53260,5,Ghi chu 731
+Vat tu 732,Thep hop,tan,144.13,55469,5,Ghi chu 732
+Vat tu 733,Ong thep,kg,184.10,73755,5,Ghi chu 733
+Vat tu 734,Thep goc,kg,11.22,61320,5,Ghi chu 734
+Vat tu 735,Ong thep,met,198.48,57793,5,Ghi chu 735
+Vat tu 736,Thep hop,thung,256.98,66969,5,Ghi chu 736
+Vat tu 737,Bu long - Oc vit,tam,226.56,61356,5,Ghi chu 737
+Vat tu 738,Thep goc,thung,212.29,59929,5,Ghi chu 738
+Vat tu 739,Thep hop,tan,229.27,69295,5,Ghi chu 739
+Vat tu 740,Thep hinh,met,18.38,70041,5,Ghi chu 740
+Vat tu 741,Thep hinh,kg,259.57,71460,5,Ghi chu 741
+Vat tu 742,Bu long - Oc vit,tam,315.03,60170,5,Ghi chu 742
+Vat tu 743,Vat tu tieu hao,met,305.92,61663,5,Ghi chu 743
+Vat tu 744,Ong thep,thung,292.79,72231,5,Ghi chu 744
+Vat tu 745,Bu long - Oc vit,tam,84.30,57401,5,Ghi chu 745
+Vat tu 746,Ong thep,cai,158.42,67855,5,Ghi chu 746
+Vat tu 747,Thep hinh,met,189.77,64939,5,Ghi chu 747
+Vat tu 748,Bu long - Oc vit,cuon,40.78,51025,5,Ghi chu 748
+Vat tu 749,Dam thep,met,109.42,61347,5,Ghi chu 749
+Vat tu 750,Vat tu tieu hao,kg,132.07,80779,5,Ghi chu 750
+Vat tu 751,Vat tu tieu hao,tan,87.61,74656,5,Ghi chu 751
+Vat tu 752,Vat tu tieu hao,tan,235.57,58397,5,Ghi chu 752
+Vat tu 753,Dam thep,cai,118.85,64078,5,Ghi chu 753
+Vat tu 754,Dam thep,tam,130.36,80612,5,Ghi chu 754
+Vat tu 755,Tam thep,cai,279.26,76900,5,Ghi chu 755
+Vat tu 756,Tam thep,tam,57.30,64429,5,Ghi chu 756
+Vat tu 757,Dam thep,thung,83.98,53197,5,Ghi chu 757
+Vat tu 758,Thep hop,thung,227.73,69013,5,Ghi chu 758
+Vat tu 759,Vat tu tieu hao,kg,102.06,51013,5,Ghi chu 759
+Vat tu 760,Tam thep,tan,127.71,50863,5,Ghi chu 760
+Vat tu 761,Thep goc,tan,19.59,66678,5,Ghi chu 761
+Vat tu 762,Thep hop,met,167.63,80621,5,Ghi chu 762
+Vat tu 763,Dam thep,cai,241.54,70438,5,Ghi chu 763
+Vat tu 764,Vat tu tieu hao,kg,139.10,78734,5,Ghi chu 764
+Vat tu 765,Thep hop,met,128.44,62994,5,Ghi chu 765
+Vat tu 766,Thep hop,cuon,152.74,81663,5,Ghi chu 766
+Vat tu 767,Thep goc,tam,290.43,73254,5,Ghi chu 767
+Vat tu 768,Vat tu tieu hao,thung,216.34,54947,5,Ghi chu 768
+Vat tu 769,Thep hop,kg,223.85,53096,5,Ghi chu 769
+Vat tu 770,Dam thep,cai,186.93,54350,5,Ghi chu 770
+Vat tu 771,Thep hop,tam,31.28,74662,5,Ghi chu 771
+Vat tu 772,Vat tu tieu hao,cai,177.82,75150,5,Ghi chu 772
+Vat tu 773,Ong thep,cai,244.63,73019,5,Ghi chu 773
+Vat tu 774,Thep goc,thung,18.44,71214,5,Ghi chu 774
+Vat tu 775,Ong thep,thung,121.87,82388,5,Ghi chu 775
+Vat tu 776,Thep goc,cuon,110.22,78623,5,Ghi chu 776
+Vat tu 777,Vat tu tieu hao,cuon,236.76,57128,5,Ghi chu 777
+Vat tu 778,Vat tu tieu hao,cuon,142.95,70855,5,Ghi chu 778
+Vat tu 779,Bu long - Oc vit,tam,229.47,50336,5,Ghi chu 779
+Vat tu 780,Tam thep,thung,11.64,64654,5,Ghi chu 780
+Vat tu 781,Thep hop,tan,58.72,51558,5,Ghi chu 781
+Vat tu 782,Vat tu tieu hao,met,50.33,69475,5,Ghi chu 782
+Vat tu 783,Dam thep,kg,185.31,51784,5,Ghi chu 783
+Vat tu 784,Thep hop,cai,280.93,55369,5,Ghi chu 784
+Vat tu 785,Vat tu tieu hao,thung,253.42,60336,5,Ghi chu 785
+Vat tu 786,Thep hop,kg,50.85,78280,5,Ghi chu 786
+Vat tu 787,Vat tu tieu hao,thung,234.77,69772,5,Ghi chu 787
+Vat tu 788,Thep hinh,cai,251.05,54792,5,Ghi chu 788
+Vat tu 789,Dam thep,met,3.96,51889,5,Ghi chu 789
+Vat tu 790,Tam thep,cai,184.11,59960,5,Ghi chu 790
+Vat tu 791,Dam thep,cuon,309.16,81536,5,Ghi chu 791
+Vat tu 792,Vat tu tieu hao,cai,197.92,67090,5,Ghi chu 792
+Vat tu 793,Thep hinh,tam,132.50,61129,5,Ghi chu 793
+Vat tu 794,Thep hop,kg,245.83,56166,5,Ghi chu 794
+Vat tu 795,Tam thep,met,186.57,72489,5,Ghi chu 795
+Vat tu 796,Thep hop,tam,76.91,52379,5,Ghi chu 796
+Vat tu 797,Ong thep,tam,233.73,54205,5,Ghi chu 797
+Vat tu 798,Bu long - Oc vit,tan,15.03,60733,5,Ghi chu 798
+Vat tu 799,Tam thep,cai,19.47,70202,5,Ghi chu 799
+Vat tu 800,Thep goc,met,252.33,56820,5,Ghi chu 800
+Vat tu 801,Bu long - Oc vit,met,319.47,53488,5,Ghi chu 801
+Vat tu 802,Thep hop,kg,152.42,76276,5,Ghi chu 802
+Vat tu 803,Thep hop,met,174.35,82063,5,Ghi chu 803
+Vat tu 804,Thep hop,thung,50.71,53132,5,Ghi chu 804
+Vat tu 805,Dam thep,tan,285.93,75318,5,Ghi chu 805
+Vat tu 806,Ong thep,cuon,46.63,50827,5,Ghi chu 806
+Vat tu 807,Dam thep,tam,48.73,53056,5,Ghi chu 807
+Vat tu 808,Tam thep,cai,171.92,73623,5,Ghi chu 808
+Vat tu 809,Tam thep,met,32.46,57855,5,Ghi chu 809
+Vat tu 810,Bu long - Oc vit,tan,177.07,58025,5,Ghi chu 810
+Vat tu 811,Vat tu tieu hao,met,120.70,65792,5,Ghi chu 811
+Vat tu 812,Thep goc,cuon,70.66,68275,5,Ghi chu 812
+Vat tu 813,Ong thep,thung,166.91,67659,5,Ghi chu 813
+Vat tu 814,Tam thep,cuon,55.60,58158,5,Ghi chu 814
+Vat tu 815,Tam thep,kg,171.95,76027,5,Ghi chu 815
+Vat tu 816,Vat tu tieu hao,kg,243.82,76198,5,Ghi chu 816
+Vat tu 817,Vat tu tieu hao,tam,128.80,71848,5,Ghi chu 817
+Vat tu 818,Thep hop,kg,235.10,50226,5,Ghi chu 818
+Vat tu 819,Vat tu tieu hao,cai,261.78,59109,5,Ghi chu 819
+Vat tu 820,Ong thep,tan,127.87,66904,5,Ghi chu 820
+Vat tu 821,Thep hinh,tam,99.60,51805,5,Ghi chu 821
+Vat tu 822,Thep hop,tam,137.11,80315,5,Ghi chu 822
+Vat tu 823,Bu long - Oc vit,tan,141.30,52748,5,Ghi chu 823
+Vat tu 824,Thep hinh,kg,44.71,60562,5,Ghi chu 824
+Vat tu 825,Dam thep,cai,255.74,56252,5,Ghi chu 825
+Vat tu 826,Tam thep,thung,226.72,51592,5,Ghi chu 826
+Vat tu 827,Ong thep,cai,315.67,75202,5,Ghi chu 827
+Vat tu 828,Thep hop,tan,14.50,72776,5,Ghi chu 828
+Vat tu 829,Bu long - Oc vit,cuon,215.22,75520,5,Ghi chu 829
+Vat tu 830,Thep goc,tam,51.51,56650,5,Ghi chu 830
+Vat tu 831,Thep hop,met,232.52,61874,5,Ghi chu 831
+Vat tu 832,Thep hinh,cai,180.40,58052,5,Ghi chu 832
+Vat tu 833,Bu long - Oc vit,tan,233.24,76122,5,Ghi chu 833
+Vat tu 834,Ong thep,tan,157.21,77542,5,Ghi chu 834
+Vat tu 835,Bu long - Oc vit,cuon,124.07,75942,5,Ghi chu 835
+Vat tu 836,Thep goc,cai,215.73,62439,5,Ghi chu 836
+Vat tu 837,Thep goc,kg,197.17,73696,5,Ghi chu 837
+Vat tu 838,Thep hop,tan,291.10,60959,5,Ghi chu 838
+Vat tu 839,Ong thep,cai,191.53,68647,5,Ghi chu 839
+Vat tu 840,Ong thep,thung,254.41,61430,5,Ghi chu 840
+Vat tu 841,Tam thep,tan,253.34,68584,5,Ghi chu 841
+Vat tu 842,Ong thep,tam,169.81,55425,5,Ghi chu 842
+Vat tu 843,Bu long - Oc vit,kg,323.69,58941,5,Ghi chu 843
+Vat tu 844,Thep hop,met,138.89,73339,5,Ghi chu 844
+Vat tu 845,Dam thep,tam,294.71,56089,5,Ghi chu 845
+Vat tu 846,Bu long - Oc vit,cai,155.72,62139,5,Ghi chu 846
+Vat tu 847,Tam thep,tam,297.13,64241,5,Ghi chu 847
+Vat tu 848,Vat tu tieu hao,met,243.66,64134,5,Ghi chu 848
+Vat tu 849,Thep hop,kg,117.02,53440,5,Ghi chu 849
+Vat tu 850,Ong thep,thung,132.80,58108,5,Ghi chu 850
+Vat tu 851,Thep hop,met,236.54,69769,5,Ghi chu 851
+Vat tu 852,Thep hinh,cai,247.79,76810,5,Ghi chu 852
+Vat tu 853,Thep hop,tan,52.92,64499,5,Ghi chu 853
+Vat tu 854,Vat tu tieu hao,met,97.50,56028,5,Ghi chu 854
+Vat tu 855,Dam thep,tam,193.27,51388,5,Ghi chu 855
+Vat tu 856,Thep hop,thung,121.12,75655,5,Ghi chu 856
+Vat tu 857,Vat tu tieu hao,cai,279.74,69085,5,Ghi chu 857
+Vat tu 858,Thep hop,thung,10.83,58269,5,Ghi chu 858
+Vat tu 859,Vat tu tieu hao,kg,320.98,79517,5,Ghi chu 859
+Vat tu 860,Ong thep,met,307.80,53820,5,Ghi chu 860
+Vat tu 861,Thep goc,thung,207.15,66572,5,Ghi chu 861
+Vat tu 862,Tam thep,met,303.94,61774,5,Ghi chu 862
+Vat tu 863,Thep hinh,thung,125.35,62422,5,Ghi chu 863
+Vat tu 864,Ong thep,tam,78.90,61718,5,Ghi chu 864
+Vat tu 865,Thep hinh,tam,225.12,55486,5,Ghi chu 865
+Vat tu 866,Bu long - Oc vit,tam,244.49,51958,5,Ghi chu 866
+Vat tu 867,Dam thep,met,26.08,74383,5,Ghi chu 867
+Vat tu 868,Thep goc,met,260.13,70817,5,Ghi chu 868
+Vat tu 869,Thep hinh,tan,118.02,65760,5,Ghi chu 869
+Vat tu 870,Tam thep,met,44.48,74493,5,Ghi chu 870
+Vat tu 871,Thep goc,thung,320.09,80909,5,Ghi chu 871
+Vat tu 872,Thep hinh,kg,77.93,50381,5,Ghi chu 872
+Vat tu 873,Thep hinh,thung,95.01,62407,5,Ghi chu 873
+Vat tu 874,Tam thep,thung,45.38,64089,5,Ghi chu 874
+Vat tu 875,Dam thep,kg,38.83,51345,5,Ghi chu 875
+Vat tu 876,Bu long - Oc vit,cuon,9.57,62021,5,Ghi chu 876
+Vat tu 877,Bu long - Oc vit,thung,61.94,71103,5,Ghi chu 877
+Vat tu 878,Thep goc,kg,128.22,70804,5,Ghi chu 878
+Vat tu 879,Vat tu tieu hao,cai,88.75,67164,5,Ghi chu 879
+Vat tu 880,Tam thep,cuon,38.80,62040,5,Ghi chu 880
+Vat tu 881,Thep hop,tam,116.44,74583,5,Ghi chu 881
+Vat tu 882,Ong thep,tam,145.79,72698,5,Ghi chu 882
+Vat tu 883,Thep hop,kg,66.69,79553,5,Ghi chu 883
+Vat tu 884,Ong thep,met,278.26,51620,5,Ghi chu 884
+Vat tu 885,Ong thep,kg,130.42,77458,5,Ghi chu 885
+Vat tu 886,Thep goc,cai,321.17,82477,5,Ghi chu 886
+Vat tu 887,Bu long - Oc vit,cuon,241.16,73387,5,Ghi chu 887
+Vat tu 888,Thep hinh,met,252.03,66437,5,Ghi chu 888
+Vat tu 889,Thep hop,kg,115.65,73267,5,Ghi chu 889
+Vat tu 890,Thep hop,tan,97.05,57147,5,Ghi chu 890
+Vat tu 891,Thep hinh,cuon,230.20,73137,5,Ghi chu 891
+Vat tu 892,Vat tu tieu hao,tan,192.67,57012,5,Ghi chu 892
+Vat tu 893,Thep hinh,thung,56.05,57509,5,Ghi chu 893
+Vat tu 894,Thep hinh,met,257.58,58648,5,Ghi chu 894
+Vat tu 895,Bu long - Oc vit,tam,6.22,67262,5,Ghi chu 895
+Vat tu 896,Dam thep,thung,188.26,73436,5,Ghi chu 896
+Vat tu 897,Bu long - Oc vit,kg,79.95,57959,5,Ghi chu 897
+Vat tu 898,Thep hop,kg,52.37,64649,5,Ghi chu 898
+Vat tu 899,Tam thep,cai,125.50,81666,5,Ghi chu 899
+Vat tu 900,Bu long - Oc vit,cuon,268.75,70826,5,Ghi chu 900
+Vat tu 901,Ong thep,thung,301.68,50315,5,Ghi chu 901
+Vat tu 902,Tam thep,thung,300.09,55783,5,Ghi chu 902
+Vat tu 903,Bu long - Oc vit,cuon,279.02,58868,5,Ghi chu 903
+Vat tu 904,Dam thep,tan,187.01,81226,5,Ghi chu 904
+Vat tu 905,Thep hop,tam,281.72,57123,5,Ghi chu 905
+Vat tu 906,Tam thep,tam,280.01,71683,5,Ghi chu 906
+Vat tu 907,Ong thep,tam,250.29,56179,5,Ghi chu 907
+Vat tu 908,Vat tu tieu hao,cuon,133.15,57715,5,Ghi chu 908
+Vat tu 909,Dam thep,tan,20.55,56970,5,Ghi chu 909
+Vat tu 910,Thep hop,kg,51.33,64970,5,Ghi chu 910
+Vat tu 911,Ong thep,kg,54.78,52630,5,Ghi chu 911
+Vat tu 912,Ong thep,cai,180.90,69567,5,Ghi chu 912
+Vat tu 913,Vat tu tieu hao,tam,313.12,58321,5,Ghi chu 913
+Vat tu 914,Thep hop,cuon,52.13,55545,5,Ghi chu 914
+Vat tu 915,Dam thep,cuon,18.73,62836,5,Ghi chu 915
+Vat tu 916,Dam thep,kg,320.86,61011,5,Ghi chu 916
+Vat tu 917,Thep hop,tam,84.23,71033,5,Ghi chu 917
+Vat tu 918,Thep goc,cuon,69.68,80847,5,Ghi chu 918
+Vat tu 919,Tam thep,kg,64.11,56027,5,Ghi chu 919
+Vat tu 920,Tam thep,met,54.70,64445,5,Ghi chu 920
+Vat tu 921,Dam thep,kg,307.74,65013,5,Ghi chu 921
+Vat tu 922,Thep goc,met,98.41,60779,5,Ghi chu 922
+Vat tu 923,Dam thep,tan,270.89,59634,5,Ghi chu 923
+Vat tu 924,Thep goc,tam,94.93,75081,5,Ghi chu 924
+Vat tu 925,Thep hop,cuon,75.77,82598,5,Ghi chu 925
+Vat tu 926,Thep hop,kg,317.18,55321,5,Ghi chu 926
+Vat tu 927,Ong thep,met,7.11,62315,5,Ghi chu 927
+Vat tu 928,Tam thep,thung,165.74,63317,5,Ghi chu 928
+Vat tu 929,Thep goc,tan,307.50,56695,5,Ghi chu 929
+Vat tu 930,Ong thep,met,177.06,71882,5,Ghi chu 930
+Vat tu 931,Dam thep,tam,99.55,62258,5,Ghi chu 931
+Vat tu 932,Vat tu tieu hao,tam,240.37,73643,5,Ghi chu 932
+Vat tu 933,Thep hinh,thung,145.71,58022,5,Ghi chu 933
+Vat tu 934,Tam thep,thung,228.05,76395,5,Ghi chu 934
+Vat tu 935,Bu long - Oc vit,cuon,130.09,54838,5,Ghi chu 935
+Vat tu 936,Tam thep,cuon,257.49,75318,5,Ghi chu 936
+Vat tu 937,Tam thep,tam,225.59,53371,5,Ghi chu 937
+Vat tu 938,Tam thep,cuon,109.87,66391,5,Ghi chu 938
+Vat tu 939,Dam thep,met,269.81,77643,5,Ghi chu 939
+Vat tu 940,Tam thep,thung,210.83,75248,5,Ghi chu 940
+Vat tu 941,Tam thep,tan,284.99,65445,5,Ghi chu 941
+Vat tu 942,Thep hop,tam,28.24,67713,5,Ghi chu 942
+Vat tu 943,Thep hinh,cai,23.23,53970,5,Ghi chu 943
+Vat tu 944,Thep hop,tam,275.93,59300,5,Ghi chu 944
+Vat tu 945,Thep goc,cai,111.07,69422,5,Ghi chu 945
+Vat tu 946,Dam thep,met,143.96,50218,5,Ghi chu 946
+Vat tu 947,Tam thep,cuon,227.26,73446,5,Ghi chu 947
+Vat tu 948,Thep hinh,tan,95.47,71309,5,Ghi chu 948
+Vat tu 949,Thep hinh,tan,139.56,62502,5,Ghi chu 949
+Vat tu 950,Thep goc,tam,270.15,56335,5,Ghi chu 950
+Vat tu 951,Dam thep,tan,222.28,60989,5,Ghi chu 951
+Vat tu 952,Bu long - Oc vit,kg,258.75,55939,5,Ghi chu 952
+Vat tu 953,Thep hinh,cai,312.96,54528,5,Ghi chu 953
+Vat tu 954,Thep hop,thung,100.85,61651,5,Ghi chu 954
+Vat tu 955,Thep hop,cai,82.59,65130,5,Ghi chu 955
+Vat tu 956,Dam thep,cai,244.34,51594,5,Ghi chu 956
+Vat tu 957,Thep hinh,cai,224.56,75409,5,Ghi chu 957
+Vat tu 958,Tam thep,cai,37.33,80531,5,Ghi chu 958
+Vat tu 959,Thep hinh,met,239.45,68285,5,Ghi chu 959
+Vat tu 960,Thep hop,kg,317.11,73303,5,Ghi chu 960
+Vat tu 961,Dam thep,thung,276.92,56735,5,Ghi chu 961
+Vat tu 962,Bu long - Oc vit,cai,105.25,58182,5,Ghi chu 962
+Vat tu 963,Ong thep,cuon,179.50,58462,5,Ghi chu 963
+Vat tu 964,Thep hinh,cuon,224.91,56548,5,Ghi chu 964
+Vat tu 965,Bu long - Oc vit,cuon,35.84,73330,5,Ghi chu 965
+Vat tu 966,Vat tu tieu hao,tan,274.55,56915,5,Ghi chu 966
+Vat tu 967,Thep goc,met,311.08,58398,5,Ghi chu 967
+Vat tu 968,Dam thep,cuon,151.52,70203,5,Ghi chu 968
+Vat tu 969,Dam thep,tam,309.79,55069,5,Ghi chu 969
+Vat tu 970,Thep goc,met,237.53,69514,5,Ghi chu 970
+Vat tu 971,Thep hop,met,48.85,70680,5,Ghi chu 971
+Vat tu 972,Ong thep,tam,245.95,70842,5,Ghi chu 972
+Vat tu 973,Thep goc,cuon,247.11,63091,5,Ghi chu 973
+Vat tu 974,Tam thep,met,326.73,56692,5,Ghi chu 974
+Vat tu 975,Vat tu tieu hao,cuon,320.23,62524,5,Ghi chu 975
+Vat tu 976,Tam thep,tam,216.68,62321,5,Ghi chu 976
+Vat tu 977,Tam thep,thung,319.14,59462,5,Ghi chu 977
+Vat tu 978,Thep hop,thung,26.77,80722,5,Ghi chu 978
+Vat tu 979,Bu long - Oc vit,tan,44.18,51945,5,Ghi chu 979
+Vat tu 980,Dam thep,cuon,318.53,57422,5,Ghi chu 980
+Vat tu 981,Thep goc,tan,38.98,50368,5,Ghi chu 981
+Vat tu 982,Thep hinh,thung,94.98,79393,5,Ghi chu 982
+Vat tu 983,Ong thep,cuon,168.62,80860,5,Ghi chu 983
+Vat tu 984,Ong thep,cai,80.98,70726,5,Ghi chu 984
+Vat tu 985,Thep goc,met,126.04,52446,5,Ghi chu 985
+Vat tu 986,Dam thep,met,160.82,66022,5,Ghi chu 986
+Vat tu 987,Ong thep,cai,89.52,61440,5,Ghi chu 987
+Vat tu 988,Thep hinh,cuon,17.28,55688,5,Ghi chu 988
+Vat tu 989,Dam thep,cai,323.98,69169,5,Ghi chu 989
+Vat tu 990,Dam thep,thung,305.57,63046,5,Ghi chu 990
+Vat tu 991,Thep hop,met,257.08,68966,5,Ghi chu 991
+Vat tu 992,Thep hinh,cai,180.12,53429,5,Ghi chu 992
+Vat tu 993,Thep hinh,tam,12.85,77565,5,Ghi chu 993
+Vat tu 994,Thep hop,tan,170.95,55507,5,Ghi chu 994
+Vat tu 995,Ong thep,kg,228.72,78745,5,Ghi chu 995
+Vat tu 996,Thep hinh,met,279.46,75815,5,Ghi chu 996
+Vat tu 997,Vat tu tieu hao,tam,206.02,71028,5,Ghi chu 997
+Vat tu 998,Dam thep,thung,190.87,57037,5,Ghi chu 998
+Vat tu 999,Ong thep,kg,123.59,57078,5,Ghi chu 999
+Vat tu 1000,Thep hop,cai,173.64,66473,5,Ghi chu 1000
+Vat tu 1001,Thep hinh,met,305.77,63051,5,Ghi chu 1001
+Vat tu 1002,Tam thep,cuon,217.76,73022,5,Ghi chu 1002
+Vat tu 1003,Thep hop,cuon,31.42,70261,5,Ghi chu 1003
+Vat tu 1004,Thep hinh,tam,323.11,55638,5,Ghi chu 1004
+Vat tu 1005,Thep goc,cai,233.31,64095,5,Ghi chu 1005
+Vat tu 1006,Dam thep,cai,35.12,60011,5,Ghi chu 1006
+Vat tu 1007,Thep hinh,tan,22.35,57175,5,Ghi chu 1007
+Vat tu 1008,Ong thep,cai,163.01,53083,5,Ghi chu 1008
+Vat tu 1009,Ong thep,tam,67.88,54047,5,Ghi chu 1009
+Vat tu 1010,Dam thep,tam,127.71,56074,5,Ghi chu 1010
+Vat tu 1011,Thep hop,thung,289.40,77850,5,Ghi chu 1011
+Vat tu 1012,Thep hop,thung,202.33,73362,5,Ghi chu 1012
+Vat tu 1013,Tam thep,kg,234.91,55231,5,Ghi chu 1013
+Vat tu 1014,Dam thep,tam,41.79,55787,5,Ghi chu 1014
+Vat tu 1015,Dam thep,thung,31.78,52463,5,Ghi chu 1015
+Vat tu 1016,Thep goc,kg,259.26,52281,5,Ghi chu 1016
+Vat tu 1017,Tam thep,tam,78.00,81835,5,Ghi chu 1017
+Vat tu 1018,Thep hop,kg,145.42,77765,5,Ghi chu 1018
+Vat tu 1019,Vat tu tieu hao,cai,1.87,66005,5,Ghi chu 1019
+Vat tu 1020,Vat tu tieu hao,met,204.06,77200,5,Ghi chu 1020
+Vat tu 1021,Thep hop,kg,183.07,66843,5,Ghi chu 1021
+Vat tu 1022,Ong thep,cuon,193.15,55552,5,Ghi chu 1022
+Vat tu 1023,Thep hinh,cuon,248.50,62729,5,Ghi chu 1023
+Vat tu 1024,Dam thep,tam,164.36,70769,5,Ghi chu 1024
+Vat tu 1025,Dam thep,kg,254.42,54151,5,Ghi chu 1025
+Vat tu 1026,Ong thep,cai,171.42,72410,5,Ghi chu 1026
+Vat tu 1027,Dam thep,kg,296.62,60087,5,Ghi chu 1027
+Vat tu 1028,Bu long - Oc vit,thung,11.15,70882,5,Ghi chu 1028
+Vat tu 1029,Tam thep,cuon,31.86,75769,5,Ghi chu 1029
+Vat tu 1030,Tam thep,thung,108.26,51609,5,Ghi chu 1030
+Vat tu 1031,Tam thep,thung,131.31,63039,5,Ghi chu 1031
+Vat tu 1032,Bu long - Oc vit,kg,154.17,70516,5,Ghi chu 1032
+Vat tu 1033,Vat tu tieu hao,cuon,47.35,54529,5,Ghi chu 1033
+Vat tu 1034,Tam thep,cuon,271.53,61015,5,Ghi chu 1034
+Vat tu 1035,Ong thep,kg,86.62,76669,5,Ghi chu 1035
+Vat tu 1036,Dam thep,met,309.71,76820,5,Ghi chu 1036
+Vat tu 1037,Thep hinh,thung,289.43,52687,5,Ghi chu 1037
+Vat tu 1038,Dam thep,met,261.98,59397,5,Ghi chu 1038
+Vat tu 1039,Thep hop,thung,231.83,78524,5,Ghi chu 1039
+Vat tu 1040,Dam thep,thung,250.43,78139,5,Ghi chu 1040
+Vat tu 1041,Thep goc,thung,302.27,66937,5,Ghi chu 1041
+Vat tu 1042,Thep hop,kg,268.31,57475,5,Ghi chu 1042
+Vat tu 1043,Ong thep,tam,248.50,56357,5,Ghi chu 1043
+Vat tu 1044,Dam thep,tam,23.28,61094,5,Ghi chu 1044
+Vat tu 1045,Thep goc,thung,48.92,64076,5,Ghi chu 1045
+Vat tu 1046,Ong thep,met,26.20,78374,5,Ghi chu 1046
+Vat tu 1047,Thep hinh,tam,35.13,64023,5,Ghi chu 1047
+Vat tu 1048,Vat tu tieu hao,cai,206.11,70209,5,Ghi chu 1048
+Vat tu 1049,Thep goc,kg,187.03,78353,5,Ghi chu 1049
+Vat tu 1050,Dam thep,cai,226.71,81992,5,Ghi chu 1050
+Vat tu 1051,Thep hop,tan,285.05,58116,5,Ghi chu 1051
+Vat tu 1052,Thep hop,cai,69.90,77294,5,Ghi chu 1052
+Vat tu 1053,Ong thep,cai,112.17,64650,5,Ghi chu 1053
+Vat tu 1054,Bu long - Oc vit,cuon,237.74,82741,5,Ghi chu 1054
+Vat tu 1055,Ong thep,tan,124.35,51300,5,Ghi chu 1055
+Vat tu 1056,Bu long - Oc vit,met,123.44,69806,5,Ghi chu 1056
+Vat tu 1057,Tam thep,cai,30.13,72151,5,Ghi chu 1057
+Vat tu 1058,Dam thep,tam,239.67,60800,5,Ghi chu 1058
+Vat tu 1059,Dam thep,cuon,68.76,56750,5,Ghi chu 1059
+Vat tu 1060,Dam thep,cai,31.41,77178,5,Ghi chu 1060
+Vat tu 1061,Dam thep,cuon,270.03,61928,5,Ghi chu 1061
+Vat tu 1062,Dam thep,thung,44.61,61296,5,Ghi chu 1062
+Vat tu 1063,Ong thep,tam,114.22,51215,5,Ghi chu 1063
+Vat tu 1064,Ong thep,cuon,13.04,56984,5,Ghi chu 1064
+Vat tu 1065,Tam thep,tam,274.34,56214,5,Ghi chu 1065
+Vat tu 1066,Bu long - Oc vit,cuon,40.64,71740,5,Ghi chu 1066
+Vat tu 1067,Dam thep,cuon,289.32,53452,5,Ghi chu 1067
+Vat tu 1068,Thep hop,tan,86.29,80590,5,Ghi chu 1068
+Vat tu 1069,Thep hinh,cuon,295.07,75053,5,Ghi chu 1069
+Vat tu 1070,Tam thep,tan,170.92,75516,5,Ghi chu 1070
+Vat tu 1071,Tam thep,tam,185.03,52419,5,Ghi chu 1071
+Vat tu 1072,Ong thep,tam,65.31,52198,5,Ghi chu 1072
+Vat tu 1073,Vat tu tieu hao,tan,101.96,69832,5,Ghi chu 1073
+Vat tu 1074,Tam thep,met,23.45,54526,5,Ghi chu 1074
+Vat tu 1075,Dam thep,met,185.17,59948,5,Ghi chu 1075
+Vat tu 1076,Thep hop,thung,230.77,71946,5,Ghi chu 1076
+Vat tu 1077,Thep hinh,kg,264.44,65849,5,Ghi chu 1077
+Vat tu 1078,Thep goc,cai,27.47,57053,5,Ghi chu 1078
+Vat tu 1079,Thep hop,cuon,30.78,82329,5,Ghi chu 1079
+Vat tu 1080,Thep hinh,cuon,231.42,59007,5,Ghi chu 1080
+Vat tu 1081,Bu long - Oc vit,met,9.59,77626,5,Ghi chu 1081
+Vat tu 1082,Ong thep,cai,194.77,54950,5,Ghi chu 1082
+Vat tu 1083,Thep hinh,cai,93.42,67349,5,Ghi chu 1083
+Vat tu 1084,Tam thep,tam,33.23,74243,5,Ghi chu 1084
+Vat tu 1085,Dam thep,kg,258.20,64093,5,Ghi chu 1085
+Vat tu 1086,Thep hinh,cuon,46.57,75176,5,Ghi chu 1086
+Vat tu 1087,Tam thep,thung,226.35,58134,5,Ghi chu 1087
+Vat tu 1088,Vat tu tieu hao,thung,122.29,64205,5,Ghi chu 1088
+Vat tu 1089,Ong thep,cai,123.35,50099,5,Ghi chu 1089
+Vat tu 1090,Bu long - Oc vit,thung,118.94,77523,5,Ghi chu 1090
+Vat tu 1091,Thep hop,tan,311.95,59131,5,Ghi chu 1091
+Vat tu 1092,Vat tu tieu hao,cuon,229.83,57329,5,Ghi chu 1092
+Vat tu 1093,Tam thep,cai,262.15,77085,5,Ghi chu 1093
+Vat tu 1094,Thep hop,cuon,249.22,81817,5,Ghi chu 1094
+Vat tu 1095,Ong thep,cai,33.63,67333,5,Ghi chu 1095
+Vat tu 1096,Tam thep,thung,114.17,60392,5,Ghi chu 1096
+Vat tu 1097,Dam thep,cuon,142.96,68933,5,Ghi chu 1097
+Vat tu 1098,Ong thep,thung,227.15,61399,5,Ghi chu 1098
+Vat tu 1099,Thep hinh,tam,106.97,79014,5,Ghi chu 1099
+Vat tu 1100,Bu long - Oc vit,kg,115.56,64945,5,Ghi chu 1100
+Vat tu 1101,Vat tu tieu hao,tam,25.60,58508,5,Ghi chu 1101
+Vat tu 1102,Dam thep,tan,251.42,68240,5,Ghi chu 1102
+Vat tu 1103,Thep hop,cuon,26.59,62686,5,Ghi chu 1103
+Vat tu 1104,Thep hop,tan,64.38,52534,5,Ghi chu 1104
+Vat tu 1105,Dam thep,met,136.77,67293,5,Ghi chu 1105
+Vat tu 1106,Vat tu tieu hao,met,191.15,78516,5,Ghi chu 1106
+Vat tu 1107,Ong thep,met,251.22,81478,5,Ghi chu 1107
+Vat tu 1108,Ong thep,tam,46.55,66250,5,Ghi chu 1108
+Vat tu 1109,Dam thep,thung,83.17,64609,5,Ghi chu 1109
+Vat tu 1110,Thep hinh,cuon,322.43,63379,5,Ghi chu 1110
+Vat tu 1111,Thep hinh,cai,29.42,55558,5,Ghi chu 1111
+Vat tu 1112,Bu long - Oc vit,thung,325.93,68013,5,Ghi chu 1112
+Vat tu 1113,Thep hop,tan,85.00,81565,5,Ghi chu 1113
+Vat tu 1114,Ong thep,cuon,292.94,63656,5,Ghi chu 1114
+Vat tu 1115,Bu long - Oc vit,cuon,253.96,58884,5,Ghi chu 1115
+Vat tu 1116,Dam thep,kg,94.15,63347,5,Ghi chu 1116
+Vat tu 1117,Thep goc,thung,179.28,53837,5,Ghi chu 1117
+Vat tu 1118,Tam thep,met,64.20,64542,5,Ghi chu 1118
+Vat tu 1119,Thep hinh,tam,212.09,79905,5,Ghi chu 1119
+Vat tu 1120,Bu long - Oc vit,tan,44.12,80952,5,Ghi chu 1120
+Vat tu 1121,Thep hinh,cuon,127.24,58638,5,Ghi chu 1121
+Vat tu 1122,Bu long - Oc vit,thung,24.17,67243,5,Ghi chu 1122
+Vat tu 1123,Dam thep,cai,231.21,62391,5,Ghi chu 1123
+Vat tu 1124,Thep goc,thung,271.52,59911,5,Ghi chu 1124
+Vat tu 1125,Thep goc,kg,25.74,79674,5,Ghi chu 1125
+Vat tu 1126,Thep hop,cai,297.63,74274,5,Ghi chu 1126
+Vat tu 1127,Tam thep,tan,217.06,55429,5,Ghi chu 1127
+Vat tu 1128,Dam thep,cai,49.78,64410,5,Ghi chu 1128
+Vat tu 1129,Dam thep,cuon,103.73,69169,5,Ghi chu 1129
+Vat tu 1130,Tam thep,tam,296.22,64647,5,Ghi chu 1130
+Vat tu 1131,Dam thep,kg,114.86,54413,5,Ghi chu 1131
+Vat tu 1132,Bu long - Oc vit,thung,221.08,74661,5,Ghi chu 1132
+Vat tu 1133,Thep hop,kg,229.13,78571,5,Ghi chu 1133
+Vat tu 1134,Ong thep,tan,207.76,55066,5,Ghi chu 1134
+Vat tu 1135,Tam thep,tam,219.83,58715,5,Ghi chu 1135
+Vat tu 1136,Tam thep,cuon,155.68,60889,5,Ghi chu 1136
+Vat tu 1137,Ong thep,tam,29.25,65618,5,Ghi chu 1137
+Vat tu 1138,Ong thep,met,66.10,61258,5,Ghi chu 1138
+Vat tu 1139,Dam thep,thung,44.08,82426,5,Ghi chu 1139
+Vat tu 1140,Vat tu tieu hao,tam,252.92,61083,5,Ghi chu 1140
+Vat tu 1141,Thep goc,cai,157.42,65536,5,Ghi chu 1141
+Vat tu 1142,Thep goc,cuon,87.39,54590,5,Ghi chu 1142
+Vat tu 1143,Tam thep,tam,54.08,67517,5,Ghi chu 1143
+Vat tu 1144,Ong thep,cuon,193.75,57234,5,Ghi chu 1144
+Vat tu 1145,Tam thep,kg,275.38,55222,5,Ghi chu 1145
+Vat tu 1146,Dam thep,tam,157.23,78630,5,Ghi chu 1146
+Vat tu 1147,Tam thep,kg,297.53,78542,5,Ghi chu 1147
+Vat tu 1148,Vat tu tieu hao,tam,90.78,70845,5,Ghi chu 1148
+Vat tu 1149,Tam thep,tam,142.26,54673,5,Ghi chu 1149
+Vat tu 1150,Dam thep,cuon,286.65,54240,5,Ghi chu 1150
+Vat tu 1151,Vat tu tieu hao,thung,7.79,64450,5,Ghi chu 1151
+Vat tu 1152,Ong thep,cai,26.37,61567,5,Ghi chu 1152
+Vat tu 1153,Ong thep,met,164.09,63114,5,Ghi chu 1153
+Vat tu 1154,Bu long - Oc vit,kg,98.71,70340,5,Ghi chu 1154
+Vat tu 1155,Bu long - Oc vit,met,20.16,76896,5,Ghi chu 1155
+Vat tu 1156,Thep hinh,cuon,107.26,79907,5,Ghi chu 1156
+Vat tu 1157,Thep hop,tam,261.80,56064,5,Ghi chu 1157
+Vat tu 1158,Tam thep,met,142.93,64547,5,Ghi chu 1158
+Vat tu 1159,Vat tu tieu hao,thung,25.79,59751,5,Ghi chu 1159
+Vat tu 1160,Thep goc,kg,179.52,61920,5,Ghi chu 1160
+Vat tu 1161,Thep goc,tan,83.31,55020,5,Ghi chu 1161
+Vat tu 1162,Bu long - Oc vit,cuon,263.85,73242,5,Ghi chu 1162
+Vat tu 1163,Thep hinh,tam,17.87,81646,5,Ghi chu 1163
+Vat tu 1164,Thep hinh,thung,104.33,64667,5,Ghi chu 1164
+Vat tu 1165,Tam thep,cuon,186.00,69358,5,Ghi chu 1165
+Vat tu 1166,Thep hinh,tam,268.20,82148,5,Ghi chu 1166
+Vat tu 1167,Bu long - Oc vit,tan,57.66,79126,5,Ghi chu 1167
+Vat tu 1168,Thep goc,met,322.48,62099,5,Ghi chu 1168
+Vat tu 1169,Vat tu tieu hao,tam,61.86,64778,5,Ghi chu 1169
+Vat tu 1170,Tam thep,kg,135.31,52861,5,Ghi chu 1170
+Vat tu 1171,Thep hop,cai,236.17,59855,5,Ghi chu 1171
+Vat tu 1172,Bu long - Oc vit,cai,253.71,50471,5,Ghi chu 1172
+Vat tu 1173,Thep goc,met,280.54,50296,5,Ghi chu 1173
+Vat tu 1174,Tam thep,cai,252.94,79048,5,Ghi chu 1174
+Vat tu 1175,Bu long - Oc vit,thung,221.66,72220,5,Ghi chu 1175
+Vat tu 1176,Ong thep,tan,85.66,56978,5,Ghi chu 1176
+Vat tu 1177,Thep hinh,tan,312.12,72741,5,Ghi chu 1177
+Vat tu 1178,Thep hop,cuon,17.19,74814,5,Ghi chu 1178
+Vat tu 1179,Bu long - Oc vit,cuon,166.67,65918,5,Ghi chu 1179
+Vat tu 1180,Thep hinh,kg,102.83,70992,5,Ghi chu 1180
+Vat tu 1181,Thep hop,kg,55.43,72766,5,Ghi chu 1181
+Vat tu 1182,Thep hop,kg,147.28,54601,5,Ghi chu 1182
+Vat tu 1183,Vat tu tieu hao,cuon,157.21,51164,5,Ghi chu 1183
+Vat tu 1184,Vat tu tieu hao,cuon,252.75,78010,5,Ghi chu 1184
+Vat tu 1185,Bu long - Oc vit,cai,254.24,63298,5,Ghi chu 1185
+Vat tu 1186,Thep hinh,met,28.43,51092,5,Ghi chu 1186
+Vat tu 1187,Thep hop,cai,19.19,67711,5,Ghi chu 1187
+Vat tu 1188,Bu long - Oc vit,met,15.20,82219,5,Ghi chu 1188
+Vat tu 1189,Thep hop,cuon,122.62,61354,5,Ghi chu 1189
+Vat tu 1190,Thep goc,cuon,23.89,52908,5,Ghi chu 1190
+Vat tu 1191,Ong thep,met,118.77,78814,5,Ghi chu 1191
+Vat tu 1192,Ong thep,cuon,304.24,71264,5,Ghi chu 1192
+Vat tu 1193,Tam thep,kg,10.85,64140,5,Ghi chu 1193
+Vat tu 1194,Thep goc,cuon,130.14,74143,5,Ghi chu 1194
+Vat tu 1195,Dam thep,thung,30.67,59404,5,Ghi chu 1195
+Vat tu 1196,Thep goc,kg,111.50,74756,5,Ghi chu 1196
+Vat tu 1197,Tam thep,cai,276.82,65077,5,Ghi chu 1197
+Vat tu 1198,Thep hop,kg,85.17,53336,5,Ghi chu 1198
+Vat tu 1199,Bu long - Oc vit,thung,324.54,78538,5,Ghi chu 1199
+Vat tu 1200,Thep hop,kg,168.71,63684,5,Ghi chu 1200
+Vat tu 1201,Dam thep,tam,107.79,73671,5,Ghi chu 1201
+Vat tu 1202,Thep goc,cai,123.35,72226,5,Ghi chu 1202
+Vat tu 1203,Thep hinh,kg,290.80,77536,5,Ghi chu 1203
+Vat tu 1204,Dam thep,kg,302.00,61663,5,Ghi chu 1204
+Vat tu 1205,Dam thep,met,187.25,52301,5,Ghi chu 1205
+Vat tu 1206,Thep hinh,cuon,125.80,67677,5,Ghi chu 1206
+Vat tu 1207,Dam thep,thung,328.07,52920,5,Ghi chu 1207
+Vat tu 1208,Dam thep,tam,163.61,65165,5,Ghi chu 1208
+Vat tu 1209,Dam thep,tan,319.03,57508,5,Ghi chu 1209
+Vat tu 1210,Thep goc,tan,1.45,57932,5,Ghi chu 1210
+Vat tu 1211,Thep hinh,thung,292.50,63794,5,Ghi chu 1211
+Vat tu 1212,Thep hop,cuon,136.30,73744,5,Ghi chu 1212
+Vat tu 1213,Thep hop,thung,264.43,51024,5,Ghi chu 1213
+Vat tu 1214,Ong thep,cai,290.45,64374,5,Ghi chu 1214
+Vat tu 1215,Dam thep,met,284.85,61830,5,Ghi chu 1215
+Vat tu 1216,Bu long - Oc vit,thung,154.91,78786,5,Ghi chu 1216
+Vat tu 1217,Thep goc,cai,293.10,74097,5,Ghi chu 1217
+Vat tu 1218,Ong thep,kg,250.78,80245,5,Ghi chu 1218
+Vat tu 1219,Thep hop,met,236.47,52704,5,Ghi chu 1219
+Vat tu 1220,Thep hinh,cuon,232.47,54727,5,Ghi chu 1220
+Vat tu 1221,Vat tu tieu hao,tam,119.28,50120,5,Ghi chu 1221
+Vat tu 1222,Thep hinh,tam,298.94,57579,5,Ghi chu 1222
+Vat tu 1223,Thep hop,thung,176.59,79810,5,Ghi chu 1223
+Vat tu 1224,Thep goc,tam,325.55,81846,5,Ghi chu 1224
+Vat tu 1225,Ong thep,tam,144.90,55201,5,Ghi chu 1225
+Vat tu 1226,Thep hinh,thung,106.27,74167,5,Ghi chu 1226
+Vat tu 1227,Tam thep,tam,274.67,68915,5,Ghi chu 1227
+Vat tu 1228,Ong thep,met,296.31,79663,5,Ghi chu 1228
+Vat tu 1229,Ong thep,kg,254.00,62758,5,Ghi chu 1229
+Vat tu 1230,Vat tu tieu hao,tan,310.58,55714,5,Ghi chu 1230
+Vat tu 1231,Bu long - Oc vit,tam,259.32,60851,5,Ghi chu 1231
+Vat tu 1232,Ong thep,kg,218.95,52641,5,Ghi chu 1232
+Vat tu 1233,Dam thep,cai,165.01,55696,5,Ghi chu 1233
+Vat tu 1234,Thep goc,cai,166.62,80049,5,Ghi chu 1234
+Vat tu 1235,Ong thep,tam,290.94,58108,5,Ghi chu 1235
+Vat tu 1236,Bu long - Oc vit,cuon,203.94,50135,5,Ghi chu 1236
+Vat tu 1237,Thep goc,cai,148.19,62860,5,Ghi chu 1237
+Vat tu 1238,Ong thep,tam,239.29,62152,5,Ghi chu 1238
+Vat tu 1239,Tam thep,kg,114.70,63247,5,Ghi chu 1239
+Vat tu 1240,Thep hop,met,154.31,66434,5,Ghi chu 1240
+Vat tu 1241,Thep hinh,met,208.48,52034,5,Ghi chu 1241
+Vat tu 1242,Tam thep,cai,197.97,80031,5,Ghi chu 1242
+Vat tu 1243,Thep hinh,tam,166.13,53586,5,Ghi chu 1243
+Vat tu 1244,Ong thep,kg,208.67,52212,5,Ghi chu 1244
+Vat tu 1245,Dam thep,tan,91.88,74346,5,Ghi chu 1245
+Vat tu 1246,Thep hinh,met,107.28,55917,5,Ghi chu 1246
+Vat tu 1247,Bu long - Oc vit,kg,51.25,69819,5,Ghi chu 1247
+Vat tu 1248,Bu long - Oc vit,tan,92.56,80774,5,Ghi chu 1248
+Vat tu 1249,Thep hop,cai,26.10,70211,5,Ghi chu 1249
+Vat tu 1250,Vat tu tieu hao,tan,223.94,79142,5,Ghi chu 1250
+Vat tu 1251,Ong thep,met,300.12,68874,5,Ghi chu 1251
+Vat tu 1252,Bu long - Oc vit,cuon,221.29,60597,5,Ghi chu 1252
+Vat tu 1253,Vat tu tieu hao,met,11.80,62358,5,Ghi chu 1253
+Vat tu 1254,Ong thep,cuon,270.94,77748,5,Ghi chu 1254
+Vat tu 1255,Bu long - Oc vit,tam,89.48,54225,5,Ghi chu 1255
+Vat tu 1256,Dam thep,tan,171.55,75016,5,Ghi chu 1256
+Vat tu 1257,Vat tu tieu hao,tan,27.60,58156,5,Ghi chu 1257
+Vat tu 1258,Thep goc,met,323.75,66942,5,Ghi chu 1258
+Vat tu 1259,Ong thep,cuon,109.05,57417,5,Ghi chu 1259
+Vat tu 1260,Thep hinh,tan,205.77,60158,5,Ghi chu 1260
+Vat tu 1261,Vat tu tieu hao,met,303.47,72583,5,Ghi chu 1261
+Vat tu 1262,Vat tu tieu hao,tam,142.86,78816,5,Ghi chu 1262
+Vat tu 1263,Bu long - Oc vit,kg,11.54,64040,5,Ghi chu 1263
+Vat tu 1264,Bu long - Oc vit,met,276.07,53921,5,Ghi chu 1264
+Vat tu 1265,Vat tu tieu hao,cuon,323.39,68221,5,Ghi chu 1265
+Vat tu 1266,Thep hinh,met,9.09,77419,5,Ghi chu 1266
+Vat tu 1267,Dam thep,tan,118.51,64719,5,Ghi chu 1267
+Vat tu 1268,Bu long - Oc vit,tan,308.61,77563,5,Ghi chu 1268
+Vat tu 1269,Tam thep,cai,257.70,60410,5,Ghi chu 1269
+Vat tu 1270,Thep hop,cuon,277.18,68012,5,Ghi chu 1270
+Vat tu 1271,Ong thep,tan,271.33,68035,5,Ghi chu 1271
+Vat tu 1272,Tam thep,met,75.55,72419,5,Ghi chu 1272
+Vat tu 1273,Tam thep,cai,55.36,54508,5,Ghi chu 1273
+Vat tu 1274,Dam thep,kg,160.59,63022,5,Ghi chu 1274
+Vat tu 1275,Thep hinh,cuon,283.28,61703,5,Ghi chu 1275
+Vat tu 1276,Tam thep,thung,36.10,69982,5,Ghi chu 1276
+Vat tu 1277,Thep hinh,thung,80.16,65079,5,Ghi chu 1277
+Vat tu 1278,Thep hop,met,261.11,58851,5,Ghi chu 1278
+Vat tu 1279,Thep goc,thung,175.05,59413,5,Ghi chu 1279
+Vat tu 1280,Thep hinh,kg,108.41,63066,5,Ghi chu 1280
+Vat tu 1281,Thep hinh,met,177.28,52443,5,Ghi chu 1281
+Vat tu 1282,Dam thep,cai,239.30,63422,5,Ghi chu 1282
+Vat tu 1283,Ong thep,tan,197.37,53746,5,Ghi chu 1283
+Vat tu 1284,Ong thep,cuon,17.97,61573,5,Ghi chu 1284
+Vat tu 1285,Thep hop,cuon,100.99,82597,5,Ghi chu 1285
+Vat tu 1286,Vat tu tieu hao,cai,232.65,55862,5,Ghi chu 1286
+Vat tu 1287,Vat tu tieu hao,tam,227.39,54605,5,Ghi chu 1287
+Vat tu 1288,Bu long - Oc vit,tan,213.29,79180,5,Ghi chu 1288
+Vat tu 1289,Ong thep,cai,61.02,81075,5,Ghi chu 1289
+Vat tu 1290,Thep hinh,thung,327.98,53850,5,Ghi chu 1290
+Vat tu 1291,Bu long - Oc vit,met,180.76,58291,5,Ghi chu 1291
+Vat tu 1292,Tam thep,tan,278.66,64126,5,Ghi chu 1292
+Vat tu 1293,Ong thep,cai,244.92,82313,5,Ghi chu 1293
+Vat tu 1294,Dam thep,tam,193.94,52335,5,Ghi chu 1294
+Vat tu 1295,Tam thep,kg,69.36,58325,5,Ghi chu 1295
+Vat tu 1296,Thep hinh,cai,179.29,50196,5,Ghi chu 1296
+Vat tu 1297,Thep hop,cai,246.19,58556,5,Ghi chu 1297
+Vat tu 1298,Bu long - Oc vit,thung,309.46,59843,5,Ghi chu 1298
+Vat tu 1299,Tam thep,cai,88.42,68556,5,Ghi chu 1299
+Vat tu 1300,Dam thep,cuon,124.14,56488,5,Ghi chu 1300
+Vat tu 1301,Dam thep,tan,107.71,55619,5,Ghi chu 1301
+Vat tu 1302,Vat tu tieu hao,cuon,28.08,64166,5,Ghi chu 1302
+Vat tu 1303,Tam thep,tan,309.89,64051,5,Ghi chu 1303
+Vat tu 1304,Ong thep,met,166.38,51164,5,Ghi chu 1304
+Vat tu 1305,Thep hinh,tan,141.27,54584,5,Ghi chu 1305
+Vat tu 1306,Thep hinh,kg,237.15,75944,5,Ghi chu 1306
+Vat tu 1307,Thep hop,cuon,91.80,55752,5,Ghi chu 1307
+Vat tu 1308,Thep goc,tan,132.08,55159,5,Ghi chu 1308
+Vat tu 1309,Thep goc,tam,107.67,54343,5,Ghi chu 1309
+Vat tu 1310,Tam thep,cuon,167.30,56296,5,Ghi chu 1310
+Vat tu 1311,Tam thep,cai,99.13,56456,5,Ghi chu 1311
+Vat tu 1312,Vat tu tieu hao,thung,283.98,66883,5,Ghi chu 1312
+Vat tu 1313,Thep hinh,tan,28.83,70237,5,Ghi chu 1313
+Vat tu 1314,Thep hinh,cuon,251.07,80870,5,Ghi chu 1314
+Vat tu 1315,Ong thep,tam,206.76,78829,5,Ghi chu 1315
+Vat tu 1316,Bu long - Oc vit,met,94.27,76109,5,Ghi chu 1316
+Vat tu 1317,Vat tu tieu hao,kg,14.42,78639,5,Ghi chu 1317
+Vat tu 1318,Vat tu tieu hao,cai,46.24,50770,5,Ghi chu 1318
+Vat tu 1319,Ong thep,kg,178.34,57201,5,Ghi chu 1319
+Vat tu 1320,Thep goc,kg,4.53,69318,5,Ghi chu 1320
+Vat tu 1321,Thep goc,tan,227.09,70034,5,Ghi chu 1321
+Vat tu 1322,Dam thep,tam,26.87,54732,5,Ghi chu 1322
+Vat tu 1323,Vat tu tieu hao,thung,314.92,80979,5,Ghi chu 1323
+Vat tu 1324,Dam thep,cuon,277.78,67676,5,Ghi chu 1324
+Vat tu 1325,Thep goc,tan,193.88,79816,5,Ghi chu 1325
+Vat tu 1326,Bu long - Oc vit,tam,136.31,63645,5,Ghi chu 1326
+Vat tu 1327,Thep hop,tam,267.44,64558,5,Ghi chu 1327
+Vat tu 1328,Tam thep,cuon,97.11,69418,5,Ghi chu 1328
+Vat tu 1329,Vat tu tieu hao,cuon,91.03,74705,5,Ghi chu 1329
+Vat tu 1330,Thep goc,cuon,254.19,73909,5,Ghi chu 1330
+Vat tu 1331,Thep hinh,tam,102.47,78309,5,Ghi chu 1331
+Vat tu 1332,Vat tu tieu hao,cuon,298.28,70518,5,Ghi chu 1332
+Vat tu 1333,Dam thep,cuon,70.62,53398,5,Ghi chu 1333
+Vat tu 1334,Thep goc,met,321.36,69387,5,Ghi chu 1334
+Vat tu 1335,Thep goc,met,221.74,65868,5,Ghi chu 1335
+Vat tu 1336,Ong thep,tam,222.44,63656,5,Ghi chu 1336
+Vat tu 1337,Thep hinh,tam,112.67,54856,5,Ghi chu 1337
+Vat tu 1338,Ong thep,tan,68.69,56904,5,Ghi chu 1338
+Vat tu 1339,Vat tu tieu hao,tam,206.24,64763,5,Ghi chu 1339
+Vat tu 1340,Thep goc,met,293.80,62938,5,Ghi chu 1340
+Vat tu 1341,Ong thep,tam,74.73,51708,5,Ghi chu 1341
+Vat tu 1342,Thep hop,cai,179.74,57159,5,Ghi chu 1342
+Vat tu 1343,Thep goc,thung,171.59,57960,5,Ghi chu 1343
+Vat tu 1344,Dam thep,thung,205.39,62314,5,Ghi chu 1344
+Vat tu 1345,Vat tu tieu hao,tam,91.91,73118,5,Ghi chu 1345
+Vat tu 1346,Thep hop,cai,236.70,80258,5,Ghi chu 1346
+Vat tu 1347,Dam thep,kg,297.58,51868,5,Ghi chu 1347
+Vat tu 1348,Ong thep,tam,147.84,59342,5,Ghi chu 1348
+Vat tu 1349,Thep goc,thung,260.90,81032,5,Ghi chu 1349
+Vat tu 1350,Ong thep,cuon,114.37,70062,5,Ghi chu 1350
+Vat tu 1351,Thep goc,thung,290.84,77787,5,Ghi chu 1351
+Vat tu 1352,Thep goc,tam,69.33,59632,5,Ghi chu 1352
+Vat tu 1353,Ong thep,tam,90.44,79899,5,Ghi chu 1353
+Vat tu 1354,Dam thep,cai,25.92,68087,5,Ghi chu 1354
+Vat tu 1355,Tam thep,tam,130.28,74034,5,Ghi chu 1355
+Vat tu 1356,Thep goc,tam,2.15,69233,5,Ghi chu 1356
+Vat tu 1357,Dam thep,cuon,56.57,79747,5,Ghi chu 1357
+Vat tu 1358,Ong thep,cai,88.09,67814,5,Ghi chu 1358
+Vat tu 1359,Dam thep,cai,107.02,53127,5,Ghi chu 1359
+Vat tu 1360,Thep hinh,cai,140.36,72181,5,Ghi chu 1360
+Vat tu 1361,Thep goc,met,292.19,72326,5,Ghi chu 1361
+Vat tu 1362,Tam thep,tam,303.50,59249,5,Ghi chu 1362
+Vat tu 1363,Vat tu tieu hao,cuon,41.46,67126,5,Ghi chu 1363
+Vat tu 1364,Tam thep,cai,289.72,67013,5,Ghi chu 1364
+Vat tu 1365,Thep hinh,met,304.41,63045,5,Ghi chu 1365
+Vat tu 1366,Vat tu tieu hao,cuon,288.80,52155,5,Ghi chu 1366
+Vat tu 1367,Thep goc,tam,33.09,62200,5,Ghi chu 1367
+Vat tu 1368,Vat tu tieu hao,met,288.25,64467,5,Ghi chu 1368
+Vat tu 1369,Vat tu tieu hao,thung,169.99,50404,5,Ghi chu 1369
+Vat tu 1370,Tam thep,kg,126.14,65280,5,Ghi chu 1370
+Vat tu 1371,Thep hop,kg,130.49,70400,5,Ghi chu 1371
+Vat tu 1372,Bu long - Oc vit,met,21.27,72144,5,Ghi chu 1372
+Vat tu 1373,Thep hop,cai,275.68,82706,5,Ghi chu 1373
+Vat tu 1374,Tam thep,met,121.55,82232,5,Ghi chu 1374
+Vat tu 1375,Vat tu tieu hao,cai,57.40,50184,5,Ghi chu 1375
+Vat tu 1376,Ong thep,tan,156.19,78084,5,Ghi chu 1376
+Vat tu 1377,Thep hop,tan,323.41,54977,5,Ghi chu 1377
+Vat tu 1378,Bu long - Oc vit,cai,182.31,64494,5,Ghi chu 1378
+Vat tu 1379,Dam thep,thung,272.72,75918,5,Ghi chu 1379
+Vat tu 1380,Thep hinh,kg,271.06,69137,5,Ghi chu 1380
+Vat tu 1381,Ong thep,met,20.29,82126,5,Ghi chu 1381
+Vat tu 1382,Vat tu tieu hao,thung,92.45,81981,5,Ghi chu 1382
+Vat tu 1383,Bu long - Oc vit,tan,206.10,69606,5,Ghi chu 1383
+Vat tu 1384,Bu long - Oc vit,cai,293.52,56532,5,Ghi chu 1384
+Vat tu 1385,Thep hop,tam,17.50,64307,5,Ghi chu 1385
+Vat tu 1386,Vat tu tieu hao,cuon,191.49,79028,5,Ghi chu 1386
+Vat tu 1387,Vat tu tieu hao,tam,111.23,78405,5,Ghi chu 1387
+Vat tu 1388,Ong thep,tan,58.59,77438,5,Ghi chu 1388
+Vat tu 1389,Ong thep,thung,4.62,61314,5,Ghi chu 1389
+Vat tu 1390,Thep hinh,thung,29.00,72613,5,Ghi chu 1390
+Vat tu 1391,Thep hop,kg,13.11,80347,5,Ghi chu 1391
+Vat tu 1392,Bu long - Oc vit,thung,235.11,71113,5,Ghi chu 1392
+Vat tu 1393,Dam thep,kg,216.68,69699,5,Ghi chu 1393
+Vat tu 1394,Thep hinh,met,138.57,64956,5,Ghi chu 1394
+Vat tu 1395,Bu long - Oc vit,cuon,292.60,72055,5,Ghi chu 1395
+Vat tu 1396,Thep hinh,cai,37.89,72788,5,Ghi chu 1396
+Vat tu 1397,Thep goc,thung,284.57,72924,5,Ghi chu 1397
+Vat tu 1398,Tam thep,tan,111.77,80051,5,Ghi chu 1398
+Vat tu 1399,Vat tu tieu hao,cuon,144.76,81710,5,Ghi chu 1399
+Vat tu 1400,Thep hinh,tam,11.74,55854,5,Ghi chu 1400
+Vat tu 1401,Tam thep,thung,108.10,74938,5,Ghi chu 1401
+Vat tu 1402,Thep hop,cuon,327.79,80010,5,Ghi chu 1402
+Vat tu 1403,Thep hop,met,208.50,51099,5,Ghi chu 1403
+Vat tu 1404,Dam thep,cai,158.89,76275,5,Ghi chu 1404
+Vat tu 1405,Bu long - Oc vit,tan,226.00,63401,5,Ghi chu 1405
+Vat tu 1406,Dam thep,tan,243.44,55484,5,Ghi chu 1406
+Vat tu 1407,Thep hop,cai,25.14,50745,5,Ghi chu 1407
+Vat tu 1408,Bu long - Oc vit,tan,216.63,74397,5,Ghi chu 1408
+Vat tu 1409,Thep hop,cai,46.68,72527,5,Ghi chu 1409
+Vat tu 1410,Thep goc,cai,100.54,54870,5,Ghi chu 1410
+Vat tu 1411,Ong thep,cai,159.91,51498,5,Ghi chu 1411
+Vat tu 1412,Thep goc,met,22.75,53389,5,Ghi chu 1412
+Vat tu 1413,Dam thep,cai,132.85,80272,5,Ghi chu 1413
+Vat tu 1414,Ong thep,cuon,181.90,66234,5,Ghi chu 1414
+Vat tu 1415,Thep hinh,cai,284.59,75085,5,Ghi chu 1415
+Vat tu 1416,Bu long - Oc vit,cai,73.43,54954,5,Ghi chu 1416
+Vat tu 1417,Vat tu tieu hao,thung,58.93,77500,5,Ghi chu 1417
+Vat tu 1418,Thep goc,met,230.26,76142,5,Ghi chu 1418
+Vat tu 1419,Tam thep,cai,33.29,55054,5,Ghi chu 1419
+Vat tu 1420,Bu long - Oc vit,cuon,255.31,60277,5,Ghi chu 1420
+Vat tu 1421,Vat tu tieu hao,tan,43.37,80860,5,Ghi chu 1421
+Vat tu 1422,Vat tu tieu hao,kg,8.01,82425,5,Ghi chu 1422
+Vat tu 1423,Ong thep,tan,196.44,65021,5,Ghi chu 1423
+Vat tu 1424,Ong thep,met,167.62,81809,5,Ghi chu 1424
+Vat tu 1425,Vat tu tieu hao,kg,29.18,77297,5,Ghi chu 1425
+Vat tu 1426,Ong thep,kg,324.02,74175,5,Ghi chu 1426
+Vat tu 1427,Dam thep,cai,68.32,55914,5,Ghi chu 1427
+Vat tu 1428,Vat tu tieu hao,tan,96.61,54132,5,Ghi chu 1428
+Vat tu 1429,Bu long - Oc vit,tan,203.74,57530,5,Ghi chu 1429
+Vat tu 1430,Ong thep,kg,278.53,80241,5,Ghi chu 1430
+Vat tu 1431,Bu long - Oc vit,met,130.82,66015,5,Ghi chu 1431
+Vat tu 1432,Thep hop,cai,242.47,61898,5,Ghi chu 1432
+Vat tu 1433,Thep hop,kg,131.73,75049,5,Ghi chu 1433
+Vat tu 1434,Thep hinh,kg,161.07,79958,5,Ghi chu 1434
+Vat tu 1435,Dam thep,thung,268.78,76806,5,Ghi chu 1435
+Vat tu 1436,Ong thep,kg,234.59,64809,5,Ghi chu 1436
+Vat tu 1437,Ong thep,met,34.89,80956,5,Ghi chu 1437
+Vat tu 1438,Bu long - Oc vit,cai,230.84,80123,5,Ghi chu 1438
+Vat tu 1439,Thep goc,tam,219.69,65584,5,Ghi chu 1439
+Vat tu 1440,Bu long - Oc vit,tan,197.28,73871,5,Ghi chu 1440
+Vat tu 1441,Bu long - Oc vit,met,169.80,65155,5,Ghi chu 1441
+Vat tu 1442,Thep hop,kg,312.40,50712,5,Ghi chu 1442
+Vat tu 1443,Thep hinh,kg,42.23,60138,5,Ghi chu 1443
+Vat tu 1444,Thep hop,tam,186.86,58189,5,Ghi chu 1444
+Vat tu 1445,Ong thep,met,200.85,54816,5,Ghi chu 1445
+Vat tu 1446,Dam thep,kg,212.23,52443,5,Ghi chu 1446
+Vat tu 1447,Dam thep,cai,55.25,63199,5,Ghi chu 1447
+Vat tu 1448,Thep hinh,thung,239.63,67631,5,Ghi chu 1448
+Vat tu 1449,Tam thep,cai,102.26,56144,5,Ghi chu 1449
+Vat tu 1450,Tam thep,cuon,21.89,81388,5,Ghi chu 1450
+Vat tu 1451,Ong thep,met,254.80,82150,5,Ghi chu 1451
+Vat tu 1452,Thep hop,thung,46.73,80170,5,Ghi chu 1452
+Vat tu 1453,Vat tu tieu hao,tan,61.89,56519,5,Ghi chu 1453
+Vat tu 1454,Bu long - Oc vit,cai,107.00,56801,5,Ghi chu 1454
+Vat tu 1455,Tam thep,kg,7.45,60085,5,Ghi chu 1455
+Vat tu 1456,Ong thep,kg,68.37,80481,5,Ghi chu 1456
+Vat tu 1457,Thep hop,cai,199.38,57461,5,Ghi chu 1457
+Vat tu 1458,Thep goc,thung,320.02,70441,5,Ghi chu 1458
+Vat tu 1459,Thep hinh,tan,73.43,73624,5,Ghi chu 1459
+Vat tu 1460,Thep goc,tan,62.50,61710,5,Ghi chu 1460
+Vat tu 1461,Ong thep,cuon,58.06,74388,5,Ghi chu 1461
+Vat tu 1462,Ong thep,cuon,168.63,80083,5,Ghi chu 1462
+Vat tu 1463,Thep goc,cuon,123.41,66604,5,Ghi chu 1463
+Vat tu 1464,Vat tu tieu hao,cai,111.37,54847,5,Ghi chu 1464
+Vat tu 1465,Bu long - Oc vit,cai,268.69,57187,5,Ghi chu 1465
+Vat tu 1466,Bu long - Oc vit,kg,175.23,55289,5,Ghi chu 1466
+Vat tu 1467,Thep goc,cai,156.60,72565,5,Ghi chu 1467
+Vat tu 1468,Vat tu tieu hao,kg,95.85,52732,5,Ghi chu 1468
+Vat tu 1469,Ong thep,thung,17.97,70665,5,Ghi chu 1469
+Vat tu 1470,Ong thep,cuon,25.52,55449,5,Ghi chu 1470
+Vat tu 1471,Vat tu tieu hao,tam,272.05,80432,5,Ghi chu 1471
+Vat tu 1472,Bu long - Oc vit,cuon,256.82,70691,5,Ghi chu 1472
+Vat tu 1473,Thep hop,met,236.46,53436,5,Ghi chu 1473
+Vat tu 1474,Thep hinh,cai,105.16,74058,5,Ghi chu 1474
+Vat tu 1475,Thep goc,tam,259.22,50124,5,Ghi chu 1475
+Vat tu 1476,Tam thep,thung,100.38,75216,5,Ghi chu 1476
+Vat tu 1477,Dam thep,met,163.72,52145,5,Ghi chu 1477
+Vat tu 1478,Thep hinh,tan,35.30,65976,5,Ghi chu 1478
+Vat tu 1479,Ong thep,thung,308.92,78514,5,Ghi chu 1479
+Vat tu 1480,Vat tu tieu hao,met,242.80,79148,5,Ghi chu 1480
+Vat tu 1481,Thep hop,met,224.25,55953,5,Ghi chu 1481
+Vat tu 1482,Dam thep,tam,194.03,71127,5,Ghi chu 1482
+Vat tu 1483,Bu long - Oc vit,tam,258.94,72973,5,Ghi chu 1483
+Vat tu 1484,Vat tu tieu hao,cuon,106.80,66941,5,Ghi chu 1484
+Vat tu 1485,Dam thep,cuon,23.46,66784,5,Ghi chu 1485
+Vat tu 1486,Thep hop,tam,120.41,71818,5,Ghi chu 1486
+Vat tu 1487,Thep hop,tam,191.63,80084,5,Ghi chu 1487
+Vat tu 1488,Ong thep,cai,152.45,58050,5,Ghi chu 1488
+Vat tu 1489,Ong thep,tam,31.86,67116,5,Ghi chu 1489
+Vat tu 1490,Thep goc,met,310.89,79461,5,Ghi chu 1490
+Vat tu 1491,Bu long - Oc vit,cuon,164.24,79955,5,Ghi chu 1491
+Vat tu 1492,Tam thep,thung,43.22,68861,5,Ghi chu 1492
+Vat tu 1493,Thep hop,met,25.96,74468,5,Ghi chu 1493
+Vat tu 1494,Thep goc,met,186.06,66634,5,Ghi chu 1494
+Vat tu 1495,Bu long - Oc vit,cai,126.67,58726,5,Ghi chu 1495
+Vat tu 1496,Dam thep,kg,237.29,78342,5,Ghi chu 1496
+Vat tu 1497,Vat tu tieu hao,cai,113.08,77627,5,Ghi chu 1497
+Vat tu 1498,Thep goc,tan,290.36,80596,5,Ghi chu 1498
+Vat tu 1499,Thep hinh,cuon,73.02,51631,5,Ghi chu 1499
+Vat tu 1500,Thep hinh,kg,185.72,51736,5,Ghi chu 1500
+Vat tu 1501,Thep hinh,tam,57.26,70312,5,Ghi chu 1501
+Vat tu 1502,Bu long - Oc vit,tan,10.95,67438,5,Ghi chu 1502
+Vat tu 1503,Thep goc,thung,141.56,67837,5,Ghi chu 1503
+Vat tu 1504,Thep hinh,thung,283.82,78106,5,Ghi chu 1504
+Vat tu 1505,Dam thep,kg,170.83,70563,5,Ghi chu 1505
+Vat tu 1506,Thep hop,tan,207.71,76936,5,Ghi chu 1506
+Vat tu 1507,Tam thep,cuon,307.72,79015,5,Ghi chu 1507
+Vat tu 1508,Dam thep,met,245.42,63288,5,Ghi chu 1508
+Vat tu 1509,Thep goc,kg,228.30,73676,5,Ghi chu 1509
+Vat tu 1510,Thep hop,tan,266.81,74402,5,Ghi chu 1510
+Vat tu 1511,Thep goc,kg,326.31,50525,5,Ghi chu 1511
+Vat tu 1512,Thep hinh,thung,61.90,80386,5,Ghi chu 1512
+Vat tu 1513,Bu long - Oc vit,cuon,318.44,70650,5,Ghi chu 1513
+Vat tu 1514,Thep goc,cai,91.11,57640,5,Ghi chu 1514
+Vat tu 1515,Dam thep,met,64.18,71595,5,Ghi chu 1515
+Vat tu 1516,Tam thep,kg,101.31,64489,5,Ghi chu 1516
+Vat tu 1517,Bu long - Oc vit,thung,239.01,82657,5,Ghi chu 1517
+Vat tu 1518,Tam thep,cuon,13.39,54208,5,Ghi chu 1518
+Vat tu 1519,Bu long - Oc vit,kg,318.00,79570,5,Ghi chu 1519
+Vat tu 1520,Thep hinh,cuon,12.84,51139,5,Ghi chu 1520
+Vat tu 1521,Ong thep,met,110.08,76766,5,Ghi chu 1521
+Vat tu 1522,Thep hop,cuon,300.48,50329,5,Ghi chu 1522
+Vat tu 1523,Tam thep,kg,249.15,81733,5,Ghi chu 1523
+Vat tu 1524,Vat tu tieu hao,tan,7.77,55680,5,Ghi chu 1524
+Vat tu 1525,Thep hinh,thung,124.11,59963,5,Ghi chu 1525
+Vat tu 1526,Ong thep,cai,244.10,80487,5,Ghi chu 1526
+Vat tu 1527,Thep goc,tan,135.60,64544,5,Ghi chu 1527
+Vat tu 1528,Ong thep,met,88.83,69867,5,Ghi chu 1528
+Vat tu 1529,Ong thep,thung,44.43,81839,5,Ghi chu 1529
+Vat tu 1530,Tam thep,cai,251.59,74164,5,Ghi chu 1530
+Vat tu 1531,Thep goc,tam,301.11,63948,5,Ghi chu 1531
+Vat tu 1532,Thep goc,tan,283.82,55233,5,Ghi chu 1532
+Vat tu 1533,Tam thep,kg,117.86,59997,5,Ghi chu 1533
+Vat tu 1534,Vat tu tieu hao,cai,144.08,77524,5,Ghi chu 1534
+Vat tu 1535,Bu long - Oc vit,tan,304.97,68542,5,Ghi chu 1535
+Vat tu 1536,Vat tu tieu hao,cai,265.20,82639,5,Ghi chu 1536
+Vat tu 1537,Tam thep,tan,245.88,53859,5,Ghi chu 1537
+Vat tu 1538,Vat tu tieu hao,tan,31.80,54427,5,Ghi chu 1538
+Vat tu 1539,Bu long - Oc vit,cuon,161.55,52045,5,Ghi chu 1539
+Vat tu 1540,Tam thep,cai,113.73,81544,5,Ghi chu 1540
+Vat tu 1541,Bu long - Oc vit,met,302.90,66566,5,Ghi chu 1541
+Vat tu 1542,Dam thep,met,272.98,54422,5,Ghi chu 1542
+Vat tu 1543,Thep hinh,kg,190.74,78999,5,Ghi chu 1543
+Vat tu 1544,Thep hinh,kg,177.04,60019,5,Ghi chu 1544
+Vat tu 1545,Thep hop,cai,168.24,51814,5,Ghi chu 1545
+Vat tu 1546,Ong thep,cuon,306.76,53455,5,Ghi chu 1546
+Vat tu 1547,Dam thep,cuon,135.73,62795,5,Ghi chu 1547
+Vat tu 1548,Bu long - Oc vit,cai,143.39,70582,5,Ghi chu 1548
+Vat tu 1549,Dam thep,kg,71.53,56682,5,Ghi chu 1549
+Vat tu 1550,Bu long - Oc vit,tam,153.70,56336,5,Ghi chu 1550
+Vat tu 1551,Ong thep,tan,175.95,63007,5,Ghi chu 1551
+Vat tu 1552,Ong thep,tan,274.84,81213,5,Ghi chu 1552
+Vat tu 1553,Vat tu tieu hao,tan,311.03,57681,5,Ghi chu 1553
+Vat tu 1554,Thep goc,met,26.57,62468,5,Ghi chu 1554
+Vat tu 1555,Tam thep,tan,45.09,79283,5,Ghi chu 1555
+Vat tu 1556,Ong thep,cai,127.07,66587,5,Ghi chu 1556
+Vat tu 1557,Dam thep,met,192.07,81574,5,Ghi chu 1557
+Vat tu 1558,Tam thep,kg,134.85,56974,5,Ghi chu 1558
+Vat tu 1559,Thep goc,cai,258.74,57421,5,Ghi chu 1559
+Vat tu 1560,Dam thep,met,198.14,71677,5,Ghi chu 1560
+Vat tu 1561,Bu long - Oc vit,thung,208.37,69216,5,Ghi chu 1561
+Vat tu 1562,Ong thep,tan,295.78,67685,5,Ghi chu 1562
+Vat tu 1563,Bu long - Oc vit,cuon,53.94,58035,5,Ghi chu 1563
+Vat tu 1564,Thep goc,cuon,285.05,54569,5,Ghi chu 1564
+Vat tu 1565,Ong thep,cai,152.10,67034,5,Ghi chu 1565
+Vat tu 1566,Thep goc,tam,109.88,80983,5,Ghi chu 1566
+Vat tu 1567,Thep hinh,tam,128.18,76773,5,Ghi chu 1567
+Vat tu 1568,Thep hop,tam,27.27,75623,5,Ghi chu 1568
+Vat tu 1569,Dam thep,cuon,148.82,74253,5,Ghi chu 1569
+Vat tu 1570,Ong thep,tam,304.67,54075,5,Ghi chu 1570
+Vat tu 1571,Ong thep,tan,22.40,55087,5,Ghi chu 1571
+Vat tu 1572,Thep hinh,tam,146.53,55658,5,Ghi chu 1572
+Vat tu 1573,Vat tu tieu hao,kg,106.31,50505,5,Ghi chu 1573
+Vat tu 1574,Bu long - Oc vit,tam,78.72,61581,5,Ghi chu 1574
+Vat tu 1575,Bu long - Oc vit,thung,113.03,77884,5,Ghi chu 1575
+Vat tu 1576,Thep hinh,cai,140.71,71035,5,Ghi chu 1576
+Vat tu 1577,Thep hop,cuon,262.62,58941,5,Ghi chu 1577
+Vat tu 1578,Thep hop,met,328.13,78943,5,Ghi chu 1578
+Vat tu 1579,Thep hinh,cai,78.05,82730,5,Ghi chu 1579
+Vat tu 1580,Thep hinh,cuon,12.00,68929,5,Ghi chu 1580
+Vat tu 1581,Tam thep,thung,306.06,55827,5,Ghi chu 1581
+Vat tu 1582,Vat tu tieu hao,tan,63.45,51939,5,Ghi chu 1582
+Vat tu 1583,Dam thep,cuon,118.09,63104,5,Ghi chu 1583
+Vat tu 1584,Bu long - Oc vit,met,265.63,80341,5,Ghi chu 1584
+Vat tu 1585,Tam thep,cai,132.80,60126,5,Ghi chu 1585
+Vat tu 1586,Tam thep,thung,145.90,70424,5,Ghi chu 1586
+Vat tu 1587,Bu long - Oc vit,tan,210.06,53524,5,Ghi chu 1587
+Vat tu 1588,Tam thep,tan,241.03,80574,5,Ghi chu 1588
+Vat tu 1589,Tam thep,kg,212.71,61329,5,Ghi chu 1589
+Vat tu 1590,Thep hop,tan,133.09,70685,5,Ghi chu 1590
+Vat tu 1591,Vat tu tieu hao,kg,126.27,67869,5,Ghi chu 1591
+Vat tu 1592,Thep hinh,tan,248.41,55040,5,Ghi chu 1592
+Vat tu 1593,Thep hop,cuon,123.36,70253,5,Ghi chu 1593
+Vat tu 1594,Thep goc,kg,142.39,65362,5,Ghi chu 1594
+Vat tu 1595,Thep hinh,cai,133.47,74156,5,Ghi chu 1595
+Vat tu 1596,Tam thep,thung,121.03,70775,5,Ghi chu 1596
+Vat tu 1597,Thep hinh,cuon,88.54,57481,5,Ghi chu 1597
+Vat tu 1598,Tam thep,kg,64.17,75505,5,Ghi chu 1598
+Vat tu 1599,Thep goc,kg,4.97,55213,5,Ghi chu 1599
+Vat tu 1600,Thep hop,tan,198.96,66031,5,Ghi chu 1600
+Vat tu 1601,Tam thep,kg,309.49,68112,5,Ghi chu 1601
+Vat tu 1602,Thep hop,thung,257.83,57985,5,Ghi chu 1602
+Vat tu 1603,Vat tu tieu hao,thung,111.40,75460,5,Ghi chu 1603
+Vat tu 1604,Dam thep,kg,318.06,62386,5,Ghi chu 1604
+Vat tu 1605,Tam thep,tan,280.86,76784,5,Ghi chu 1605
+Vat tu 1606,Thep hinh,thung,302.08,66771,5,Ghi chu 1606
+Vat tu 1607,Bu long - Oc vit,tan,115.33,81033,5,Ghi chu 1607
+Vat tu 1608,Thep goc,tan,161.27,79070,5,Ghi chu 1608
+Vat tu 1609,Vat tu tieu hao,cai,60.28,59672,5,Ghi chu 1609
+Vat tu 1610,Thep hop,thung,135.03,59817,5,Ghi chu 1610
+Vat tu 1611,Thep hop,met,192.50,70107,5,Ghi chu 1611
+Vat tu 1612,Thep goc,kg,4.58,54262,5,Ghi chu 1612
+Vat tu 1613,Thep hop,tan,201.02,78927,5,Ghi chu 1613
+Vat tu 1614,Thep hinh,cuon,131.87,73980,5,Ghi chu 1614
+Vat tu 1615,Thep goc,cuon,37.14,55064,5,Ghi chu 1615
+Vat tu 1616,Bu long - Oc vit,tan,175.11,56399,5,Ghi chu 1616
+Vat tu 1617,Thep hop,tan,166.14,76646,5,Ghi chu 1617
+Vat tu 1618,Tam thep,kg,111.19,81316,5,Ghi chu 1618
+Vat tu 1619,Thep hinh,tam,154.89,59467,5,Ghi chu 1619
+Vat tu 1620,Vat tu tieu hao,kg,229.21,60722,5,Ghi chu 1620
+Vat tu 1621,Thep goc,tan,265.62,80478,5,Ghi chu 1621
+Vat tu 1622,Thep hop,tam,207.32,50416,5,Ghi chu 1622
+Vat tu 1623,Vat tu tieu hao,cuon,231.76,63626,5,Ghi chu 1623
+Vat tu 1624,Ong thep,tam,98.17,70884,5,Ghi chu 1624
+Vat tu 1625,Thep hop,tan,228.70,54898,5,Ghi chu 1625
+Vat tu 1626,Thep goc,tam,172.50,68617,5,Ghi chu 1626
+Vat tu 1627,Bu long - Oc vit,tam,9.06,75864,5,Ghi chu 1627
+Vat tu 1628,Thep goc,tam,179.61,80342,5,Ghi chu 1628
+Vat tu 1629,Thep hop,kg,80.70,67827,5,Ghi chu 1629
+Vat tu 1630,Vat tu tieu hao,met,281.93,62813,5,Ghi chu 1630
+Vat tu 1631,Vat tu tieu hao,tan,299.88,70359,5,Ghi chu 1631
+Vat tu 1632,Tam thep,tam,315.43,78033,5,Ghi chu 1632
+Vat tu 1633,Thep hop,cai,34.45,66600,5,Ghi chu 1633
+Vat tu 1634,Thep hinh,met,32.02,68424,5,Ghi chu 1634
+Vat tu 1635,Bu long - Oc vit,thung,168.72,66425,5,Ghi chu 1635
+Vat tu 1636,Thep goc,cai,177.95,79841,5,Ghi chu 1636
+Vat tu 1637,Vat tu tieu hao,met,309.08,65584,5,Ghi chu 1637
+Vat tu 1638,Thep hop,kg,200.20,64896,5,Ghi chu 1638
+Vat tu 1639,Thep hinh,thung,90.50,67170,5,Ghi chu 1639
+Vat tu 1640,Thep hinh,thung,19.86,62586,5,Ghi chu 1640
+Vat tu 1641,Ong thep,cuon,205.30,78725,5,Ghi chu 1641
+Vat tu 1642,Dam thep,tam,10.37,54838,5,Ghi chu 1642
+Vat tu 1643,Thep hinh,met,290.94,67166,5,Ghi chu 1643
+Vat tu 1644,Dam thep,tan,252.63,72773,5,Ghi chu 1644
+Vat tu 1645,Tam thep,met,313.51,60772,5,Ghi chu 1645
+Vat tu 1646,Dam thep,tam,277.58,62334,5,Ghi chu 1646
+Vat tu 1647,Dam thep,cuon,166.20,50710,5,Ghi chu 1647
+Vat tu 1648,Vat tu tieu hao,met,320.15,77637,5,Ghi chu 1648
+Vat tu 1649,Tam thep,kg,259.99,63637,5,Ghi chu 1649
+Vat tu 1650,Dam thep,cai,267.98,62534,5,Ghi chu 1650
+Vat tu 1651,Ong thep,kg,279.11,71360,5,Ghi chu 1651
+Vat tu 1652,Tam thep,cai,107.27,51934,5,Ghi chu 1652
+Vat tu 1653,Bu long - Oc vit,cai,65.46,82582,5,Ghi chu 1653
+Vat tu 1654,Dam thep,kg,219.11,56695,5,Ghi chu 1654
+Vat tu 1655,Bu long - Oc vit,tam,66.26,64130,5,Ghi chu 1655
+Vat tu 1656,Tam thep,cuon,198.19,66152,5,Ghi chu 1656
+Vat tu 1657,Vat tu tieu hao,met,283.86,61719,5,Ghi chu 1657
+Vat tu 1658,Tam thep,thung,110.17,51010,5,Ghi chu 1658
+Vat tu 1659,Vat tu tieu hao,cuon,21.66,79938,5,Ghi chu 1659
+Vat tu 1660,Tam thep,tam,311.88,73367,5,Ghi chu 1660
+Vat tu 1661,Bu long - Oc vit,met,51.43,58371,5,Ghi chu 1661
+Vat tu 1662,Bu long - Oc vit,tan,68.94,73960,5,Ghi chu 1662
+Vat tu 1663,Bu long - Oc vit,met,227.12,68995,5,Ghi chu 1663
+Vat tu 1664,Thep hinh,kg,13.77,73563,5,Ghi chu 1664
+Vat tu 1665,Ong thep,tam,60.74,82145,5,Ghi chu 1665
+Vat tu 1666,Thep hinh,met,146.41,76976,5,Ghi chu 1666
+Vat tu 1667,Thep hinh,tam,260.07,65720,5,Ghi chu 1667
+Vat tu 1668,Dam thep,cuon,45.42,56875,5,Ghi chu 1668
+Vat tu 1669,Vat tu tieu hao,tan,37.23,58892,5,Ghi chu 1669
+Vat tu 1670,Dam thep,kg,316.53,69754,5,Ghi chu 1670
+Vat tu 1671,Bu long - Oc vit,cuon,197.50,80330,5,Ghi chu 1671
+Vat tu 1672,Dam thep,met,35.73,69026,5,Ghi chu 1672
+Vat tu 1673,Thep goc,met,75.31,69173,5,Ghi chu 1673
+Vat tu 1674,Thep hinh,thung,205.18,74412,5,Ghi chu 1674
+Vat tu 1675,Vat tu tieu hao,kg,258.28,79707,5,Ghi chu 1675
+Vat tu 1676,Dam thep,thung,62.48,62303,5,Ghi chu 1676
+Vat tu 1677,Tam thep,tan,282.81,52564,5,Ghi chu 1677
+Vat tu 1678,Tam thep,thung,40.72,57702,5,Ghi chu 1678
+Vat tu 1679,Tam thep,cai,84.55,51727,5,Ghi chu 1679
+Vat tu 1680,Thep hinh,cuon,167.05,52510,5,Ghi chu 1680
+Vat tu 1681,Thep hop,met,90.18,54753,5,Ghi chu 1681
+Vat tu 1682,Dam thep,kg,267.61,56401,5,Ghi chu 1682
+Vat tu 1683,Thep goc,kg,244.10,69056,5,Ghi chu 1683
+Vat tu 1684,Vat tu tieu hao,cuon,220.00,79885,5,Ghi chu 1684
+Vat tu 1685,Thep hop,cai,101.05,72734,5,Ghi chu 1685
+Vat tu 1686,Thep hop,tam,178.10,63638,5,Ghi chu 1686
+Vat tu 1687,Bu long - Oc vit,tan,228.76,50173,5,Ghi chu 1687
+Vat tu 1688,Dam thep,kg,178.74,78696,5,Ghi chu 1688
+Vat tu 1689,Thep goc,cuon,2.90,68336,5,Ghi chu 1689
+Vat tu 1690,Ong thep,tan,257.45,74684,5,Ghi chu 1690
+Vat tu 1691,Thep hop,cai,89.44,68855,5,Ghi chu 1691
+Vat tu 1692,Thep hinh,met,15.18,52670,5,Ghi chu 1692
+Vat tu 1693,Thep hinh,thung,305.81,71163,5,Ghi chu 1693
+Vat tu 1694,Thep goc,thung,306.08,77309,5,Ghi chu 1694
+Vat tu 1695,Thep hop,cuon,88.29,76533,5,Ghi chu 1695
+Vat tu 1696,Thep goc,cuon,204.92,56892,5,Ghi chu 1696
+Vat tu 1697,Thep goc,tam,121.54,67822,5,Ghi chu 1697
+Vat tu 1698,Thep hop,met,59.79,60782,5,Ghi chu 1698
+Vat tu 1699,Vat tu tieu hao,kg,202.35,53519,5,Ghi chu 1699
+Vat tu 1700,Ong thep,tan,225.49,57444,5,Ghi chu 1700
+Vat tu 1701,Dam thep,met,164.95,54835,5,Ghi chu 1701
+Vat tu 1702,Dam thep,thung,113.59,77852,5,Ghi chu 1702
+Vat tu 1703,Thep goc,thung,170.98,74702,5,Ghi chu 1703
+Vat tu 1704,Thep hinh,tam,240.43,81790,5,Ghi chu 1704
+Vat tu 1705,Thep hop,met,222.25,71503,5,Ghi chu 1705
+Vat tu 1706,Thep goc,tan,5.02,77337,5,Ghi chu 1706
+Vat tu 1707,Bu long - Oc vit,cuon,15.12,65967,5,Ghi chu 1707
+Vat tu 1708,Dam thep,tam,188.38,68021,5,Ghi chu 1708
+Vat tu 1709,Thep goc,thung,83.81,77659,5,Ghi chu 1709
+Vat tu 1710,Ong thep,thung,164.74,79376,5,Ghi chu 1710
+Vat tu 1711,Dam thep,cai,271.74,69254,5,Ghi chu 1711
+Vat tu 1712,Dam thep,kg,207.78,69551,5,Ghi chu 1712
+Vat tu 1713,Thep hinh,kg,29.98,75536,5,Ghi chu 1713
+Vat tu 1714,Tam thep,cai,253.26,61779,5,Ghi chu 1714
+Vat tu 1715,Thep hinh,thung,271.22,77809,5,Ghi chu 1715
+Vat tu 1716,Ong thep,cuon,156.09,70454,5,Ghi chu 1716
+Vat tu 1717,Thep goc,met,110.69,79078,5,Ghi chu 1717
+Vat tu 1718,Dam thep,met,21.77,66144,5,Ghi chu 1718
+Vat tu 1719,Thep hop,thung,304.67,77318,5,Ghi chu 1719
+Vat tu 1720,Vat tu tieu hao,kg,314.45,79156,5,Ghi chu 1720
+Vat tu 1721,Tam thep,cai,134.00,61635,5,Ghi chu 1721
+Vat tu 1722,Thep goc,kg,92.50,53570,5,Ghi chu 1722
+Vat tu 1723,Thep hop,met,196.77,66488,5,Ghi chu 1723
+Vat tu 1724,Thep hinh,tam,156.80,60085,5,Ghi chu 1724
+Vat tu 1725,Tam thep,tam,289.59,80575,5,Ghi chu 1725
+Vat tu 1726,Tam thep,cai,167.82,73372,5,Ghi chu 1726
+Vat tu 1727,Bu long - Oc vit,cuon,186.27,58356,5,Ghi chu 1727
+Vat tu 1728,Thep hop,cuon,58.56,77658,5,Ghi chu 1728
+Vat tu 1729,Vat tu tieu hao,tam,174.02,53996,5,Ghi chu 1729
+Vat tu 1730,Vat tu tieu hao,cuon,27.74,59757,5,Ghi chu 1730
+Vat tu 1731,Vat tu tieu hao,thung,69.38,60889,5,Ghi chu 1731
+Vat tu 1732,Bu long - Oc vit,cuon,42.69,72727,5,Ghi chu 1732
+Vat tu 1733,Tam thep,cuon,118.45,80995,5,Ghi chu 1733
+Vat tu 1734,Vat tu tieu hao,kg,127.62,50364,5,Ghi chu 1734
+Vat tu 1735,Tam thep,kg,77.57,76585,5,Ghi chu 1735
+Vat tu 1736,Dam thep,cuon,199.70,67847,5,Ghi chu 1736
+Vat tu 1737,Vat tu tieu hao,kg,326.49,77762,5,Ghi chu 1737
+Vat tu 1738,Thep hop,kg,211.86,80818,5,Ghi chu 1738
+Vat tu 1739,Dam thep,thung,29.63,58979,5,Ghi chu 1739
+Vat tu 1740,Thep hop,cai,197.36,51284,5,Ghi chu 1740
+Vat tu 1741,Thep hop,kg,40.22,53547,5,Ghi chu 1741
+Vat tu 1742,Bu long - Oc vit,tan,205.37,56562,5,Ghi chu 1742
+Vat tu 1743,Thep hinh,tan,323.00,77708,5,Ghi chu 1743
+Vat tu 1744,Thep goc,cai,243.00,63363,5,Ghi chu 1744
+Vat tu 1745,Ong thep,cuon,116.90,50579,5,Ghi chu 1745
+Vat tu 1746,Thep goc,kg,110.91,60222,5,Ghi chu 1746
+Vat tu 1747,Thep hinh,tan,273.03,54947,5,Ghi chu 1747
+Vat tu 1748,Vat tu tieu hao,thung,54.46,68930,5,Ghi chu 1748
+Vat tu 1749,Bu long - Oc vit,cuon,225.76,67738,5,Ghi chu 1749
+Vat tu 1750,Thep goc,cai,284.76,59210,5,Ghi chu 1750
+Vat tu 1751,Thep hinh,kg,212.70,58370,5,Ghi chu 1751
+Vat tu 1752,Dam thep,cuon,189.13,66134,5,Ghi chu 1752
+Vat tu 1753,Ong thep,kg,27.43,64501,5,Ghi chu 1753
+Vat tu 1754,Dam thep,thung,175.04,61306,5,Ghi chu 1754
+Vat tu 1755,Bu long - Oc vit,met,274.28,55598,5,Ghi chu 1755
+Vat tu 1756,Dam thep,tan,193.29,58730,5,Ghi chu 1756
+Vat tu 1757,Bu long - Oc vit,met,103.01,60513,5,Ghi chu 1757
+Vat tu 1758,Thep goc,thung,27.27,68990,5,Ghi chu 1758
+Vat tu 1759,Thep goc,kg,286.61,68672,5,Ghi chu 1759
+Vat tu 1760,Thep hinh,tan,83.26,71402,5,Ghi chu 1760
+Vat tu 1761,Vat tu tieu hao,tam,152.13,59803,5,Ghi chu 1761
+Vat tu 1762,Ong thep,met,29.72,53724,5,Ghi chu 1762
+Vat tu 1763,Bu long - Oc vit,kg,273.60,59063,5,Ghi chu 1763
+Vat tu 1764,Bu long - Oc vit,kg,167.56,50427,5,Ghi chu 1764
+Vat tu 1765,Bu long - Oc vit,thung,231.91,57824,5,Ghi chu 1765
+Vat tu 1766,Tam thep,tam,289.48,69945,5,Ghi chu 1766
+Vat tu 1767,Vat tu tieu hao,thung,92.89,71425,5,Ghi chu 1767
+Vat tu 1768,Thep hop,cuon,193.58,81727,5,Ghi chu 1768
+Vat tu 1769,Thep goc,tan,297.52,82427,5,Ghi chu 1769
+Vat tu 1770,Thep hop,thung,231.74,81479,5,Ghi chu 1770
+Vat tu 1771,Thep hinh,tan,188.82,59343,5,Ghi chu 1771
+Vat tu 1772,Thep hop,cuon,229.83,55763,5,Ghi chu 1772
+Vat tu 1773,Thep hop,cai,112.75,53943,5,Ghi chu 1773
+Vat tu 1774,Vat tu tieu hao,thung,115.57,58055,5,Ghi chu 1774
+Vat tu 1775,Thep hop,thung,271.63,58432,5,Ghi chu 1775
+Vat tu 1776,Thep hinh,thung,269.45,64767,5,Ghi chu 1776
+Vat tu 1777,Thep goc,thung,211.28,60816,5,Ghi chu 1777
+Vat tu 1778,Bu long - Oc vit,cuon,4.64,55711,5,Ghi chu 1778
+Vat tu 1779,Ong thep,thung,62.97,59125,5,Ghi chu 1779
+Vat tu 1780,Thep goc,tan,316.15,76723,5,Ghi chu 1780
+Vat tu 1781,Thep hop,tam,170.84,67223,5,Ghi chu 1781
+Vat tu 1782,Thep goc,cai,210.24,73159,5,Ghi chu 1782
+Vat tu 1783,Bu long - Oc vit,tam,99.87,79071,5,Ghi chu 1783
+Vat tu 1784,Thep hinh,cuon,26.66,74504,5,Ghi chu 1784
+Vat tu 1785,Thep hinh,tam,72.02,65780,5,Ghi chu 1785
+Vat tu 1786,Dam thep,tan,196.76,71498,5,Ghi chu 1786
+Vat tu 1787,Thep hop,cai,113.01,74289,5,Ghi chu 1787
+Vat tu 1788,Thep hop,thung,105.43,60777,5,Ghi chu 1788
+Vat tu 1789,Thep goc,tam,128.31,76499,5,Ghi chu 1789
+Vat tu 1790,Thep goc,tam,110.61,76651,5,Ghi chu 1790
+Vat tu 1791,Tam thep,tam,285.15,82249,5,Ghi chu 1791
+Vat tu 1792,Thep hop,tam,315.18,55725,5,Ghi chu 1792
+Vat tu 1793,Bu long - Oc vit,tam,144.62,59980,5,Ghi chu 1793
+Vat tu 1794,Thep goc,tan,104.00,81353,5,Ghi chu 1794
+Vat tu 1795,Dam thep,thung,18.30,74546,5,Ghi chu 1795
+Vat tu 1796,Ong thep,cai,259.27,64418,5,Ghi chu 1796
+Vat tu 1797,Tam thep,tam,172.06,50933,5,Ghi chu 1797
+Vat tu 1798,Ong thep,thung,47.66,61004,5,Ghi chu 1798
+Vat tu 1799,Tam thep,cai,70.10,66658,5,Ghi chu 1799
+Vat tu 1800,Thep goc,cai,159.57,74510,5,Ghi chu 1800
+Vat tu 1801,Ong thep,tan,208.29,62459,5,Ghi chu 1801
+Vat tu 1802,Ong thep,met,193.24,82290,5,Ghi chu 1802
+Vat tu 1803,Bu long - Oc vit,cuon,145.24,79319,5,Ghi chu 1803
+Vat tu 1804,Ong thep,met,206.52,51062,5,Ghi chu 1804
+Vat tu 1805,Bu long - Oc vit,tam,305.96,76005,5,Ghi chu 1805
+Vat tu 1806,Tam thep,met,318.04,70252,5,Ghi chu 1806
+Vat tu 1807,Dam thep,met,103.58,77868,5,Ghi chu 1807
+Vat tu 1808,Dam thep,met,57.47,71251,5,Ghi chu 1808
+Vat tu 1809,Dam thep,tan,204.56,59756,5,Ghi chu 1809
+Vat tu 1810,Dam thep,kg,237.14,70470,5,Ghi chu 1810
+Vat tu 1811,Vat tu tieu hao,thung,16.69,70516,5,Ghi chu 1811
+Vat tu 1812,Bu long - Oc vit,kg,154.98,82558,5,Ghi chu 1812
+Vat tu 1813,Dam thep,cai,121.19,78772,5,Ghi chu 1813
+Vat tu 1814,Thep hinh,met,135.53,62487,5,Ghi chu 1814
+Vat tu 1815,Thep goc,tam,2.37,76097,5,Ghi chu 1815
+Vat tu 1816,Tam thep,met,124.55,74729,5,Ghi chu 1816
+Vat tu 1817,Ong thep,tam,14.05,75079,5,Ghi chu 1817
+Vat tu 1818,Ong thep,tam,237.14,61367,5,Ghi chu 1818
+Vat tu 1819,Thep hinh,kg,17.64,80980,5,Ghi chu 1819
+Vat tu 1820,Thep hinh,tan,78.96,63182,5,Ghi chu 1820
+Vat tu 1821,Thep hinh,cuon,32.53,54190,5,Ghi chu 1821
+Vat tu 1822,Tam thep,met,45.64,72862,5,Ghi chu 1822
+Vat tu 1823,Thep goc,met,154.45,66844,5,Ghi chu 1823
+Vat tu 1824,Vat tu tieu hao,thung,313.53,60466,5,Ghi chu 1824
+Vat tu 1825,Dam thep,thung,80.57,81005,5,Ghi chu 1825
+Vat tu 1826,Tam thep,cuon,242.15,81324,5,Ghi chu 1826
+Vat tu 1827,Bu long - Oc vit,met,104.46,82340,5,Ghi chu 1827
+Vat tu 1828,Tam thep,cai,274.56,82741,5,Ghi chu 1828
+Vat tu 1829,Thep goc,tan,56.78,69639,5,Ghi chu 1829
+Vat tu 1830,Thep hop,cuon,312.48,54479,5,Ghi chu 1830
+Vat tu 1831,Thep goc,cuon,270.15,76341,5,Ghi chu 1831
+Vat tu 1832,Thep goc,kg,27.29,82321,5,Ghi chu 1832
+Vat tu 1833,Thep hinh,met,148.39,60844,5,Ghi chu 1833
+Vat tu 1834,Thep hinh,tam,184.96,79889,5,Ghi chu 1834
+Vat tu 1835,Vat tu tieu hao,tam,190.63,77190,5,Ghi chu 1835
+Vat tu 1836,Tam thep,kg,310.36,65819,5,Ghi chu 1836
+Vat tu 1837,Tam thep,cuon,166.59,73310,5,Ghi chu 1837
+Vat tu 1838,Thep goc,tan,198.26,67453,5,Ghi chu 1838
+Vat tu 1839,Tam thep,thung,30.77,52063,5,Ghi chu 1839
+Vat tu 1840,Thep hop,tam,270.57,63973,5,Ghi chu 1840
+Vat tu 1841,Vat tu tieu hao,met,302.35,81804,5,Ghi chu 1841
+Vat tu 1842,Vat tu tieu hao,thung,324.05,82519,5,Ghi chu 1842
+Vat tu 1843,Vat tu tieu hao,tan,141.56,54945,5,Ghi chu 1843
+Vat tu 1844,Thep hop,thung,120.51,70613,5,Ghi chu 1844
+Vat tu 1845,Dam thep,thung,202.90,62534,5,Ghi chu 1845
+Vat tu 1846,Bu long - Oc vit,met,167.68,74513,5,Ghi chu 1846
+Vat tu 1847,Thep hop,cuon,320.64,79677,5,Ghi chu 1847
+Vat tu 1848,Ong thep,kg,90.08,72053,5,Ghi chu 1848
+Vat tu 1849,Ong thep,cai,281.73,82533,5,Ghi chu 1849
+Vat tu 1850,Thep hinh,cuon,209.58,67721,5,Ghi chu 1850
+Vat tu 1851,Tam thep,cuon,194.29,65214,5,Ghi chu 1851
+Vat tu 1852,Thep goc,cuon,313.29,52295,5,Ghi chu 1852
+Vat tu 1853,Tam thep,cuon,138.61,65474,5,Ghi chu 1853
+Vat tu 1854,Thep goc,cuon,65.26,60863,5,Ghi chu 1854
+Vat tu 1855,Thep hinh,tan,22.03,61743,5,Ghi chu 1855
+Vat tu 1856,Thep goc,tam,160.92,50645,5,Ghi chu 1856
+Vat tu 1857,Thep hop,cai,110.43,55942,5,Ghi chu 1857
+Vat tu 1858,Bu long - Oc vit,tan,121.74,58360,5,Ghi chu 1858
+Vat tu 1859,Thep hop,cuon,28.24,75713,5,Ghi chu 1859
+Vat tu 1860,Thep hop,tam,82.01,74176,5,Ghi chu 1860
+Vat tu 1861,Vat tu tieu hao,cuon,104.35,71706,5,Ghi chu 1861
+Vat tu 1862,Vat tu tieu hao,cuon,2.70,57385,5,Ghi chu 1862
+Vat tu 1863,Dam thep,cuon,158.42,52623,5,Ghi chu 1863
+Vat tu 1864,Vat tu tieu hao,met,118.30,52133,5,Ghi chu 1864
+Vat tu 1865,Vat tu tieu hao,kg,19.75,62471,5,Ghi chu 1865
+Vat tu 1866,Vat tu tieu hao,tan,2.46,72024,5,Ghi chu 1866
+Vat tu 1867,Ong thep,kg,173.87,81450,5,Ghi chu 1867
+Vat tu 1868,Thep hop,cuon,201.45,67733,5,Ghi chu 1868
+Vat tu 1869,Thep hinh,thung,257.74,75493,5,Ghi chu 1869
+Vat tu 1870,Thep goc,kg,116.69,79522,5,Ghi chu 1870
+Vat tu 1871,Bu long - Oc vit,thung,188.38,50973,5,Ghi chu 1871
+Vat tu 1872,Thep hop,cai,185.13,54866,5,Ghi chu 1872
+Vat tu 1873,Thep hop,thung,110.46,55959,5,Ghi chu 1873
+Vat tu 1874,Thep goc,cuon,50.68,64878,5,Ghi chu 1874
+Vat tu 1875,Ong thep,tan,29.19,71479,5,Ghi chu 1875
+Vat tu 1876,Thep hinh,tan,19.53,67735,5,Ghi chu 1876
+Vat tu 1877,Thep hinh,cai,313.04,62949,5,Ghi chu 1877
+Vat tu 1878,Bu long - Oc vit,kg,51.98,68156,5,Ghi chu 1878
+Vat tu 1879,Bu long - Oc vit,tan,86.66,73724,5,Ghi chu 1879
+Vat tu 1880,Tam thep,cai,250.45,79741,5,Ghi chu 1880
+Vat tu 1881,Ong thep,tam,246.78,82390,5,Ghi chu 1881
+Vat tu 1882,Thep hop,tam,17.39,63375,5,Ghi chu 1882
+Vat tu 1883,Vat tu tieu hao,cai,185.68,63866,5,Ghi chu 1883
+Vat tu 1884,Vat tu tieu hao,tan,174.47,51089,5,Ghi chu 1884
+Vat tu 1885,Ong thep,thung,67.22,62867,5,Ghi chu 1885
+Vat tu 1886,Tam thep,cai,8.97,74689,5,Ghi chu 1886
+Vat tu 1887,Vat tu tieu hao,thung,178.15,63633,5,Ghi chu 1887
+Vat tu 1888,Thep hop,cai,227.35,53932,5,Ghi chu 1888
+Vat tu 1889,Thep hop,met,129.77,58953,5,Ghi chu 1889
+Vat tu 1890,Thep hop,tan,53.14,74994,5,Ghi chu 1890
+Vat tu 1891,Ong thep,tam,112.80,53615,5,Ghi chu 1891
+Vat tu 1892,Tam thep,cuon,193.48,72703,5,Ghi chu 1892
+Vat tu 1893,Vat tu tieu hao,thung,317.21,59355,5,Ghi chu 1893
+Vat tu 1894,Thep hop,cuon,35.28,71586,5,Ghi chu 1894
+Vat tu 1895,Thep hinh,cai,160.50,50947,5,Ghi chu 1895
+Vat tu 1896,Dam thep,cai,101.87,56827,5,Ghi chu 1896
+Vat tu 1897,Thep hinh,tam,163.44,51471,5,Ghi chu 1897
+Vat tu 1898,Ong thep,met,72.41,60075,5,Ghi chu 1898
+Vat tu 1899,Ong thep,met,86.41,71792,5,Ghi chu 1899
+Vat tu 1900,Thep hinh,met,98.77,81671,5,Ghi chu 1900
+Vat tu 1901,Thep goc,tan,226.06,62863,5,Ghi chu 1901
+Vat tu 1902,Tam thep,tan,311.52,76487,5,Ghi chu 1902
+Vat tu 1903,Tam thep,cai,288.36,75695,5,Ghi chu 1903
+Vat tu 1904,Thep hop,cuon,62.58,77886,5,Ghi chu 1904
+Vat tu 1905,Dam thep,thung,275.29,74209,5,Ghi chu 1905
+Vat tu 1906,Bu long - Oc vit,cai,164.02,77037,5,Ghi chu 1906
+Vat tu 1907,Ong thep,tan,244.73,65733,5,Ghi chu 1907
+Vat tu 1908,Thep hop,kg,115.07,62721,5,Ghi chu 1908
+Vat tu 1909,Bu long - Oc vit,thung,18.65,81387,5,Ghi chu 1909
+Vat tu 1910,Dam thep,tan,203.02,76159,5,Ghi chu 1910
+Vat tu 1911,Tam thep,cai,181.46,52139,5,Ghi chu 1911
+Vat tu 1912,Bu long - Oc vit,cuon,116.49,59639,5,Ghi chu 1912
+Vat tu 1913,Thep hop,cuon,286.50,58710,5,Ghi chu 1913
+Vat tu 1914,Vat tu tieu hao,tam,294.57,73608,5,Ghi chu 1914
+Vat tu 1915,Ong thep,thung,182.94,60687,5,Ghi chu 1915
+Vat tu 1916,Ong thep,cai,191.68,50406,5,Ghi chu 1916
+Vat tu 1917,Tam thep,cuon,244.53,73069,5,Ghi chu 1917
+Vat tu 1918,Thep hinh,cai,189.03,58065,5,Ghi chu 1918
+Vat tu 1919,Ong thep,tan,262.42,59429,5,Ghi chu 1919
+Vat tu 1920,Thep hinh,thung,278.83,81523,5,Ghi chu 1920
+Vat tu 1921,Vat tu tieu hao,cai,281.05,71577,5,Ghi chu 1921
+Vat tu 1922,Bu long - Oc vit,thung,19.13,59857,5,Ghi chu 1922
+Vat tu 1923,Dam thep,met,216.06,51553,5,Ghi chu 1923
+Vat tu 1924,Tam thep,cuon,147.25,67479,5,Ghi chu 1924
+Vat tu 1925,Thep goc,tam,23.18,66273,5,Ghi chu 1925
+Vat tu 1926,Ong thep,tan,301.43,50194,5,Ghi chu 1926
+Vat tu 1927,Ong thep,kg,323.68,67407,5,Ghi chu 1927
+Vat tu 1928,Thep hop,kg,190.32,51937,5,Ghi chu 1928
+Vat tu 1929,Thep goc,met,104.37,67193,5,Ghi chu 1929
+Vat tu 1930,Ong thep,cuon,270.38,53933,5,Ghi chu 1930
+Vat tu 1931,Thep hop,met,182.04,51408,5,Ghi chu 1931
+Vat tu 1932,Bu long - Oc vit,cai,238.90,57489,5,Ghi chu 1932
+Vat tu 1933,Thep hop,cai,266.46,72816,5,Ghi chu 1933
+Vat tu 1934,Bu long - Oc vit,met,288.23,75621,5,Ghi chu 1934
+Vat tu 1935,Bu long - Oc vit,kg,280.79,67387,5,Ghi chu 1935
+Vat tu 1936,Ong thep,cuon,306.61,68217,5,Ghi chu 1936
+Vat tu 1937,Thep goc,cuon,194.55,77820,5,Ghi chu 1937
+Vat tu 1938,Dam thep,cuon,259.51,75637,5,Ghi chu 1938
+Vat tu 1939,Bu long - Oc vit,tam,84.12,62249,5,Ghi chu 1939
+Vat tu 1940,Thep goc,kg,253.69,61849,5,Ghi chu 1940
+Vat tu 1941,Tam thep,tam,206.98,71245,5,Ghi chu 1941
+Vat tu 1942,Ong thep,met,251.34,82180,5,Ghi chu 1942
+Vat tu 1943,Vat tu tieu hao,tam,308.88,59064,5,Ghi chu 1943
+Vat tu 1944,Bu long - Oc vit,tan,42.58,60465,5,Ghi chu 1944
+Vat tu 1945,Thep hinh,met,162.51,55847,5,Ghi chu 1945
+Vat tu 1946,Dam thep,thung,98.91,67740,5,Ghi chu 1946
+Vat tu 1947,Thep hop,cai,85.97,60505,5,Ghi chu 1947
+Vat tu 1948,Ong thep,cai,190.15,75892,5,Ghi chu 1948
+Vat tu 1949,Bu long - Oc vit,thung,274.94,69203,5,Ghi chu 1949
+Vat tu 1950,Bu long - Oc vit,cuon,145.63,62737,5,Ghi chu 1950
+Vat tu 1951,Ong thep,tam,166.92,59206,5,Ghi chu 1951
+Vat tu 1952,Bu long - Oc vit,met,321.41,58793,5,Ghi chu 1952
+Vat tu 1953,Bu long - Oc vit,cuon,226.76,75801,5,Ghi chu 1953
+Vat tu 1954,Tam thep,cuon,326.92,69971,5,Ghi chu 1954
+Vat tu 1955,Thep goc,tam,5.14,80502,5,Ghi chu 1955
+Vat tu 1956,Thep hinh,kg,28.83,72202,5,Ghi chu 1956
+Vat tu 1957,Vat tu tieu hao,thung,92.70,50646,5,Ghi chu 1957
+Vat tu 1958,Ong thep,thung,16.36,78504,5,Ghi chu 1958
+Vat tu 1959,Tam thep,cuon,96.26,59662,5,Ghi chu 1959
+Vat tu 1960,Dam thep,cai,80.75,61275,5,Ghi chu 1960
+Vat tu 1961,Thep goc,cuon,292.85,68067,5,Ghi chu 1961
+Vat tu 1962,Dam thep,thung,122.02,51198,5,Ghi chu 1962
+Vat tu 1963,Tam thep,thung,311.82,80708,5,Ghi chu 1963
+Vat tu 1964,Bu long - Oc vit,cai,116.19,62301,5,Ghi chu 1964
+Vat tu 1965,Thep goc,kg,287.96,68755,5,Ghi chu 1965
+Vat tu 1966,Dam thep,thung,314.02,53882,5,Ghi chu 1966
+Vat tu 1967,Ong thep,cai,283.95,68083,5,Ghi chu 1967
+Vat tu 1968,Vat tu tieu hao,kg,143.10,75026,5,Ghi chu 1968
+Vat tu 1969,Tam thep,kg,55.95,51781,5,Ghi chu 1969
+Vat tu 1970,Dam thep,cai,110.33,66911,5,Ghi chu 1970
+Vat tu 1971,Thep goc,tam,281.35,70483,5,Ghi chu 1971
+Vat tu 1972,Thep hinh,tam,203.99,65098,5,Ghi chu 1972
+Vat tu 1973,Thep goc,met,65.22,64769,5,Ghi chu 1973
+Vat tu 1974,Thep goc,tam,218.92,59075,5,Ghi chu 1974
+Vat tu 1975,Thep hinh,thung,50.17,54844,5,Ghi chu 1975
+Vat tu 1976,Bu long - Oc vit,met,303.59,74262,5,Ghi chu 1976
+Vat tu 1977,Ong thep,kg,240.50,51740,5,Ghi chu 1977
+Vat tu 1978,Thep hop,kg,179.81,81692,5,Ghi chu 1978
+Vat tu 1979,Thep goc,cuon,325.34,55200,5,Ghi chu 1979
+Vat tu 1980,Bu long - Oc vit,tan,113.34,63195,5,Ghi chu 1980
+Vat tu 1981,Tam thep,kg,135.44,51212,5,Ghi chu 1981
+Vat tu 1982,Thep hinh,kg,76.59,67951,5,Ghi chu 1982
+Vat tu 1983,Ong thep,cai,257.79,50423,5,Ghi chu 1983
+Vat tu 1984,Bu long - Oc vit,cuon,235.19,50270,5,Ghi chu 1984
+Vat tu 1985,Thep goc,met,148.47,64034,5,Ghi chu 1985
+Vat tu 1986,Dam thep,cuon,253.08,51524,5,Ghi chu 1986
+Vat tu 1987,Ong thep,tam,157.54,80562,5,Ghi chu 1987
+Vat tu 1988,Vat tu tieu hao,thung,61.87,80098,5,Ghi chu 1988
+Vat tu 1989,Thep hop,thung,297.21,54560,5,Ghi chu 1989
+Vat tu 1990,Vat tu tieu hao,met,5.99,60314,5,Ghi chu 1990
+Vat tu 1991,Dam thep,thung,297.09,57079,5,Ghi chu 1991
+Vat tu 1992,Ong thep,cai,21.38,72311,5,Ghi chu 1992
+Vat tu 1993,Vat tu tieu hao,kg,238.05,58241,5,Ghi chu 1993
+Vat tu 1994,Thep hop,tan,212.09,78852,5,Ghi chu 1994
+Vat tu 1995,Ong thep,tam,285.55,50467,5,Ghi chu 1995
+Vat tu 1996,Dam thep,tam,323.56,56311,5,Ghi chu 1996
+Vat tu 1997,Tam thep,tan,98.78,72268,5,Ghi chu 1997
+Vat tu 1998,Thep hop,kg,9.89,80133,5,Ghi chu 1998
+Vat tu 1999,Thep hop,cai,191.71,81032,5,Ghi chu 1999
+Vat tu 2000,Dam thep,tan,65.68,65311,5,Ghi chu 2000
+Vat tu 2001,Thep goc,cuon,124.98,56321,5,Ghi chu 2001
+Vat tu 2002,Thep hinh,cuon,269.50,63976,5,Ghi chu 2002
+Vat tu 2003,Tam thep,kg,265.02,61456,5,Ghi chu 2003
+Vat tu 2004,Bu long - Oc vit,cai,155.53,70946,5,Ghi chu 2004
+Vat tu 2005,Thep hop,kg,52.26,80090,5,Ghi chu 2005
+Vat tu 2006,Dam thep,cai,151.23,54092,5,Ghi chu 2006
+Vat tu 2007,Bu long - Oc vit,tam,37.51,68149,5,Ghi chu 2007
+Vat tu 2008,Ong thep,tan,259.11,64619,5,Ghi chu 2008
+Vat tu 2009,Thep goc,thung,133.87,55587,5,Ghi chu 2009
+Vat tu 2010,Thep goc,met,323.03,51787,5,Ghi chu 2010
+Vat tu 2011,Thep hop,thung,36.85,69379,5,Ghi chu 2011
+Vat tu 2012,Thep hop,thung,317.54,65061,5,Ghi chu 2012
+Vat tu 2013,Dam thep,met,173.19,73721,5,Ghi chu 2013
+Vat tu 2014,Thep hop,cai,109.04,56943,5,Ghi chu 2014
+Vat tu 2015,Bu long - Oc vit,tam,98.07,72760,5,Ghi chu 2015
+Vat tu 2016,Vat tu tieu hao,cai,233.47,70470,5,Ghi chu 2016
+Vat tu 2017,Bu long - Oc vit,kg,111.20,77949,5,Ghi chu 2017
+Vat tu 2018,Dam thep,cuon,282.29,73695,5,Ghi chu 2018
+Vat tu 2019,Thep hop,thung,271.38,77363,5,Ghi chu 2019
+Vat tu 2020,Thep hop,kg,62.44,69295,5,Ghi chu 2020
+Vat tu 2021,Thep hinh,tam,207.72,82229,5,Ghi chu 2021
+Vat tu 2022,Bu long - Oc vit,thung,216.56,78857,5,Ghi chu 2022
+Vat tu 2023,Dam thep,thung,304.23,59376,5,Ghi chu 2023
+Vat tu 2024,Dam thep,met,267.08,50304,5,Ghi chu 2024
+Vat tu 2025,Thep goc,tan,67.97,74319,5,Ghi chu 2025
+Vat tu 2026,Dam thep,cai,231.30,69903,5,Ghi chu 2026
+Vat tu 2027,Ong thep,cai,276.03,73586,5,Ghi chu 2027
+Vat tu 2028,Thep goc,met,146.36,75387,5,Ghi chu 2028
+Vat tu 2029,Ong thep,thung,106.33,66770,5,Ghi chu 2029
+Vat tu 2030,Thep hinh,cai,6.61,55718,5,Ghi chu 2030
+Vat tu 2031,Bu long - Oc vit,cuon,298.81,54409,5,Ghi chu 2031
+Vat tu 2032,Thep hinh,tan,319.45,64276,5,Ghi chu 2032
+Vat tu 2033,Thep goc,cai,262.40,73432,5,Ghi chu 2033
+Vat tu 2034,Vat tu tieu hao,thung,260.79,52314,5,Ghi chu 2034
+Vat tu 2035,Tam thep,cuon,161.02,52242,5,Ghi chu 2035
+Vat tu 2036,Ong thep,thung,141.95,51130,5,Ghi chu 2036
+Vat tu 2037,Ong thep,kg,163.79,79088,5,Ghi chu 2037
+Vat tu 2038,Ong thep,tam,104.49,58541,5,Ghi chu 2038
+Vat tu 2039,Dam thep,tan,101.70,60654,5,Ghi chu 2039
+Vat tu 2040,Thep hop,tan,93.53,76394,5,Ghi chu 2040
+Vat tu 2041,Thep hinh,tam,89.44,79331,5,Ghi chu 2041
+Vat tu 2042,Dam thep,kg,53.61,74535,5,Ghi chu 2042
+Vat tu 2043,Thep hop,thung,64.16,70928,5,Ghi chu 2043
+Vat tu 2044,Ong thep,tam,281.77,60836,5,Ghi chu 2044
+Vat tu 2045,Tam thep,met,158.70,58028,5,Ghi chu 2045
+Vat tu 2046,Tam thep,met,90.75,70306,5,Ghi chu 2046
+Vat tu 2047,Thep goc,cai,186.98,67221,5,Ghi chu 2047
+Vat tu 2048,Thep goc,cai,275.70,56746,5,Ghi chu 2048
+Vat tu 2049,Vat tu tieu hao,thung,207.30,55052,5,Ghi chu 2049
+Vat tu 2050,Thep hop,cuon,296.05,67359,5,Ghi chu 2050
+Vat tu 2051,Thep hinh,tan,262.21,77192,5,Ghi chu 2051
+Vat tu 2052,Tam thep,cuon,207.88,80532,5,Ghi chu 2052
+Vat tu 2053,Dam thep,thung,21.48,75565,5,Ghi chu 2053
+Vat tu 2054,Ong thep,thung,5.52,60844,5,Ghi chu 2054
+Vat tu 2055,Bu long - Oc vit,thung,300.44,69556,5,Ghi chu 2055
+Vat tu 2056,Thep hop,kg,59.90,61705,5,Ghi chu 2056
+Vat tu 2057,Thep goc,tam,285.52,71377,5,Ghi chu 2057
+Vat tu 2058,Ong thep,cai,49.20,53248,5,Ghi chu 2058
+Vat tu 2059,Thep hinh,tam,233.86,63546,5,Ghi chu 2059
+Vat tu 2060,Dam thep,tam,90.51,50276,5,Ghi chu 2060
+Vat tu 2061,Thep hop,cuon,132.69,55211,5,Ghi chu 2061
+Vat tu 2062,Thep goc,kg,74.29,59362,5,Ghi chu 2062
+Vat tu 2063,Bu long - Oc vit,tam,78.07,79518,5,Ghi chu 2063
+Vat tu 2064,Dam thep,tan,242.27,68817,5,Ghi chu 2064
+Vat tu 2065,Ong thep,kg,17.06,65729,5,Ghi chu 2065
+Vat tu 2066,Tam thep,tam,270.47,56198,5,Ghi chu 2066
+Vat tu 2067,Thep hop,tam,252.10,64985,5,Ghi chu 2067
+Vat tu 2068,Thep hop,cuon,73.46,78374,5,Ghi chu 2068
+Vat tu 2069,Vat tu tieu hao,kg,282.28,52422,5,Ghi chu 2069
+Vat tu 2070,Vat tu tieu hao,met,210.18,61990,5,Ghi chu 2070
+Vat tu 2071,Thep goc,tam,206.32,58028,5,Ghi chu 2071
+Vat tu 2072,Vat tu tieu hao,tan,239.34,82402,5,Ghi chu 2072
+Vat tu 2073,Ong thep,met,191.17,62730,5,Ghi chu 2073
+Vat tu 2074,Tam thep,met,133.39,76785,5,Ghi chu 2074
+Vat tu 2075,Thep hinh,kg,282.27,79119,5,Ghi chu 2075
+Vat tu 2076,Bu long - Oc vit,cai,5.93,51177,5,Ghi chu 2076
+Vat tu 2077,Thep hinh,cuon,88.19,67738,5,Ghi chu 2077
+Vat tu 2078,Thep hop,cuon,112.32,73669,5,Ghi chu 2078
+Vat tu 2079,Bu long - Oc vit,cai,294.39,55968,5,Ghi chu 2079
+Vat tu 2080,Thep goc,met,113.08,62376,5,Ghi chu 2080
+Vat tu 2081,Thep hop,cai,326.37,62505,5,Ghi chu 2081
+Vat tu 2082,Thep goc,tan,226.46,70097,5,Ghi chu 2082
+Vat tu 2083,Thep goc,thung,289.69,70463,5,Ghi chu 2083
+Vat tu 2084,Vat tu tieu hao,tan,166.07,81790,5,Ghi chu 2084
+Vat tu 2085,Thep goc,met,198.41,79563,5,Ghi chu 2085
+Vat tu 2086,Vat tu tieu hao,kg,160.79,50074,5,Ghi chu 2086
+Vat tu 2087,Vat tu tieu hao,met,268.78,65562,5,Ghi chu 2087
+Vat tu 2088,Thep goc,cai,319.14,50499,5,Ghi chu 2088
+Vat tu 2089,Bu long - Oc vit,kg,288.40,68779,5,Ghi chu 2089
+Vat tu 2090,Vat tu tieu hao,tan,288.42,58745,5,Ghi chu 2090
+Vat tu 2091,Tam thep,cuon,243.57,53963,5,Ghi chu 2091
+Vat tu 2092,Dam thep,cai,47.50,50908,5,Ghi chu 2092
+Vat tu 2093,Thep hop,thung,171.82,64295,5,Ghi chu 2093
+Vat tu 2094,Bu long - Oc vit,kg,138.40,65468,5,Ghi chu 2094
+Vat tu 2095,Bu long - Oc vit,met,278.18,78031,5,Ghi chu 2095
+Vat tu 2096,Tam thep,met,15.08,80189,5,Ghi chu 2096
+Vat tu 2097,Dam thep,tan,312.66,53159,5,Ghi chu 2097
+Vat tu 2098,Dam thep,thung,288.17,66102,5,Ghi chu 2098
+Vat tu 2099,Thep goc,cuon,151.15,54895,5,Ghi chu 2099
+Vat tu 2100,Thep hinh,kg,285.57,67072,5,Ghi chu 2100
+Vat tu 2101,Tam thep,tan,85.67,63663,5,Ghi chu 2101
+Vat tu 2102,Thep goc,tam,176.30,66176,5,Ghi chu 2102
+Vat tu 2103,Bu long - Oc vit,thung,39.71,59801,5,Ghi chu 2103
+Vat tu 2104,Tam thep,thung,324.95,73158,5,Ghi chu 2104
+Vat tu 2105,Thep hinh,cai,33.57,77235,5,Ghi chu 2105
+Vat tu 2106,Thep goc,tan,56.18,72096,5,Ghi chu 2106
+Vat tu 2107,Thep hop,kg,320.01,62814,5,Ghi chu 2107
+Vat tu 2108,Dam thep,thung,247.72,59405,5,Ghi chu 2108
+Vat tu 2109,Thep goc,tan,46.41,61391,5,Ghi chu 2109
+Vat tu 2110,Thep goc,thung,229.91,53982,5,Ghi chu 2110
+Vat tu 2111,Bu long - Oc vit,cai,323.76,64058,5,Ghi chu 2111
+Vat tu 2112,Bu long - Oc vit,kg,113.59,57505,5,Ghi chu 2112
+Vat tu 2113,Vat tu tieu hao,kg,272.10,68984,5,Ghi chu 2113
+Vat tu 2114,Thep hop,kg,280.16,74314,5,Ghi chu 2114
+Vat tu 2115,Thep hinh,kg,2.94,65924,5,Ghi chu 2115
+Vat tu 2116,Bu long - Oc vit,cai,322.07,53801,5,Ghi chu 2116
+Vat tu 2117,Bu long - Oc vit,tan,52.70,82658,5,Ghi chu 2117
+Vat tu 2118,Vat tu tieu hao,cai,202.57,81691,5,Ghi chu 2118
+Vat tu 2119,Thep hinh,cai,309.84,71565,5,Ghi chu 2119
+Vat tu 2120,Thep hinh,tam,81.20,70617,5,Ghi chu 2120
+Vat tu 2121,Thep hop,tan,324.66,62179,5,Ghi chu 2121
+Vat tu 2122,Thep hinh,tan,45.24,67474,5,Ghi chu 2122
+Vat tu 2123,Dam thep,tan,77.30,51138,5,Ghi chu 2123
+Vat tu 2124,Thep hinh,tan,146.32,64531,5,Ghi chu 2124
+Vat tu 2125,Thep hinh,kg,18.76,69730,5,Ghi chu 2125
+Vat tu 2126,Ong thep,thung,223.72,66283,5,Ghi chu 2126
+Vat tu 2127,Ong thep,met,187.70,64169,5,Ghi chu 2127
+Vat tu 2128,Dam thep,kg,58.09,50587,5,Ghi chu 2128
+Vat tu 2129,Dam thep,met,90.67,62668,5,Ghi chu 2129
+Vat tu 2130,Dam thep,kg,60.15,56517,5,Ghi chu 2130
+Vat tu 2131,Thep goc,tan,144.32,79778,5,Ghi chu 2131
+Vat tu 2132,Bu long - Oc vit,kg,89.06,80339,5,Ghi chu 2132
+Vat tu 2133,Thep hinh,met,120.75,67890,5,Ghi chu 2133
+Vat tu 2134,Tam thep,tam,168.43,53136,5,Ghi chu 2134
+Vat tu 2135,Vat tu tieu hao,cuon,131.37,69296,5,Ghi chu 2135
+Vat tu 2136,Thep hinh,thung,141.03,75680,5,Ghi chu 2136
+Vat tu 2137,Ong thep,thung,175.01,63627,5,Ghi chu 2137
+Vat tu 2138,Tam thep,met,226.86,65864,5,Ghi chu 2138
+Vat tu 2139,Thep hinh,thung,22.37,61063,5,Ghi chu 2139
+Vat tu 2140,Vat tu tieu hao,tan,75.36,56762,5,Ghi chu 2140
+Vat tu 2141,Thep hop,kg,111.61,53254,5,Ghi chu 2141
+Vat tu 2142,Dam thep,met,24.75,62281,5,Ghi chu 2142
+Vat tu 2143,Vat tu tieu hao,met,174.80,76141,5,Ghi chu 2143
+Vat tu 2144,Dam thep,tam,161.46,63933,5,Ghi chu 2144
+Vat tu 2145,Dam thep,kg,216.36,78032,5,Ghi chu 2145
+Vat tu 2146,Ong thep,cai,267.88,55390,5,Ghi chu 2146
+Vat tu 2147,Bu long - Oc vit,tam,48.67,51841,5,Ghi chu 2147
+Vat tu 2148,Bu long - Oc vit,tam,94.40,75501,5,Ghi chu 2148
+Vat tu 2149,Ong thep,tan,119.40,58056,5,Ghi chu 2149
+Vat tu 2150,Thep hop,kg,.68,63609,5,Ghi chu 2150
+Vat tu 2151,Thep hop,tan,293.85,55965,5,Ghi chu 2151
+Vat tu 2152,Tam thep,cuon,180.10,59449,5,Ghi chu 2152
+Vat tu 2153,Thep hinh,cuon,94.00,52632,5,Ghi chu 2153
+Vat tu 2154,Bu long - Oc vit,tam,4.27,75691,5,Ghi chu 2154
+Vat tu 2155,Dam thep,tan,132.23,67568,5,Ghi chu 2155
+Vat tu 2156,Ong thep,thung,6.09,58870,5,Ghi chu 2156
+Vat tu 2157,Thep goc,tan,274.93,52823,5,Ghi chu 2157
+Vat tu 2158,Vat tu tieu hao,cuon,205.94,78588,5,Ghi chu 2158
+Vat tu 2159,Tam thep,tam,53.20,59496,5,Ghi chu 2159
+Vat tu 2160,Thep goc,kg,320.47,55010,5,Ghi chu 2160
+Vat tu 2161,Thep hop,kg,11.78,73598,5,Ghi chu 2161
+Vat tu 2162,Thep hop,met,105.75,66477,5,Ghi chu 2162
+Vat tu 2163,Dam thep,thung,287.86,54231,5,Ghi chu 2163
+Vat tu 2164,Vat tu tieu hao,cai,161.47,72975,5,Ghi chu 2164
+Vat tu 2165,Thep hinh,tam,122.39,53712,5,Ghi chu 2165
+Vat tu 2166,Thep hop,cai,5.23,52703,5,Ghi chu 2166
+Vat tu 2167,Bu long - Oc vit,thung,92.30,80353,5,Ghi chu 2167
+Vat tu 2168,Bu long - Oc vit,kg,166.33,65045,5,Ghi chu 2168
+Vat tu 2169,Thep goc,thung,69.77,64750,5,Ghi chu 2169
+Vat tu 2170,Thep hop,kg,52.20,82438,5,Ghi chu 2170
+Vat tu 2171,Dam thep,tan,135.12,63879,5,Ghi chu 2171
+Vat tu 2172,Tam thep,tan,32.31,61912,5,Ghi chu 2172
+Vat tu 2173,Vat tu tieu hao,cuon,5.94,55160,5,Ghi chu 2173
+Vat tu 2174,Thep goc,cuon,259.61,56168,5,Ghi chu 2174
+Vat tu 2175,Bu long - Oc vit,cai,253.22,70831,5,Ghi chu 2175
+Vat tu 2176,Thep goc,kg,249.64,57648,5,Ghi chu 2176
+Vat tu 2177,Dam thep,thung,281.43,67989,5,Ghi chu 2177
+Vat tu 2178,Bu long - Oc vit,kg,49.07,72684,5,Ghi chu 2178
+Vat tu 2179,Bu long - Oc vit,kg,236.87,80142,5,Ghi chu 2179
+Vat tu 2180,Tam thep,tam,71.58,75607,5,Ghi chu 2180
+Vat tu 2181,Thep hop,tan,27.69,60968,5,Ghi chu 2181
+Vat tu 2182,Thep goc,cai,88.90,63272,5,Ghi chu 2182
+Vat tu 2183,Ong thep,tam,217.89,58336,5,Ghi chu 2183
+Vat tu 2184,Bu long - Oc vit,tan,183.51,57548,5,Ghi chu 2184
+Vat tu 2185,Thep goc,cuon,300.28,54641,5,Ghi chu 2185
+Vat tu 2186,Tam thep,met,94.33,67414,5,Ghi chu 2186
+Vat tu 2187,Dam thep,cuon,37.14,77052,5,Ghi chu 2187
+Vat tu 2188,Vat tu tieu hao,tam,131.57,74036,5,Ghi chu 2188
+Vat tu 2189,Thep hinh,cai,258.21,50785,5,Ghi chu 2189
+Vat tu 2190,Vat tu tieu hao,tam,33.81,52665,5,Ghi chu 2190
+Vat tu 2191,Ong thep,cai,171.64,66691,5,Ghi chu 2191
+Vat tu 2192,Dam thep,cuon,308.52,76654,5,Ghi chu 2192
+Vat tu 2193,Vat tu tieu hao,met,19.31,64040,5,Ghi chu 2193
+Vat tu 2194,Ong thep,kg,187.55,59691,5,Ghi chu 2194
+Vat tu 2195,Vat tu tieu hao,cai,233.19,57179,5,Ghi chu 2195
+Vat tu 2196,Bu long - Oc vit,kg,264.62,81766,5,Ghi chu 2196
+Vat tu 2197,Bu long - Oc vit,kg,268.32,55824,5,Ghi chu 2197
+Vat tu 2198,Tam thep,met,213.39,72814,5,Ghi chu 2198
+Vat tu 2199,Thep hop,tam,224.89,81914,5,Ghi chu 2199
+Vat tu 2200,Dam thep,tan,51.09,65529,5,Ghi chu 2200
+Vat tu 2201,Thep goc,tam,280.46,78145,5,Ghi chu 2201
+Vat tu 2202,Dam thep,cai,285.29,56787,5,Ghi chu 2202
+Vat tu 2203,Dam thep,cai,108.70,53845,5,Ghi chu 2203
+Vat tu 2204,Ong thep,tam,260.46,66432,5,Ghi chu 2204
+Vat tu 2205,Thep hinh,met,107.30,60078,5,Ghi chu 2205
+Vat tu 2206,Thep goc,tan,35.44,74541,5,Ghi chu 2206
+Vat tu 2207,Thep hinh,cuon,258.19,66258,5,Ghi chu 2207
+Vat tu 2208,Thep hop,met,96.47,51526,5,Ghi chu 2208
+Vat tu 2209,Thep hop,tam,297.51,71430,5,Ghi chu 2209
+Vat tu 2210,Thep goc,tam,273.92,81064,5,Ghi chu 2210
+Vat tu 2211,Vat tu tieu hao,thung,55.58,63652,5,Ghi chu 2211
+Vat tu 2212,Thep hop,kg,166.10,80417,5,Ghi chu 2212
+Vat tu 2213,Vat tu tieu hao,kg,225.32,66843,5,Ghi chu 2213
+Vat tu 2214,Thep goc,kg,232.23,55921,5,Ghi chu 2214
+Vat tu 2215,Dam thep,tam,92.45,54127,5,Ghi chu 2215
+Vat tu 2216,Ong thep,thung,167.87,80652,5,Ghi chu 2216
+Vat tu 2217,Tam thep,kg,9.78,55063,5,Ghi chu 2217
+Vat tu 2218,Dam thep,cai,65.34,68032,5,Ghi chu 2218
+Vat tu 2219,Thep goc,thung,286.56,74953,5,Ghi chu 2219
+Vat tu 2220,Tam thep,kg,77.38,62875,5,Ghi chu 2220
+Vat tu 2221,Vat tu tieu hao,tam,296.66,58173,5,Ghi chu 2221
+Vat tu 2222,Bu long - Oc vit,cai,264.76,81186,5,Ghi chu 2222
+Vat tu 2223,Thep goc,cai,39.94,76950,5,Ghi chu 2223
+Vat tu 2224,Thep goc,tan,270.10,67296,5,Ghi chu 2224
+Vat tu 2225,Bu long - Oc vit,thung,217.90,79610,5,Ghi chu 2225
+Vat tu 2226,Bu long - Oc vit,tan,255.09,76417,5,Ghi chu 2226
+Vat tu 2227,Dam thep,cuon,183.91,60824,5,Ghi chu 2227
+Vat tu 2228,Ong thep,cai,208.13,74958,5,Ghi chu 2228
+Vat tu 2229,Vat tu tieu hao,thung,196.52,71079,5,Ghi chu 2229
+Vat tu 2230,Thep hop,thung,207.64,52127,5,Ghi chu 2230
+Vat tu 2231,Dam thep,cuon,95.97,70720,5,Ghi chu 2231
+Vat tu 2232,Ong thep,met,55.56,50432,5,Ghi chu 2232
+Vat tu 2233,Vat tu tieu hao,cuon,101.76,74022,5,Ghi chu 2233
+Vat tu 2234,Thep hop,cai,275.12,80257,5,Ghi chu 2234
+Vat tu 2235,Thep goc,tam,44.63,56838,5,Ghi chu 2235
+Vat tu 2236,Ong thep,met,189.52,51277,5,Ghi chu 2236
+Vat tu 2237,Thep hop,cuon,69.80,72839,5,Ghi chu 2237
+Vat tu 2238,Thep hop,tam,31.39,62274,5,Ghi chu 2238
+Vat tu 2239,Vat tu tieu hao,cai,313.34,56634,5,Ghi chu 2239
+Vat tu 2240,Thep hinh,cuon,233.96,55091,5,Ghi chu 2240
+Vat tu 2241,Vat tu tieu hao,met,100.13,66764,5,Ghi chu 2241
+Vat tu 2242,Tam thep,met,63.08,51251,5,Ghi chu 2242
+Vat tu 2243,Tam thep,cai,198.46,67874,5,Ghi chu 2243
+Vat tu 2244,Thep hop,kg,102.40,52824,5,Ghi chu 2244
+Vat tu 2245,Thep goc,tam,202.49,61726,5,Ghi chu 2245
+Vat tu 2246,Vat tu tieu hao,thung,12.46,76207,5,Ghi chu 2246
+Vat tu 2247,Ong thep,cai,128.95,65350,5,Ghi chu 2247
+Vat tu 2248,Bu long - Oc vit,kg,86.27,70662,5,Ghi chu 2248
+Vat tu 2249,Tam thep,tam,296.55,70755,5,Ghi chu 2249
+Vat tu 2250,Thep hinh,cai,239.78,54763,5,Ghi chu 2250
+Vat tu 2251,Vat tu tieu hao,tan,158.92,81075,5,Ghi chu 2251
+Vat tu 2252,Thep goc,cai,88.37,68267,5,Ghi chu 2252
+Vat tu 2253,Bu long - Oc vit,kg,164.13,70342,5,Ghi chu 2253
+Vat tu 2254,Tam thep,thung,11.10,79341,5,Ghi chu 2254
+Vat tu 2255,Dam thep,tam,300.39,67932,5,Ghi chu 2255
+Vat tu 2256,Ong thep,thung,216.15,55813,5,Ghi chu 2256
+Vat tu 2257,Ong thep,met,303.96,59525,5,Ghi chu 2257
+Vat tu 2258,Thep goc,cuon,187.58,74101,5,Ghi chu 2258
+Vat tu 2259,Bu long - Oc vit,kg,202.71,52515,5,Ghi chu 2259
+Vat tu 2260,Ong thep,tam,284.64,62133,5,Ghi chu 2260
+Vat tu 2261,Thep hinh,met,246.64,70577,5,Ghi chu 2261
+Vat tu 2262,Vat tu tieu hao,tan,223.68,72877,5,Ghi chu 2262
+Vat tu 2263,Thep hop,thung,317.59,78365,5,Ghi chu 2263
+Vat tu 2264,Ong thep,cai,176.26,51110,5,Ghi chu 2264
+Vat tu 2265,Thep goc,tam,240.31,79552,5,Ghi chu 2265
+Vat tu 2266,Dam thep,met,221.02,67595,5,Ghi chu 2266
+Vat tu 2267,Tam thep,met,51.68,74848,5,Ghi chu 2267
+Vat tu 2268,Thep hinh,kg,135.97,74347,5,Ghi chu 2268
+Vat tu 2269,Tam thep,cuon,256.65,61169,5,Ghi chu 2269
+Vat tu 2270,Thep goc,met,233.37,60464,5,Ghi chu 2270
+Vat tu 2271,Thep goc,cai,232.38,57577,5,Ghi chu 2271
+Vat tu 2272,Thep hop,met,28.54,70900,5,Ghi chu 2272
+Vat tu 2273,Thep hinh,kg,13.01,79681,5,Ghi chu 2273
+Vat tu 2274,Bu long - Oc vit,tam,123.51,78748,5,Ghi chu 2274
+Vat tu 2275,Thep hop,met,121.83,59267,5,Ghi chu 2275
+Vat tu 2276,Thep hinh,cai,104.83,66192,5,Ghi chu 2276
+Vat tu 2277,Dam thep,met,292.13,63749,5,Ghi chu 2277
+Vat tu 2278,Bu long - Oc vit,tan,265.09,81650,5,Ghi chu 2278
+Vat tu 2279,Thep hinh,met,270.79,69534,5,Ghi chu 2279
+Vat tu 2280,Ong thep,kg,148.15,59855,5,Ghi chu 2280
+Vat tu 2281,Ong thep,met,59.57,57512,5,Ghi chu 2281
+Vat tu 2282,Vat tu tieu hao,tan,308.86,64091,5,Ghi chu 2282
+Vat tu 2283,Tam thep,thung,206.68,79562,5,Ghi chu 2283
+Vat tu 2284,Thep goc,tan,230.91,68408,5,Ghi chu 2284
+Vat tu 2285,Ong thep,tam,303.90,52279,5,Ghi chu 2285
+Vat tu 2286,Thep goc,tam,302.68,52961,5,Ghi chu 2286
+Vat tu 2287,Bu long - Oc vit,cuon,190.19,67228,5,Ghi chu 2287
+Vat tu 2288,Thep hop,tan,288.37,73265,5,Ghi chu 2288
+Vat tu 2289,Dam thep,thung,149.27,70352,5,Ghi chu 2289
+Vat tu 2290,Dam thep,met,291.62,74461,5,Ghi chu 2290
+Vat tu 2291,Thep hinh,tam,123.85,72153,5,Ghi chu 2291
+Vat tu 2292,Ong thep,cai,162.64,60402,5,Ghi chu 2292
+Vat tu 2293,Tam thep,cai,87.79,58672,5,Ghi chu 2293
+Vat tu 2294,Dam thep,cuon,80.52,65906,5,Ghi chu 2294
+Vat tu 2295,Thep hop,kg,214.00,60744,5,Ghi chu 2295
+Vat tu 2296,Tam thep,tan,313.22,65708,5,Ghi chu 2296
+Vat tu 2297,Thep goc,cuon,313.14,55383,5,Ghi chu 2297
+Vat tu 2298,Vat tu tieu hao,cuon,38.91,65059,5,Ghi chu 2298
+Vat tu 2299,Vat tu tieu hao,cai,284.65,72472,5,Ghi chu 2299
+Vat tu 2300,Thep hinh,tam,68.99,57866,5,Ghi chu 2300
+Vat tu 2301,Tam thep,kg,98.62,52643,5,Ghi chu 2301
+Vat tu 2302,Thep hop,cuon,287.08,62510,5,Ghi chu 2302
+Vat tu 2303,Thep hop,kg,204.28,51901,5,Ghi chu 2303
+Vat tu 2304,Vat tu tieu hao,cuon,226.53,54962,5,Ghi chu 2304
+Vat tu 2305,Dam thep,tam,119.49,66542,5,Ghi chu 2305
+Vat tu 2306,Tam thep,tam,166.80,76329,5,Ghi chu 2306
+Vat tu 2307,Dam thep,kg,91.57,59565,5,Ghi chu 2307
+Vat tu 2308,Thep goc,cuon,271.60,55517,5,Ghi chu 2308
+Vat tu 2309,Tam thep,thung,20.34,79465,5,Ghi chu 2309
+Vat tu 2310,Bu long - Oc vit,tan,35.37,57676,5,Ghi chu 2310
+Vat tu 2311,Thep hinh,tam,178.76,62734,5,Ghi chu 2311
+Vat tu 2312,Thep goc,met,249.14,50641,5,Ghi chu 2312
+Vat tu 2313,Ong thep,kg,85.15,74572,5,Ghi chu 2313
+Vat tu 2314,Vat tu tieu hao,met,96.56,76666,5,Ghi chu 2314
+Vat tu 2315,Ong thep,cai,143.26,57242,5,Ghi chu 2315
+Vat tu 2316,Tam thep,kg,244.09,76143,5,Ghi chu 2316
+Vat tu 2317,Ong thep,thung,72.76,77022,5,Ghi chu 2317
+Vat tu 2318,Thep hop,tan,311.67,82049,5,Ghi chu 2318
+Vat tu 2319,Thep hop,cai,252.57,53913,5,Ghi chu 2319
+Vat tu 2320,Thep goc,tan,273.18,65997,5,Ghi chu 2320
+Vat tu 2321,Dam thep,met,191.74,80100,5,Ghi chu 2321
+Vat tu 2322,Dam thep,thung,55.11,52597,5,Ghi chu 2322
+Vat tu 2323,Ong thep,cai,130.48,81066,5,Ghi chu 2323
+Vat tu 2324,Bu long - Oc vit,cuon,101.41,58644,5,Ghi chu 2324
+Vat tu 2325,Bu long - Oc vit,cuon,36.41,76731,5,Ghi chu 2325
+Vat tu 2326,Tam thep,kg,240.44,63552,5,Ghi chu 2326
+Vat tu 2327,Vat tu tieu hao,thung,276.51,67023,5,Ghi chu 2327
+Vat tu 2328,Ong thep,tan,302.94,67531,5,Ghi chu 2328
+Vat tu 2329,Thep hop,tam,3.91,76547,5,Ghi chu 2329
+Vat tu 2330,Vat tu tieu hao,tam,149.16,56610,5,Ghi chu 2330
+Vat tu 2331,Dam thep,tan,40.83,61085,5,Ghi chu 2331
+Vat tu 2332,Dam thep,cai,250.79,61605,5,Ghi chu 2332
+Vat tu 2333,Thep hinh,cai,143.17,77094,5,Ghi chu 2333
+Vat tu 2334,Thep hop,kg,115.68,56835,5,Ghi chu 2334
+Vat tu 2335,Thep hinh,kg,153.55,71964,5,Ghi chu 2335
+Vat tu 2336,Dam thep,cuon,289.80,56848,5,Ghi chu 2336
+Vat tu 2337,Dam thep,kg,48.57,67491,5,Ghi chu 2337
+Vat tu 2338,Vat tu tieu hao,cuon,273.50,68071,5,Ghi chu 2338
+Vat tu 2339,Thep goc,kg,206.40,68028,5,Ghi chu 2339
+Vat tu 2340,Thep hinh,thung,45.33,62100,5,Ghi chu 2340
+Vat tu 2341,Dam thep,met,102.94,75193,5,Ghi chu 2341
+Vat tu 2342,Thep hop,kg,286.18,56273,5,Ghi chu 2342
+Vat tu 2343,Thep hop,cuon,168.90,76128,5,Ghi chu 2343
+Vat tu 2344,Thep hop,cuon,36.08,56404,5,Ghi chu 2344
+Vat tu 2345,Ong thep,tan,222.55,56143,5,Ghi chu 2345
+Vat tu 2346,Thep hinh,tam,226.54,53543,5,Ghi chu 2346
+Vat tu 2347,Ong thep,tam,267.71,77979,5,Ghi chu 2347
+Vat tu 2348,Vat tu tieu hao,cuon,127.29,50443,5,Ghi chu 2348
+Vat tu 2349,Dam thep,tam,258.10,55726,5,Ghi chu 2349
+Vat tu 2350,Tam thep,met,4.66,78481,5,Ghi chu 2350
+Vat tu 2351,Thep hinh,cai,130.21,80569,5,Ghi chu 2351
+Vat tu 2352,Bu long - Oc vit,tam,148.72,63399,5,Ghi chu 2352
+Vat tu 2353,Tam thep,kg,4.50,74077,5,Ghi chu 2353
+Vat tu 2354,Bu long - Oc vit,cai,241.54,71766,5,Ghi chu 2354
+Vat tu 2355,Thep goc,tan,186.01,69845,5,Ghi chu 2355
+Vat tu 2356,Ong thep,cuon,301.23,53805,5,Ghi chu 2356
+Vat tu 2357,Thep hinh,cai,.93,71756,5,Ghi chu 2357
+Vat tu 2358,Tam thep,tan,183.54,63222,5,Ghi chu 2358
+Vat tu 2359,Vat tu tieu hao,tan,200.65,54773,5,Ghi chu 2359
+Vat tu 2360,Thep hop,cuon,25.86,68110,5,Ghi chu 2360
+Vat tu 2361,Bu long - Oc vit,tan,144.12,58187,5,Ghi chu 2361
+Vat tu 2362,Dam thep,cuon,289.18,77617,5,Ghi chu 2362
+Vat tu 2363,Bu long - Oc vit,tan,107.44,65048,5,Ghi chu 2363
+Vat tu 2364,Ong thep,kg,184.11,78635,5,Ghi chu 2364
+Vat tu 2365,Tam thep,cai,275.07,60988,5,Ghi chu 2365
+Vat tu 2366,Vat tu tieu hao,cai,44.42,58864,5,Ghi chu 2366
+Vat tu 2367,Bu long - Oc vit,tan,124.62,79948,5,Ghi chu 2367
+Vat tu 2368,Thep hop,tan,80.10,56704,5,Ghi chu 2368
+Vat tu 2369,Vat tu tieu hao,thung,150.91,64588,5,Ghi chu 2369
+Vat tu 2370,Ong thep,thung,151.01,75172,5,Ghi chu 2370
+Vat tu 2371,Thep hop,kg,67.67,68921,5,Ghi chu 2371
+Vat tu 2372,Vat tu tieu hao,kg,144.84,55263,5,Ghi chu 2372
+Vat tu 2373,Thep hop,met,245.50,68961,5,Ghi chu 2373
+Vat tu 2374,Dam thep,cuon,320.42,78225,5,Ghi chu 2374
+Vat tu 2375,Dam thep,kg,282.38,74723,5,Ghi chu 2375
+Vat tu 2376,Vat tu tieu hao,tam,161.34,58809,5,Ghi chu 2376
+Vat tu 2377,Ong thep,cai,36.85,55947,5,Ghi chu 2377
+Vat tu 2378,Tam thep,cai,165.33,72717,5,Ghi chu 2378
+Vat tu 2379,Vat tu tieu hao,cai,49.36,81950,5,Ghi chu 2379
+Vat tu 2380,Thep hop,kg,159.45,54062,5,Ghi chu 2380
+Vat tu 2381,Thep hop,kg,33.81,78337,5,Ghi chu 2381
+Vat tu 2382,Vat tu tieu hao,thung,122.24,64053,5,Ghi chu 2382
+Vat tu 2383,Bu long - Oc vit,kg,125.04,51873,5,Ghi chu 2383
+Vat tu 2384,Vat tu tieu hao,cuon,17.47,54278,5,Ghi chu 2384
+Vat tu 2385,Vat tu tieu hao,tan,325.86,61332,5,Ghi chu 2385
+Vat tu 2386,Thep hop,tam,133.02,73691,5,Ghi chu 2386
+Vat tu 2387,Dam thep,cuon,123.03,75593,5,Ghi chu 2387
+Vat tu 2388,Thep hinh,thung,305.83,60467,5,Ghi chu 2388
+Vat tu 2389,Thep hop,cai,291.47,68466,5,Ghi chu 2389
+Vat tu 2390,Vat tu tieu hao,cuon,4.76,54348,5,Ghi chu 2390
+Vat tu 2391,Thep hop,cai,165.24,68411,5,Ghi chu 2391
+Vat tu 2392,Vat tu tieu hao,cuon,26.54,66366,5,Ghi chu 2392
+Vat tu 2393,Thep goc,kg,322.27,69477,5,Ghi chu 2393
+Vat tu 2394,Tam thep,kg,202.54,75360,5,Ghi chu 2394
+Vat tu 2395,Ong thep,tan,266.77,52924,5,Ghi chu 2395
+Vat tu 2396,Thep hop,kg,93.24,54915,5,Ghi chu 2396
+Vat tu 2397,Bu long - Oc vit,tam,96.07,79964,5,Ghi chu 2397
+Vat tu 2398,Thep goc,cuon,89.76,56857,5,Ghi chu 2398
+Vat tu 2399,Vat tu tieu hao,tam,107.03,76964,5,Ghi chu 2399
+Vat tu 2400,Thep goc,kg,290.82,50193,5,Ghi chu 2400
+Vat tu 2401,Ong thep,tan,303.90,67872,5,Ghi chu 2401
+Vat tu 2402,Vat tu tieu hao,tam,125.39,81163,5,Ghi chu 2402
+Vat tu 2403,Thep hop,thung,129.99,54370,5,Ghi chu 2403
+Vat tu 2404,Thep goc,cai,7.46,82252,5,Ghi chu 2404
+Vat tu 2405,Thep hinh,cuon,91.33,77835,5,Ghi chu 2405
+Vat tu 2406,Thep hop,thung,232.12,70368,5,Ghi chu 2406
+Vat tu 2407,Dam thep,cuon,164.27,77712,5,Ghi chu 2407
+Vat tu 2408,Bu long - Oc vit,cuon,30.63,66808,5,Ghi chu 2408
+Vat tu 2409,Tam thep,cai,298.07,58700,5,Ghi chu 2409
+Vat tu 2410,Thep hinh,thung,112.54,62021,5,Ghi chu 2410
+Vat tu 2411,Dam thep,thung,79.09,50781,5,Ghi chu 2411
+Vat tu 2412,Dam thep,tan,248.26,71343,5,Ghi chu 2412
+Vat tu 2413,Thep hop,thung,324.72,52082,5,Ghi chu 2413
+Vat tu 2414,Thep goc,kg,224.23,72507,5,Ghi chu 2414
+Vat tu 2415,Vat tu tieu hao,cai,152.61,55976,5,Ghi chu 2415
+Vat tu 2416,Vat tu tieu hao,tam,190.96,69544,5,Ghi chu 2416
+Vat tu 2417,Thep hinh,thung,150.46,76286,5,Ghi chu 2417
+Vat tu 2418,Bu long - Oc vit,thung,193.48,73931,5,Ghi chu 2418
+Vat tu 2419,Thep hinh,thung,116.60,67479,5,Ghi chu 2419
+Vat tu 2420,Tam thep,tan,250.06,78648,5,Ghi chu 2420
+Vat tu 2421,Ong thep,cai,124.42,51419,5,Ghi chu 2421
+Vat tu 2422,Ong thep,tan,40.67,76224,5,Ghi chu 2422
+Vat tu 2423,Dam thep,cai,68.86,79558,5,Ghi chu 2423
+Vat tu 2424,Thep hop,tan,163.78,57054,5,Ghi chu 2424
+Vat tu 2425,Thep goc,tam,178.03,70572,5,Ghi chu 2425
+Vat tu 2426,Ong thep,tan,242.49,50984,5,Ghi chu 2426
+Vat tu 2427,Ong thep,thung,154.16,50404,5,Ghi chu 2427
+Vat tu 2428,Thep hinh,thung,4.72,60494,5,Ghi chu 2428
+Vat tu 2429,Bu long - Oc vit,met,198.02,62926,5,Ghi chu 2429
+Vat tu 2430,Bu long - Oc vit,cai,82.57,58140,5,Ghi chu 2430
+Vat tu 2431,Ong thep,cuon,256.32,79097,5,Ghi chu 2431
+Vat tu 2432,Thep hinh,tan,21.61,59102,5,Ghi chu 2432
+Vat tu 2433,Thep hinh,cuon,214.79,54708,5,Ghi chu 2433
+Vat tu 2434,Ong thep,tan,224.50,69525,5,Ghi chu 2434
+Vat tu 2435,Ong thep,met,28.89,74938,5,Ghi chu 2435
+Vat tu 2436,Dam thep,thung,252.46,56631,5,Ghi chu 2436
+Vat tu 2437,Thep hinh,met,241.11,55190,5,Ghi chu 2437
+Vat tu 2438,Dam thep,thung,29.70,63585,5,Ghi chu 2438
+Vat tu 2439,Ong thep,met,25.94,57827,5,Ghi chu 2439
+Vat tu 2440,Tam thep,tam,139.20,71821,5,Ghi chu 2440
+Vat tu 2441,Bu long - Oc vit,tan,126.45,72801,5,Ghi chu 2441
+Vat tu 2442,Thep goc,kg,125.02,66486,5,Ghi chu 2442
+Vat tu 2443,Bu long - Oc vit,tan,254.31,65926,5,Ghi chu 2443
+Vat tu 2444,Tam thep,tam,307.26,51134,5,Ghi chu 2444
+Vat tu 2445,Thep hop,cuon,131.39,64762,5,Ghi chu 2445
+Vat tu 2446,Tam thep,thung,2.93,79939,5,Ghi chu 2446
+Vat tu 2447,Thep hop,tam,185.13,77118,5,Ghi chu 2447
+Vat tu 2448,Tam thep,tam,170.25,61383,5,Ghi chu 2448
+Vat tu 2449,Dam thep,cuon,175.62,69838,5,Ghi chu 2449
+Vat tu 2450,Dam thep,kg,309.74,68521,5,Ghi chu 2450
+Vat tu 2451,Vat tu tieu hao,kg,204.93,50633,5,Ghi chu 2451
+Vat tu 2452,Ong thep,tan,317.29,77477,5,Ghi chu 2452
+Vat tu 2453,Thep goc,tan,139.06,65027,5,Ghi chu 2453
+Vat tu 2454,Dam thep,cuon,286.79,53094,5,Ghi chu 2454
+Vat tu 2455,Bu long - Oc vit,tan,156.71,52201,5,Ghi chu 2455
+Vat tu 2456,Bu long - Oc vit,cai,110.12,70718,5,Ghi chu 2456
+Vat tu 2457,Dam thep,kg,211.99,72140,5,Ghi chu 2457
+Vat tu 2458,Bu long - Oc vit,cuon,176.66,68695,5,Ghi chu 2458
+Vat tu 2459,Dam thep,met,110.20,57181,5,Ghi chu 2459
+Vat tu 2460,Vat tu tieu hao,kg,122.48,60393,5,Ghi chu 2460
+Vat tu 2461,Thep hinh,tan,47.30,57536,5,Ghi chu 2461
+Vat tu 2462,Tam thep,thung,287.33,69432,5,Ghi chu 2462
+Vat tu 2463,Vat tu tieu hao,cuon,327.03,79416,5,Ghi chu 2463
+Vat tu 2464,Thep hop,tan,40.87,58304,5,Ghi chu 2464
+Vat tu 2465,Thep goc,tan,263.54,82199,5,Ghi chu 2465
+Vat tu 2466,Thep goc,thung,65.45,65147,5,Ghi chu 2466
+Vat tu 2467,Vat tu tieu hao,met,157.85,74369,5,Ghi chu 2467
+Vat tu 2468,Bu long - Oc vit,tan,260.38,66817,5,Ghi chu 2468
+Vat tu 2469,Thep hinh,tam,4.26,80513,5,Ghi chu 2469
+Vat tu 2470,Ong thep,tam,74.92,76073,5,Ghi chu 2470
+Vat tu 2471,Vat tu tieu hao,tan,153.51,72874,5,Ghi chu 2471
+Vat tu 2472,Tam thep,kg,59.06,57806,5,Ghi chu 2472
+Vat tu 2473,Dam thep,met,163.32,57966,5,Ghi chu 2473
+Vat tu 2474,Bu long - Oc vit,thung,279.52,74809,5,Ghi chu 2474
+Vat tu 2475,Bu long - Oc vit,tan,174.53,74141,5,Ghi chu 2475
+Vat tu 2476,Dam thep,tam,185.66,67418,5,Ghi chu 2476
+Vat tu 2477,Bu long - Oc vit,tam,235.07,68802,5,Ghi chu 2477
+Vat tu 2478,Tam thep,thung,103.11,77548,5,Ghi chu 2478
+Vat tu 2479,Dam thep,tam,161.27,79412,5,Ghi chu 2479
+Vat tu 2480,Ong thep,tan,270.15,55906,5,Ghi chu 2480
+Vat tu 2481,Dam thep,met,29.71,58436,5,Ghi chu 2481
+Vat tu 2482,Thep goc,tan,129.66,60996,5,Ghi chu 2482
+Vat tu 2483,Dam thep,kg,213.63,74931,5,Ghi chu 2483
+Vat tu 2484,Thep hop,tan,58.73,63670,5,Ghi chu 2484
+Vat tu 2485,Thep goc,met,240.48,76359,5,Ghi chu 2485
+Vat tu 2486,Thep hop,tam,90.62,77179,5,Ghi chu 2486
+Vat tu 2487,Tam thep,kg,223.29,74609,5,Ghi chu 2487
+Vat tu 2488,Tam thep,kg,248.99,67094,5,Ghi chu 2488
+Vat tu 2489,Tam thep,tan,192.65,50298,5,Ghi chu 2489
+Vat tu 2490,Thep goc,cuon,12.60,66903,5,Ghi chu 2490
+Vat tu 2491,Thep hop,tan,276.41,58342,5,Ghi chu 2491
+Vat tu 2492,Thep goc,met,247.72,72932,5,Ghi chu 2492
+Vat tu 2493,Tam thep,tam,230.45,58730,5,Ghi chu 2493
+Vat tu 2494,Bu long - Oc vit,tan,105.16,59617,5,Ghi chu 2494
+Vat tu 2495,Thep goc,cai,9.48,50155,5,Ghi chu 2495
+Vat tu 2496,Vat tu tieu hao,kg,102.65,77195,5,Ghi chu 2496
+Vat tu 2497,Ong thep,tam,99.50,51775,5,Ghi chu 2497
+Vat tu 2498,Dam thep,met,3.76,78993,5,Ghi chu 2498
+Vat tu 2499,Ong thep,cai,154.00,54139,5,Ghi chu 2499
+Vat tu 2500,Tam thep,met,201.63,71496,5,Ghi chu 2500
+Vat tu 2501,Dam thep,thung,301.64,75973,5,Ghi chu 2501
+Vat tu 2502,Thep hop,cai,183.49,61779,5,Ghi chu 2502
+Vat tu 2503,Tam thep,thung,190.92,80959,5,Ghi chu 2503
+Vat tu 2504,Ong thep,met,171.27,52849,5,Ghi chu 2504
+Vat tu 2505,Bu long - Oc vit,cuon,33.40,68788,5,Ghi chu 2505
+Vat tu 2506,Bu long - Oc vit,met,40.96,72977,5,Ghi chu 2506
+Vat tu 2507,Tam thep,kg,94.01,66226,5,Ghi chu 2507
+Vat tu 2508,Bu long - Oc vit,thung,218.73,58582,5,Ghi chu 2508
+Vat tu 2509,Bu long - Oc vit,met,118.30,56745,5,Ghi chu 2509
+Vat tu 2510,Thep hinh,cuon,218.98,52696,5,Ghi chu 2510
+Vat tu 2511,Bu long - Oc vit,thung,236.99,64632,5,Ghi chu 2511
+Vat tu 2512,Vat tu tieu hao,thung,162.10,55315,5,Ghi chu 2512
+Vat tu 2513,Bu long - Oc vit,tan,136.06,58268,5,Ghi chu 2513
+Vat tu 2514,Thep hop,kg,87.88,60194,5,Ghi chu 2514
+Vat tu 2515,Tam thep,tan,20.35,77496,5,Ghi chu 2515
+Vat tu 2516,Tam thep,cai,132.35,70076,5,Ghi chu 2516
+Vat tu 2517,Tam thep,tan,309.23,58514,5,Ghi chu 2517
+Vat tu 2518,Thep hinh,thung,321.70,54888,5,Ghi chu 2518
+Vat tu 2519,Dam thep,tam,47.90,59659,5,Ghi chu 2519
+Vat tu 2520,Thep goc,tan,165.73,64090,5,Ghi chu 2520
+Vat tu 2521,Vat tu tieu hao,met,73.27,53842,5,Ghi chu 2521
+Vat tu 2522,Ong thep,met,91.88,63295,5,Ghi chu 2522
+Vat tu 2523,Tam thep,kg,256.66,74976,5,Ghi chu 2523
+Vat tu 2524,Ong thep,cai,53.88,81862,5,Ghi chu 2524
+Vat tu 2525,Vat tu tieu hao,met,48.18,63786,5,Ghi chu 2525
+Vat tu 2526,Ong thep,cai,102.20,50688,5,Ghi chu 2526
+Vat tu 2527,Ong thep,cuon,276.17,54748,5,Ghi chu 2527
+Vat tu 2528,Thep goc,met,293.33,51000,5,Ghi chu 2528
+Vat tu 2529,Ong thep,kg,119.57,64466,5,Ghi chu 2529
+Vat tu 2530,Thep goc,cai,284.46,61710,5,Ghi chu 2530
+Vat tu 2531,Dam thep,met,281.55,59343,5,Ghi chu 2531
+Vat tu 2532,Ong thep,kg,29.11,54579,5,Ghi chu 2532
+Vat tu 2533,Thep goc,met,184.84,82694,5,Ghi chu 2533
+Vat tu 2534,Thep hop,met,172.51,77275,5,Ghi chu 2534
+Vat tu 2535,Tam thep,met,114.08,55373,5,Ghi chu 2535
+Vat tu 2536,Bu long - Oc vit,met,1.40,57523,5,Ghi chu 2536
+Vat tu 2537,Bu long - Oc vit,kg,4.35,57131,5,Ghi chu 2537
+Vat tu 2538,Bu long - Oc vit,met,163.79,57224,5,Ghi chu 2538
+Vat tu 2539,Ong thep,cuon,11.89,69705,5,Ghi chu 2539
+Vat tu 2540,Bu long - Oc vit,cuon,20.87,52413,5,Ghi chu 2540
+Vat tu 2541,Vat tu tieu hao,tan,133.27,55175,5,Ghi chu 2541
+Vat tu 2542,Tam thep,tam,323.35,61019,5,Ghi chu 2542
+Vat tu 2543,Ong thep,thung,325.62,62164,5,Ghi chu 2543
+Vat tu 2544,Thep hinh,cai,317.57,60199,5,Ghi chu 2544
+Vat tu 2545,Thep goc,cai,185.64,56577,5,Ghi chu 2545
+Vat tu 2546,Vat tu tieu hao,kg,59.81,74001,5,Ghi chu 2546
+Vat tu 2547,Bu long - Oc vit,cuon,92.17,67374,5,Ghi chu 2547
+Vat tu 2548,Thep hinh,met,294.39,62879,5,Ghi chu 2548
+Vat tu 2549,Ong thep,cuon,269.62,64516,5,Ghi chu 2549
+Vat tu 2550,Thep hinh,tam,235.10,67064,5,Ghi chu 2550
+Vat tu 2551,Ong thep,cai,313.03,76641,5,Ghi chu 2551
+Vat tu 2552,Thep hop,met,225.80,54779,5,Ghi chu 2552
+Vat tu 2553,Thep hinh,kg,98.64,66210,5,Ghi chu 2553
+Vat tu 2554,Thep goc,tan,120.39,75618,5,Ghi chu 2554
+Vat tu 2555,Thep hinh,kg,154.31,62835,5,Ghi chu 2555
+Vat tu 2556,Dam thep,tam,234.59,55587,5,Ghi chu 2556
+Vat tu 2557,Tam thep,tam,108.91,57883,5,Ghi chu 2557
+Vat tu 2558,Ong thep,kg,274.98,52669,5,Ghi chu 2558
+Vat tu 2559,Thep goc,cuon,222.93,65481,5,Ghi chu 2559
+Vat tu 2560,Tam thep,tan,120.30,68207,5,Ghi chu 2560
+Vat tu 2561,Thep hop,tan,62.94,70115,5,Ghi chu 2561
+Vat tu 2562,Thep goc,cuon,115.00,53149,5,Ghi chu 2562
+Vat tu 2563,Thep goc,tam,287.31,53904,5,Ghi chu 2563
+Vat tu 2564,Thep hop,cuon,185.63,80136,5,Ghi chu 2564
+Vat tu 2565,Dam thep,met,106.06,70984,5,Ghi chu 2565
+Vat tu 2566,Thep goc,tam,20.47,58011,5,Ghi chu 2566
+Vat tu 2567,Thep goc,thung,177.87,52749,5,Ghi chu 2567
+Vat tu 2568,Bu long - Oc vit,tan,68.12,70294,5,Ghi chu 2568
+Vat tu 2569,Bu long - Oc vit,kg,25.51,70873,5,Ghi chu 2569
+Vat tu 2570,Bu long - Oc vit,tam,305.38,80131,5,Ghi chu 2570
+Vat tu 2571,Thep goc,kg,318.07,82085,5,Ghi chu 2571
+Vat tu 2572,Bu long - Oc vit,cai,221.73,58089,5,Ghi chu 2572
+Vat tu 2573,Ong thep,kg,155.62,55301,5,Ghi chu 2573
+Vat tu 2574,Bu long - Oc vit,tan,196.39,53804,5,Ghi chu 2574
+Vat tu 2575,Dam thep,kg,146.37,76024,5,Ghi chu 2575
+Vat tu 2576,Thep hop,cuon,250.31,77729,5,Ghi chu 2576
+Vat tu 2577,Ong thep,kg,65.99,52572,5,Ghi chu 2577
+Vat tu 2578,Thep hop,met,220.69,51244,5,Ghi chu 2578
+Vat tu 2579,Thep goc,thung,60.37,50696,5,Ghi chu 2579
+Vat tu 2580,Ong thep,met,21.72,75879,5,Ghi chu 2580
+Vat tu 2581,Thep goc,tan,312.90,53381,5,Ghi chu 2581
+Vat tu 2582,Tam thep,cuon,271.07,82291,5,Ghi chu 2582
+Vat tu 2583,Ong thep,kg,217.57,51306,5,Ghi chu 2583
+Vat tu 2584,Dam thep,tan,264.16,63285,5,Ghi chu 2584
+Vat tu 2585,Vat tu tieu hao,thung,90.63,55249,5,Ghi chu 2585
+Vat tu 2586,Tam thep,tam,228.59,59354,5,Ghi chu 2586
+Vat tu 2587,Bu long - Oc vit,met,297.63,58046,5,Ghi chu 2587
+Vat tu 2588,Thep goc,cuon,290.94,73951,5,Ghi chu 2588
+Vat tu 2589,Vat tu tieu hao,cuon,125.04,80083,5,Ghi chu 2589
+Vat tu 2590,Bu long - Oc vit,kg,18.50,59139,5,Ghi chu 2590
+Vat tu 2591,Thep goc,tam,181.84,52515,5,Ghi chu 2591
+Vat tu 2592,Thep goc,met,1.18,60613,5,Ghi chu 2592
+Vat tu 2593,Thep hinh,cuon,211.55,58786,5,Ghi chu 2593
+Vat tu 2594,Thep hop,cai,61.12,74111,5,Ghi chu 2594
+Vat tu 2595,Thep hinh,cai,120.11,73368,5,Ghi chu 2595
+Vat tu 2596,Vat tu tieu hao,thung,287.33,72785,5,Ghi chu 2596
+Vat tu 2597,Thep hop,tan,14.08,73544,5,Ghi chu 2597
+Vat tu 2598,Vat tu tieu hao,cai,162.86,50224,5,Ghi chu 2598
+Vat tu 2599,Dam thep,cai,216.42,78576,5,Ghi chu 2599
+Vat tu 2600,Tam thep,thung,213.35,52473,5,Ghi chu 2600
+Vat tu 2601,Ong thep,thung,29.14,80878,5,Ghi chu 2601
+Vat tu 2602,Thep hop,tam,45.67,59739,5,Ghi chu 2602
+Vat tu 2603,Tam thep,cuon,263.22,66365,5,Ghi chu 2603
+Vat tu 2604,Tam thep,tan,136.36,73010,5,Ghi chu 2604
+Vat tu 2605,Dam thep,thung,305.15,58250,5,Ghi chu 2605
+Vat tu 2606,Thep hinh,tam,194.29,77267,5,Ghi chu 2606
+Vat tu 2607,Vat tu tieu hao,tan,325.93,50725,5,Ghi chu 2607
+Vat tu 2608,Thep hinh,thung,177.30,63197,5,Ghi chu 2608
+Vat tu 2609,Vat tu tieu hao,cuon,281.15,72122,5,Ghi chu 2609
+Vat tu 2610,Vat tu tieu hao,kg,297.38,61726,5,Ghi chu 2610
+Vat tu 2611,Tam thep,thung,49.87,61752,5,Ghi chu 2611
+Vat tu 2612,Tam thep,met,139.21,81338,5,Ghi chu 2612
+Vat tu 2613,Thep hinh,tam,96.53,78075,5,Ghi chu 2613
+Vat tu 2614,Vat tu tieu hao,cai,162.07,51259,5,Ghi chu 2614
+Vat tu 2615,Vat tu tieu hao,met,150.20,76565,5,Ghi chu 2615
+Vat tu 2616,Thep goc,cuon,215.46,59314,5,Ghi chu 2616
+Vat tu 2617,Dam thep,cai,61.99,62900,5,Ghi chu 2617
+Vat tu 2618,Ong thep,cuon,310.30,77599,5,Ghi chu 2618
+Vat tu 2619,Vat tu tieu hao,kg,275.21,64357,5,Ghi chu 2619
+Vat tu 2620,Tam thep,cai,84.82,63008,5,Ghi chu 2620
+Vat tu 2621,Thep hop,cuon,135.36,74013,5,Ghi chu 2621
+Vat tu 2622,Thep hop,tam,272.72,69247,5,Ghi chu 2622
+Vat tu 2623,Thep hop,cai,312.37,71319,5,Ghi chu 2623
+Vat tu 2624,Tam thep,thung,218.23,66900,5,Ghi chu 2624
+Vat tu 2625,Thep hinh,tan,39.08,73673,5,Ghi chu 2625
+Vat tu 2626,Ong thep,cuon,236.68,57330,5,Ghi chu 2626
+Vat tu 2627,Dam thep,kg,43.71,62281,5,Ghi chu 2627
+Vat tu 2628,Thep hinh,kg,89.29,51466,5,Ghi chu 2628
+Vat tu 2629,Dam thep,cuon,151.51,66158,5,Ghi chu 2629
+Vat tu 2630,Bu long - Oc vit,tan,309.34,75954,5,Ghi chu 2630
+Vat tu 2631,Thep hop,met,312.03,75167,5,Ghi chu 2631
+Vat tu 2632,Thep hinh,kg,94.67,64304,5,Ghi chu 2632
+Vat tu 2633,Tam thep,kg,102.05,69050,5,Ghi chu 2633
+Vat tu 2634,Thep hinh,tam,231.99,69179,5,Ghi chu 2634
+Vat tu 2635,Vat tu tieu hao,cai,255.37,79426,5,Ghi chu 2635
+Vat tu 2636,Vat tu tieu hao,tam,272.94,69003,5,Ghi chu 2636
+Vat tu 2637,Thep hop,tam,88.74,59103,5,Ghi chu 2637
+Vat tu 2638,Tam thep,tan,275.02,70740,5,Ghi chu 2638
+Vat tu 2639,Thep hop,cuon,136.80,64201,5,Ghi chu 2639
+Vat tu 2640,Dam thep,tam,268.65,63766,5,Ghi chu 2640
+Vat tu 2641,Vat tu tieu hao,tan,198.61,57121,5,Ghi chu 2641
+Vat tu 2642,Thep goc,cuon,127.40,51954,5,Ghi chu 2642
+Vat tu 2643,Bu long - Oc vit,tam,226.09,74673,5,Ghi chu 2643
+Vat tu 2644,Bu long - Oc vit,tan,153.28,54434,5,Ghi chu 2644
+Vat tu 2645,Thep hop,tam,241.93,79417,5,Ghi chu 2645
+Vat tu 2646,Thep hop,met,30.43,60267,5,Ghi chu 2646
+Vat tu 2647,Dam thep,thung,185.95,69719,5,Ghi chu 2647
+Vat tu 2648,Ong thep,cuon,126.23,73872,5,Ghi chu 2648
+Vat tu 2649,Vat tu tieu hao,tan,175.16,79771,5,Ghi chu 2649
+Vat tu 2650,Thep goc,kg,165.16,70604,5,Ghi chu 2650
+Vat tu 2651,Thep hinh,thung,199.00,65186,5,Ghi chu 2651
+Vat tu 2652,Thep hop,tan,218.22,65128,5,Ghi chu 2652
+Vat tu 2653,Bu long - Oc vit,kg,66.29,63073,5,Ghi chu 2653
+Vat tu 2654,Vat tu tieu hao,thung,291.52,70909,5,Ghi chu 2654
+Vat tu 2655,Thep hop,met,139.91,78073,5,Ghi chu 2655
+Vat tu 2656,Ong thep,kg,112.14,50675,5,Ghi chu 2656
+Vat tu 2657,Vat tu tieu hao,cuon,251.27,66408,5,Ghi chu 2657
+Vat tu 2658,Vat tu tieu hao,tan,119.39,67720,5,Ghi chu 2658
+Vat tu 2659,Thep hop,met,269.56,59123,5,Ghi chu 2659
+Vat tu 2660,Dam thep,kg,115.15,73104,5,Ghi chu 2660
+Vat tu 2661,Thep hinh,tan,167.92,75358,5,Ghi chu 2661
+Vat tu 2662,Vat tu tieu hao,tan,186.02,67678,5,Ghi chu 2662
+Vat tu 2663,Thep goc,met,309.92,82560,5,Ghi chu 2663
+Vat tu 2664,Thep goc,thung,183.01,72914,5,Ghi chu 2664
+Vat tu 2665,Dam thep,thung,71.08,81118,5,Ghi chu 2665
+Vat tu 2666,Thep hop,kg,254.81,80478,5,Ghi chu 2666
+Vat tu 2667,Ong thep,kg,279.25,51799,5,Ghi chu 2667
+Vat tu 2668,Thep hinh,cuon,319.68,77535,5,Ghi chu 2668
+Vat tu 2669,Ong thep,kg,323.82,73577,5,Ghi chu 2669
+Vat tu 2670,Vat tu tieu hao,met,23.47,54425,5,Ghi chu 2670
+Vat tu 2671,Bu long - Oc vit,cuon,270.99,68073,5,Ghi chu 2671
+Vat tu 2672,Dam thep,met,209.45,81290,5,Ghi chu 2672
+Vat tu 2673,Bu long - Oc vit,tan,3.18,68575,5,Ghi chu 2673
+Vat tu 2674,Thep goc,tam,93.47,68298,5,Ghi chu 2674
+Vat tu 2675,Thep hop,met,219.18,62706,5,Ghi chu 2675
+Vat tu 2676,Ong thep,tan,81.53,69928,5,Ghi chu 2676
+Vat tu 2677,Ong thep,cuon,268.26,62926,5,Ghi chu 2677
+Vat tu 2678,Ong thep,met,258.38,57231,5,Ghi chu 2678
+Vat tu 2679,Vat tu tieu hao,kg,166.45,66649,5,Ghi chu 2679
+Vat tu 2680,Thep goc,cai,243.78,54799,5,Ghi chu 2680
+Vat tu 2681,Thep hinh,tan,38.37,50139,5,Ghi chu 2681
+Vat tu 2682,Ong thep,kg,249.74,62236,5,Ghi chu 2682
+Vat tu 2683,Bu long - Oc vit,tan,139.72,58851,5,Ghi chu 2683
+Vat tu 2684,Vat tu tieu hao,tam,37.80,61432,5,Ghi chu 2684
+Vat tu 2685,Thep hinh,met,217.99,55057,5,Ghi chu 2685
+Vat tu 2686,Bu long - Oc vit,tam,66.13,70268,5,Ghi chu 2686
+Vat tu 2687,Thep hinh,thung,46.82,77766,5,Ghi chu 2687
+Vat tu 2688,Vat tu tieu hao,thung,169.22,81438,5,Ghi chu 2688
+Vat tu 2689,Ong thep,cai,178.69,71883,5,Ghi chu 2689
+Vat tu 2690,Bu long - Oc vit,thung,305.77,82198,5,Ghi chu 2690
+Vat tu 2691,Tam thep,thung,151.28,56345,5,Ghi chu 2691
+Vat tu 2692,Tam thep,cai,247.61,74301,5,Ghi chu 2692
+Vat tu 2693,Ong thep,kg,150.05,69105,5,Ghi chu 2693
+Vat tu 2694,Dam thep,tam,2.63,61142,5,Ghi chu 2694
+Vat tu 2695,Thep goc,kg,239.56,80782,5,Ghi chu 2695
+Vat tu 2696,Vat tu tieu hao,tan,147.77,76270,5,Ghi chu 2696
+Vat tu 2697,Vat tu tieu hao,cai,9.12,81015,5,Ghi chu 2697
+Vat tu 2698,Dam thep,cai,9.68,55441,5,Ghi chu 2698
+Vat tu 2699,Thep goc,met,248.36,68451,5,Ghi chu 2699
+Vat tu 2700,Thep hop,met,196.13,72900,5,Ghi chu 2700
+Vat tu 2701,Vat tu tieu hao,thung,251.37,78517,5,Ghi chu 2701
+Vat tu 2702,Tam thep,tan,12.23,80574,5,Ghi chu 2702
+Vat tu 2703,Thep hinh,met,93.82,57421,5,Ghi chu 2703
+Vat tu 2704,Bu long - Oc vit,met,286.76,79497,5,Ghi chu 2704
+Vat tu 2705,Dam thep,cuon,153.91,67269,5,Ghi chu 2705
+Vat tu 2706,Dam thep,cai,258.31,81473,5,Ghi chu 2706
+Vat tu 2707,Ong thep,cuon,315.62,54506,5,Ghi chu 2707
+Vat tu 2708,Vat tu tieu hao,cuon,108.38,71080,5,Ghi chu 2708
+Vat tu 2709,Ong thep,cai,113.33,81394,5,Ghi chu 2709
+Vat tu 2710,Thep goc,kg,175.40,54973,5,Ghi chu 2710
+Vat tu 2711,Vat tu tieu hao,cuon,218.36,60347,5,Ghi chu 2711
+Vat tu 2712,Thep goc,cuon,110.86,73044,5,Ghi chu 2712
+Vat tu 2713,Vat tu tieu hao,kg,214.59,61212,5,Ghi chu 2713
+Vat tu 2714,Ong thep,tam,13.52,70972,5,Ghi chu 2714
+Vat tu 2715,Thep hop,met,11.16,66262,5,Ghi chu 2715
+Vat tu 2716,Ong thep,met,295.69,64402,5,Ghi chu 2716
+Vat tu 2717,Tam thep,thung,172.01,78970,5,Ghi chu 2717
+Vat tu 2718,Vat tu tieu hao,thung,86.23,75521,5,Ghi chu 2718
+Vat tu 2719,Tam thep,cuon,260.19,68735,5,Ghi chu 2719
+Vat tu 2720,Thep hop,tan,115.71,64181,5,Ghi chu 2720
+Vat tu 2721,Tam thep,tan,281.28,54279,5,Ghi chu 2721
+Vat tu 2722,Vat tu tieu hao,kg,52.62,62043,5,Ghi chu 2722
+Vat tu 2723,Thep goc,thung,212.97,67957,5,Ghi chu 2723
+Vat tu 2724,Thep goc,thung,302.74,73034,5,Ghi chu 2724
+Vat tu 2725,Dam thep,tam,275.78,58713,5,Ghi chu 2725
+Vat tu 2726,Bu long - Oc vit,cai,215.66,72525,5,Ghi chu 2726
+Vat tu 2727,Dam thep,tan,242.65,72776,5,Ghi chu 2727
+Vat tu 2728,Thep hinh,cuon,202.84,59734,5,Ghi chu 2728
+Vat tu 2729,Thep hop,kg,84.52,55079,5,Ghi chu 2729
+Vat tu 2730,Ong thep,tam,251.69,72733,5,Ghi chu 2730
+Vat tu 2731,Dam thep,cuon,124.51,81392,5,Ghi chu 2731
+Vat tu 2732,Thep hinh,tam,193.86,75790,5,Ghi chu 2732
+Vat tu 2733,Thep hop,cuon,310.26,54108,5,Ghi chu 2733
+Vat tu 2734,Ong thep,tan,241.52,53404,5,Ghi chu 2734
+Vat tu 2735,Vat tu tieu hao,tam,328.05,61310,5,Ghi chu 2735
+Vat tu 2736,Tam thep,tam,5.22,60381,5,Ghi chu 2736
+Vat tu 2737,Vat tu tieu hao,cai,211.97,69721,5,Ghi chu 2737
+Vat tu 2738,Bu long - Oc vit,tan,222.03,65733,5,Ghi chu 2738
+Vat tu 2739,Vat tu tieu hao,kg,236.29,53360,5,Ghi chu 2739
+Vat tu 2740,Vat tu tieu hao,thung,224.04,58141,5,Ghi chu 2740
+Vat tu 2741,Ong thep,tan,54.03,52394,5,Ghi chu 2741
+Vat tu 2742,Thep goc,kg,41.41,68393,5,Ghi chu 2742
+Vat tu 2743,Tam thep,met,290.48,51215,5,Ghi chu 2743
+Vat tu 2744,Thep hop,cuon,14.75,82676,5,Ghi chu 2744
+Vat tu 2745,Vat tu tieu hao,cuon,62.84,58310,5,Ghi chu 2745
+Vat tu 2746,Ong thep,cuon,110.26,54788,5,Ghi chu 2746
+Vat tu 2747,Vat tu tieu hao,cai,133.23,51337,5,Ghi chu 2747
+Vat tu 2748,Dam thep,cai,99.33,51207,5,Ghi chu 2748
+Vat tu 2749,Dam thep,met,261.49,59171,5,Ghi chu 2749
+Vat tu 2750,Tam thep,cai,238.81,82623,5,Ghi chu 2750
+Vat tu 2751,Tam thep,kg,.61,55071,5,Ghi chu 2751
+Vat tu 2752,Thep hinh,met,182.67,53709,5,Ghi chu 2752
+Vat tu 2753,Thep goc,tam,54.93,55782,5,Ghi chu 2753
+Vat tu 2754,Bu long - Oc vit,cuon,121.46,77410,5,Ghi chu 2754
+Vat tu 2755,Bu long - Oc vit,thung,115.87,62812,5,Ghi chu 2755
+Vat tu 2756,Vat tu tieu hao,kg,16.29,70298,5,Ghi chu 2756
+Vat tu 2757,Dam thep,tam,178.06,58707,5,Ghi chu 2757
+Vat tu 2758,Thep goc,kg,72.80,63662,5,Ghi chu 2758
+Vat tu 2759,Thep hop,cuon,41.70,53840,5,Ghi chu 2759
+Vat tu 2760,Tam thep,met,78.46,74050,5,Ghi chu 2760
+Vat tu 2761,Thep hinh,tam,282.18,62955,5,Ghi chu 2761
+Vat tu 2762,Thep hop,kg,185.21,60932,5,Ghi chu 2762
+Vat tu 2763,Thep hinh,tam,315.72,51346,5,Ghi chu 2763
+Vat tu 2764,Thep hop,tam,216.82,51487,5,Ghi chu 2764
+Vat tu 2765,Tam thep,kg,140.40,77564,5,Ghi chu 2765
+Vat tu 2766,Ong thep,tan,8.83,76118,5,Ghi chu 2766
+Vat tu 2767,Bu long - Oc vit,thung,138.55,80695,5,Ghi chu 2767
+Vat tu 2768,Bu long - Oc vit,tam,192.12,62083,5,Ghi chu 2768
+Vat tu 2769,Thep hinh,kg,155.37,61274,5,Ghi chu 2769
+Vat tu 2770,Thep goc,cuon,326.17,76830,5,Ghi chu 2770
+Vat tu 2771,Thep goc,cai,39.38,74019,5,Ghi chu 2771
+Vat tu 2772,Dam thep,tan,104.63,78656,5,Ghi chu 2772
+Vat tu 2773,Tam thep,met,278.93,59472,5,Ghi chu 2773
+Vat tu 2774,Bu long - Oc vit,tan,99.78,71770,5,Ghi chu 2774
+Vat tu 2775,Thep hop,tam,1.30,59913,5,Ghi chu 2775
+Vat tu 2776,Ong thep,cai,255.09,64036,5,Ghi chu 2776
+Vat tu 2777,Ong thep,thung,41.30,80427,5,Ghi chu 2777
+Vat tu 2778,Thep hinh,cuon,218.65,66498,5,Ghi chu 2778
+Vat tu 2779,Thep goc,thung,111.23,82655,5,Ghi chu 2779
+Vat tu 2780,Thep goc,cai,25.71,66170,5,Ghi chu 2780
+Vat tu 2781,Dam thep,cuon,6.88,55636,5,Ghi chu 2781
+Vat tu 2782,Bu long - Oc vit,tam,105.10,57169,5,Ghi chu 2782
+Vat tu 2783,Tam thep,tam,282.02,60985,5,Ghi chu 2783
+Vat tu 2784,Thep goc,met,115.39,61760,5,Ghi chu 2784
+Vat tu 2785,Thep goc,tam,124.80,67631,5,Ghi chu 2785
+Vat tu 2786,Thep hinh,tam,187.44,55896,5,Ghi chu 2786
+Vat tu 2787,Tam thep,tan,276.07,58703,5,Ghi chu 2787
+Vat tu 2788,Tam thep,tan,29.70,73966,5,Ghi chu 2788
+Vat tu 2789,Tam thep,kg,252.95,57071,5,Ghi chu 2789
+Vat tu 2790,Dam thep,cai,311.38,62845,5,Ghi chu 2790
+Vat tu 2791,Ong thep,met,92.63,61168,5,Ghi chu 2791
+Vat tu 2792,Tam thep,thung,157.30,51965,5,Ghi chu 2792
+Vat tu 2793,Ong thep,cai,6.05,56215,5,Ghi chu 2793
+Vat tu 2794,Thep goc,cuon,151.77,79289,5,Ghi chu 2794
+Vat tu 2795,Tam thep,cuon,246.85,63458,5,Ghi chu 2795
+Vat tu 2796,Ong thep,met,314.32,61505,5,Ghi chu 2796
+Vat tu 2797,Vat tu tieu hao,thung,269.00,63929,5,Ghi chu 2797
+Vat tu 2798,Bu long - Oc vit,tam,4.54,82202,5,Ghi chu 2798
+Vat tu 2799,Thep goc,met,111.70,76664,5,Ghi chu 2799
+Vat tu 2800,Thep hop,tan,145.70,62656,5,Ghi chu 2800
+Vat tu 2801,Dam thep,cuon,6.06,62180,5,Ghi chu 2801
+Vat tu 2802,Thep hop,cuon,151.94,76940,5,Ghi chu 2802
+Vat tu 2803,Bu long - Oc vit,thung,34.68,79536,5,Ghi chu 2803
+Vat tu 2804,Bu long - Oc vit,kg,321.00,52973,5,Ghi chu 2804
+Vat tu 2805,Vat tu tieu hao,kg,183.65,82321,5,Ghi chu 2805
+Vat tu 2806,Dam thep,met,260.31,50680,5,Ghi chu 2806
+Vat tu 2807,Tam thep,cuon,320.13,51147,5,Ghi chu 2807
+Vat tu 2808,Bu long - Oc vit,cai,72.55,67292,5,Ghi chu 2808
+Vat tu 2809,Dam thep,met,50.29,65508,5,Ghi chu 2809
+Vat tu 2810,Thep hop,tam,143.50,54551,5,Ghi chu 2810
+Vat tu 2811,Thep goc,met,324.77,51116,5,Ghi chu 2811
+Vat tu 2812,Dam thep,met,2.50,67045,5,Ghi chu 2812
+Vat tu 2813,Thep hinh,thung,158.75,61238,5,Ghi chu 2813
+Vat tu 2814,Bu long - Oc vit,cai,229.81,75938,5,Ghi chu 2814
+Vat tu 2815,Thep hop,tam,119.23,80247,5,Ghi chu 2815
+Vat tu 2816,Ong thep,tan,276.88,63427,5,Ghi chu 2816
+Vat tu 2817,Ong thep,cai,137.35,58537,5,Ghi chu 2817
+Vat tu 2818,Dam thep,thung,170.10,60410,5,Ghi chu 2818
+Vat tu 2819,Vat tu tieu hao,kg,49.29,57624,5,Ghi chu 2819
+Vat tu 2820,Thep goc,thung,96.47,64401,5,Ghi chu 2820
+Vat tu 2821,Thep goc,tan,71.57,54749,5,Ghi chu 2821
+Vat tu 2822,Bu long - Oc vit,tam,297.47,62595,5,Ghi chu 2822
+Vat tu 2823,Vat tu tieu hao,tam,41.35,60074,5,Ghi chu 2823
+Vat tu 2824,Thep hop,met,128.44,74724,5,Ghi chu 2824
+Vat tu 2825,Ong thep,thung,103.72,73577,5,Ghi chu 2825
+Vat tu 2826,Tam thep,thung,167.66,55608,5,Ghi chu 2826
+Vat tu 2827,Dam thep,tan,137.05,67302,5,Ghi chu 2827
+Vat tu 2828,Tam thep,kg,36.48,76261,5,Ghi chu 2828
+Vat tu 2829,Ong thep,cai,145.74,52047,5,Ghi chu 2829
+Vat tu 2830,Tam thep,cuon,81.88,65024,5,Ghi chu 2830
+Vat tu 2831,Dam thep,cuon,12.89,63214,5,Ghi chu 2831
+Vat tu 2832,Thep hinh,cai,180.74,62291,5,Ghi chu 2832
+Vat tu 2833,Thep goc,tan,5.07,75350,5,Ghi chu 2833
+Vat tu 2834,Thep hop,thung,163.01,53057,5,Ghi chu 2834
+Vat tu 2835,Tam thep,cuon,166.98,56611,5,Ghi chu 2835
+Vat tu 2836,Thep hop,kg,143.45,66459,5,Ghi chu 2836
+Vat tu 2837,Bu long - Oc vit,met,83.27,59336,5,Ghi chu 2837
+Vat tu 2838,Bu long - Oc vit,cuon,204.94,55313,5,Ghi chu 2838
+Vat tu 2839,Vat tu tieu hao,thung,140.01,67191,5,Ghi chu 2839
+Vat tu 2840,Ong thep,tan,38.98,74052,5,Ghi chu 2840
+Vat tu 2841,Bu long - Oc vit,thung,160.70,55962,5,Ghi chu 2841
+Vat tu 2842,Bu long - Oc vit,cai,79.71,70718,5,Ghi chu 2842
+Vat tu 2843,Dam thep,tam,61.60,70834,5,Ghi chu 2843
+Vat tu 2844,Thep goc,cai,312.00,82125,5,Ghi chu 2844
+Vat tu 2845,Thep goc,thung,169.76,74297,5,Ghi chu 2845
+Vat tu 2846,Ong thep,cai,255.98,60167,5,Ghi chu 2846
+Vat tu 2847,Bu long - Oc vit,kg,146.22,63924,5,Ghi chu 2847
+Vat tu 2848,Thep hinh,met,41.12,52339,5,Ghi chu 2848
+Vat tu 2849,Vat tu tieu hao,tam,40.78,73375,5,Ghi chu 2849
+Vat tu 2850,Tam thep,tam,236.48,64008,5,Ghi chu 2850
+Vat tu 2851,Ong thep,met,281.07,59475,5,Ghi chu 2851
+Vat tu 2852,Tam thep,cuon,52.31,67498,5,Ghi chu 2852
+Vat tu 2853,Bu long - Oc vit,met,154.59,68451,5,Ghi chu 2853
+Vat tu 2854,Vat tu tieu hao,cai,153.79,75604,5,Ghi chu 2854
+Vat tu 2855,Bu long - Oc vit,cuon,325.04,61272,5,Ghi chu 2855
+Vat tu 2856,Thep hinh,kg,127.89,54269,5,Ghi chu 2856
+Vat tu 2857,Ong thep,tan,297.36,58551,5,Ghi chu 2857
+Vat tu 2858,Thep hop,thung,65.82,65163,5,Ghi chu 2858
+Vat tu 2859,Bu long - Oc vit,thung,298.71,53050,5,Ghi chu 2859
+Vat tu 2860,Tam thep,thung,299.46,72693,5,Ghi chu 2860
+Vat tu 2861,Thep goc,tan,7.15,81437,5,Ghi chu 2861
+Vat tu 2862,Thep hop,thung,84.29,74354,5,Ghi chu 2862
+Vat tu 2863,Bu long - Oc vit,kg,12.90,70706,5,Ghi chu 2863
+Vat tu 2864,Ong thep,thung,293.29,78020,5,Ghi chu 2864
+Vat tu 2865,Bu long - Oc vit,kg,179.47,50715,5,Ghi chu 2865
+Vat tu 2866,Ong thep,thung,99.91,80723,5,Ghi chu 2866
+Vat tu 2867,Thep hinh,tam,3.53,80140,5,Ghi chu 2867
+Vat tu 2868,Thep hinh,thung,121.79,50134,5,Ghi chu 2868
+Vat tu 2869,Dam thep,met,33.77,71779,5,Ghi chu 2869
+Vat tu 2870,Thep goc,cai,45.37,62743,5,Ghi chu 2870
+Vat tu 2871,Dam thep,tam,316.22,79505,5,Ghi chu 2871
+Vat tu 2872,Ong thep,kg,46.93,60055,5,Ghi chu 2872
+Vat tu 2873,Thep hop,cai,206.74,66407,5,Ghi chu 2873
+Vat tu 2874,Thep hop,tan,226.15,71609,5,Ghi chu 2874
+Vat tu 2875,Thep hop,cai,242.15,77723,5,Ghi chu 2875
+Vat tu 2876,Thep goc,tam,198.78,57643,5,Ghi chu 2876
+Vat tu 2877,Thep goc,tam,190.36,57958,5,Ghi chu 2877
+Vat tu 2878,Thep hop,cuon,16.26,57657,5,Ghi chu 2878
+Vat tu 2879,Dam thep,tam,281.11,80061,5,Ghi chu 2879
+Vat tu 2880,Thep hop,tan,267.39,79486,5,Ghi chu 2880
+Vat tu 2881,Tam thep,met,279.71,50536,5,Ghi chu 2881
+Vat tu 2882,Dam thep,tam,69.63,70263,5,Ghi chu 2882
+Vat tu 2883,Ong thep,cuon,284.66,51612,5,Ghi chu 2883
+Vat tu 2884,Thep hop,tam,43.67,54046,5,Ghi chu 2884
+Vat tu 2885,Bu long - Oc vit,tam,181.77,58515,5,Ghi chu 2885
+Vat tu 2886,Thep hinh,thung,245.25,73567,5,Ghi chu 2886
+Vat tu 2887,Bu long - Oc vit,thung,322.44,50038,5,Ghi chu 2887
+Vat tu 2888,Thep hinh,tan,59.37,75229,5,Ghi chu 2888
+Vat tu 2889,Thep hinh,met,19.74,55069,5,Ghi chu 2889
+Vat tu 2890,Vat tu tieu hao,cai,286.70,81078,5,Ghi chu 2890
+Vat tu 2891,Vat tu tieu hao,kg,66.86,57550,5,Ghi chu 2891
+Vat tu 2892,Tam thep,kg,277.07,57690,5,Ghi chu 2892
+Vat tu 2893,Dam thep,tam,290.63,62885,5,Ghi chu 2893
+Vat tu 2894,Thep goc,met,38.78,51316,5,Ghi chu 2894
+Vat tu 2895,Ong thep,thung,48.97,71435,5,Ghi chu 2895
+Vat tu 2896,Thep hop,cuon,27.15,71114,5,Ghi chu 2896
+Vat tu 2897,Dam thep,tam,280.13,75075,5,Ghi chu 2897
+Vat tu 2898,Dam thep,cuon,226.30,71137,5,Ghi chu 2898
+Vat tu 2899,Bu long - Oc vit,kg,248.30,79465,5,Ghi chu 2899
+Vat tu 2900,Thep hinh,thung,324.98,82684,5,Ghi chu 2900
+Vat tu 2901,Thep hinh,tan,87.48,62931,5,Ghi chu 2901
+Vat tu 2902,Tam thep,cai,13.54,60589,5,Ghi chu 2902
+Vat tu 2903,Ong thep,cai,20.01,76985,5,Ghi chu 2903
+Vat tu 2904,Bu long - Oc vit,met,.80,61622,5,Ghi chu 2904
+Vat tu 2905,Thep goc,tam,227.36,69954,5,Ghi chu 2905
+Vat tu 2906,Dam thep,kg,148.44,62988,5,Ghi chu 2906
+Vat tu 2907,Vat tu tieu hao,tan,303.84,51017,5,Ghi chu 2907
+Vat tu 2908,Thep hinh,kg,130.80,73005,5,Ghi chu 2908
+Vat tu 2909,Ong thep,kg,183.13,52499,5,Ghi chu 2909
+Vat tu 2910,Vat tu tieu hao,met,217.37,60176,5,Ghi chu 2910
+Vat tu 2911,Thep hinh,cai,14.31,67907,5,Ghi chu 2911
+Vat tu 2912,Tam thep,thung,92.86,72739,5,Ghi chu 2912
+Vat tu 2913,Thep goc,thung,153.19,69835,5,Ghi chu 2913
+Vat tu 2914,Vat tu tieu hao,tan,207.43,56369,5,Ghi chu 2914
+Vat tu 2915,Thep hinh,tan,45.01,56290,5,Ghi chu 2915
+Vat tu 2916,Bu long - Oc vit,thung,3.28,80136,5,Ghi chu 2916
+Vat tu 2917,Tam thep,met,212.09,59285,5,Ghi chu 2917
+Vat tu 2918,Dam thep,tan,239.03,66768,5,Ghi chu 2918
+Vat tu 2919,Dam thep,cai,278.96,75644,5,Ghi chu 2919
+Vat tu 2920,Tam thep,thung,263.10,50690,5,Ghi chu 2920
+Vat tu 2921,Dam thep,kg,80.84,64211,5,Ghi chu 2921
+Vat tu 2922,Thep hinh,kg,246.72,51570,5,Ghi chu 2922
+Vat tu 2923,Bu long - Oc vit,met,203.33,65634,5,Ghi chu 2923
+Vat tu 2924,Vat tu tieu hao,thung,326.68,55971,5,Ghi chu 2924
+Vat tu 2925,Bu long - Oc vit,tan,216.99,70333,5,Ghi chu 2925
+Vat tu 2926,Thep hop,tan,119.54,56255,5,Ghi chu 2926
+Vat tu 2927,Thep goc,thung,113.15,76357,5,Ghi chu 2927
+Vat tu 2928,Tam thep,tam,20.37,66753,5,Ghi chu 2928
+Vat tu 2929,Vat tu tieu hao,cai,63.94,52177,5,Ghi chu 2929
+Vat tu 2930,Vat tu tieu hao,tan,85.81,61742,5,Ghi chu 2930
+Vat tu 2931,Thep hinh,cuon,57.39,57396,5,Ghi chu 2931
+Vat tu 2932,Bu long - Oc vit,cai,81.54,82502,5,Ghi chu 2932
+Vat tu 2933,Thep goc,cai,25.02,61870,5,Ghi chu 2933
+Vat tu 2934,Dam thep,thung,217.34,50806,5,Ghi chu 2934
+Vat tu 2935,Dam thep,thung,164.35,79648,5,Ghi chu 2935
+Vat tu 2936,Dam thep,cuon,291.15,61692,5,Ghi chu 2936
+Vat tu 2937,Ong thep,met,220.40,78219,5,Ghi chu 2937
+Vat tu 2938,Dam thep,kg,164.11,65090,5,Ghi chu 2938
+Vat tu 2939,Tam thep,thung,86.75,60524,5,Ghi chu 2939
+Vat tu 2940,Ong thep,thung,94.49,55260,5,Ghi chu 2940
+Vat tu 2941,Dam thep,cai,188.76,55349,5,Ghi chu 2941
+Vat tu 2942,Bu long - Oc vit,kg,65.68,60783,5,Ghi chu 2942
+Vat tu 2943,Dam thep,tan,151.73,55779,5,Ghi chu 2943
+Vat tu 2944,Thep goc,tam,182.41,66775,5,Ghi chu 2944
+Vat tu 2945,Thep hop,kg,125.41,77985,5,Ghi chu 2945
+Vat tu 2946,Thep hop,met,165.34,54808,5,Ghi chu 2946
+Vat tu 2947,Dam thep,cai,265.38,65004,5,Ghi chu 2947
+Vat tu 2948,Thep goc,met,204.50,74850,5,Ghi chu 2948
+Vat tu 2949,Ong thep,cuon,125.55,53192,5,Ghi chu 2949
+Vat tu 2950,Thep hinh,cuon,207.29,75195,5,Ghi chu 2950
+Vat tu 2951,Thep goc,met,17.69,75357,5,Ghi chu 2951
+Vat tu 2952,Bu long - Oc vit,tam,67.11,70378,5,Ghi chu 2952
+Vat tu 2953,Thep goc,tam,41.05,81068,5,Ghi chu 2953
+Vat tu 2954,Thep goc,thung,130.19,64568,5,Ghi chu 2954
+Vat tu 2955,Vat tu tieu hao,thung,281.29,80830,5,Ghi chu 2955
+Vat tu 2956,Ong thep,cuon,7.76,67229,5,Ghi chu 2956
+Vat tu 2957,Dam thep,cuon,58.72,50300,5,Ghi chu 2957
+Vat tu 2958,Dam thep,cuon,249.44,67724,5,Ghi chu 2958
+Vat tu 2959,Dam thep,tan,13.86,76482,5,Ghi chu 2959
+Vat tu 2960,Vat tu tieu hao,tan,168.82,79653,5,Ghi chu 2960
+Vat tu 2961,Tam thep,thung,173.99,66857,5,Ghi chu 2961
+Vat tu 2962,Bu long - Oc vit,cuon,311.71,52770,5,Ghi chu 2962
+Vat tu 2963,Tam thep,cai,2.43,73323,5,Ghi chu 2963
+Vat tu 2964,Ong thep,tan,54.80,56261,5,Ghi chu 2964
+Vat tu 2965,Thep hop,met,250.08,61224,5,Ghi chu 2965
+Vat tu 2966,Bu long - Oc vit,thung,182.18,60013,5,Ghi chu 2966
+Vat tu 2967,Dam thep,met,216.51,63380,5,Ghi chu 2967
+Vat tu 2968,Thep hop,met,180.00,81787,5,Ghi chu 2968
+Vat tu 2969,Thep goc,tam,299.07,58728,5,Ghi chu 2969
+Vat tu 2970,Bu long - Oc vit,cai,41.33,72001,5,Ghi chu 2970
+Vat tu 2971,Vat tu tieu hao,kg,75.83,50797,5,Ghi chu 2971
+Vat tu 2972,Bu long - Oc vit,tam,305.37,69174,5,Ghi chu 2972
+Vat tu 2973,Ong thep,cuon,29.29,63141,5,Ghi chu 2973
+Vat tu 2974,Bu long - Oc vit,tam,208.47,64515,5,Ghi chu 2974
+Vat tu 2975,Tam thep,thung,133.39,50982,5,Ghi chu 2975
+Vat tu 2976,Bu long - Oc vit,cai,135.11,71706,5,Ghi chu 2976
+Vat tu 2977,Thep goc,met,233.28,64228,5,Ghi chu 2977
+Vat tu 2978,Thep hinh,thung,155.06,52569,5,Ghi chu 2978
+Vat tu 2979,Tam thep,cuon,223.12,50289,5,Ghi chu 2979
+Vat tu 2980,Bu long - Oc vit,thung,274.03,76691,5,Ghi chu 2980
+Vat tu 2981,Vat tu tieu hao,cai,18.61,58990,5,Ghi chu 2981
+Vat tu 2982,Thep hop,met,129.69,56060,5,Ghi chu 2982
+Vat tu 2983,Dam thep,tam,303.65,54742,5,Ghi chu 2983
+Vat tu 2984,Vat tu tieu hao,cai,119.45,65789,5,Ghi chu 2984
+Vat tu 2985,Vat tu tieu hao,met,208.18,53769,5,Ghi chu 2985
+Vat tu 2986,Thep hop,cai,141.04,54457,5,Ghi chu 2986
+Vat tu 2987,Thep hop,met,175.44,78008,5,Ghi chu 2987
+Vat tu 2988,Tam thep,met,133.96,76661,5,Ghi chu 2988
+Vat tu 2989,Thep hop,tan,127.12,55562,5,Ghi chu 2989
+Vat tu 2990,Dam thep,tan,267.07,59538,5,Ghi chu 2990
+Vat tu 2991,Dam thep,tan,274.59,60306,5,Ghi chu 2991
+Vat tu 2992,Vat tu tieu hao,cuon,206.89,59753,5,Ghi chu 2992
+Vat tu 2993,Tam thep,thung,7.26,73516,5,Ghi chu 2993
+Vat tu 2994,Bu long - Oc vit,cai,135.82,54950,5,Ghi chu 2994
+Vat tu 2995,Ong thep,cuon,121.25,62171,5,Ghi chu 2995
+Vat tu 2996,Thep goc,thung,92.56,56279,5,Ghi chu 2996
+Vat tu 2997,Thep hinh,kg,22.83,66684,5,Ghi chu 2997
+Vat tu 2998,Ong thep,tan,131.67,81399,5,Ghi chu 2998
+Vat tu 2999,Bu long - Oc vit,kg,222.10,76438,5,Ghi chu 2999
+Vat tu 3000,Vat tu tieu hao,tan,288.98,79533,5,Ghi chu 3000
