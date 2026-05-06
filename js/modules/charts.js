@@ -476,6 +476,41 @@ window.switchDashboardTab = function(tab) {
     currentDashboardTab = tab;
     if (tab === 'projects' || tab === 'suppliers') {
         document.getElementById('pane-dashboard').innerHTML = renderTabContent(tab);
+    setTimeout(function(){
+        if (tab === 'projects') {
+            var ctx1 = document.getElementById('top-projects-chart');
+            var ctx2 = document.getElementById('budget-pie-chart');
+            if (ctx1 && ctx2) {
+                if (topProjectsChart) topProjectsChart.destroy();
+                if (window._bp) window._bp.destroy();
+                var pdata = state.data.projects.map(function(p){
+                    var u = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='usage'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
+                    var r = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='return'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
+                    return { name: p.name.length>20?p.name.substring(0,20):p.name, spent: u-r };
+                }).sort(function(a,b){return b.spent-a.spent}).slice(0,5);
+                topProjectsChart = new Chart(ctx1, { type:'bar', data:{ labels:pdata.map(function(p){return p.name}), datasets:[{ label:'Chi', data:pdata.map(function(p){return p.spent}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+                var tu = pdata.reduce(function(s,p){return s+p.spent},0);
+                var tb = state.data.projects.reduce(function(s,p){return s+Number(p.budget||0)},0);
+                window._bp = new Chart(ctx2, { type:'doughnut', data:{ labels:['Dung','Con'], datasets:[{ data:[tu, Math.max(0,tb-tu)], backgroundColor:['#F09595','#97C459'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
+            }
+        }
+        if (tab === 'suppliers') {
+            var ctx1 = document.getElementById('top-suppliers-chart');
+            var ctx2 = document.getElementById('supplier-pie-chart');
+            if (ctx1 && ctx2) {
+                if (topSuppliersChart) topSuppliersChart.destroy();
+                if (window._sp) window._sp.destroy();
+                var sdata = state.data.suppliers.map(function(s){
+                    var t = state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===s.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0);
+                    return { name: s.name.length>20?s.name.substring(0,20):s.name, total: t };
+                }).sort(function(a,b){return b.total-a.total}).slice(0,5);
+                topSuppliersChart = new Chart(ctx1, { type:'bar', data:{ labels:sdata.map(function(s){return s.name}), datasets:[{ label:'Tong chi', data:sdata.map(function(s){return s.total}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+                var t5 = sdata.reduce(function(s,p){return s+p.total},0);
+                var at = state.data.suppliers.reduce(function(s,p){ var t=state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===p.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0); return s+t; },0);
+                window._sp = new Chart(ctx2, { type:'doughnut', data:{ labels:sdata.map(function(s){return s.name}).concat(['Khac']), datasets:[{ data:sdata.map(function(s){return s.total}).concat([Math.max(0,at-t5)]), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
+            }
+        }
+    }, 500);
     } else {
         updateDashboardContent();
     }
@@ -513,7 +548,11 @@ function renderTabContent(tab) {
         </div>`;
         return filters + projectKPIs + `
             <div class="card">
-                <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</span><select id="proj-limit" onchange="switchDashboardTab('projects')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
+                <div class="grid2" style="margin-bottom:18px;">
+                <div class="card"><div class="sec-title">📊 TOP 5 CÔNG TRÌNH</div><div class="chart-container" style="height:280px;"><canvas id="top-projects-chart"></canvas></div></div>
+                <div class="card"><div class="sec-title">🎯 NGÂN SÁCH</div><div class="chart-container" style="height:280px;"><canvas id="budget-pie-chart"></canvas></div></div>
+            </div>
+            <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</span><select id="proj-limit" onchange="switchDashboardTab('projects')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
                     <table class="dashboard-table" style="min-width:900px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
@@ -555,7 +594,11 @@ function renderTabContent(tab) {
         </div>`;
         return filters + supplierKPIs + `
             <div class="card">
-                <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</span><select id="sup-limit" onchange="switchDashboardTab('suppliers')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
+                <div class="grid2" style="margin-bottom:18px;">
+                <div class="card"><div class="sec-title">📊 TOP 5 NHÀ CUNG CẤP</div><div class="chart-container" style="height:280px;"><canvas id="top-suppliers-chart"></canvas></div></div>
+                <div class="card"><div class="sec-title">🎯 TỶ LỆ CHI TIÊU</div><div class="chart-container" style="height:280px;"><canvas id="supplier-pie-chart"></canvas></div></div>
+            </div>
+            <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</span><select id="sup-limit" onchange="switchDashboardTab('suppliers')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
                     <table class="dashboard-table" style="min-width:800px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
@@ -653,6 +696,94 @@ export function renderDashboardChart() {
     }
 }
 
+// Vẽ biểu đồ cho tab projects & suppliers
+    setTimeout(() => {
+        // === TAB CÔNG TRÌNH ===
+        const projCtx = document.getElementById('top-projects-chart');
+        const pieCtx = document.getElementById('budget-pie-chart');
+        if (projCtx && pieCtx && projCtx.offsetParent !== null) {
+            if (topProjectsChart) topProjectsChart.destroy();
+            if (window._budgetPie) window._budgetPie.destroy();
+            
+            const projects2 = state.data.projects.map(p => {
+                const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+Number(t.totalAmount||0),0);
+                const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+Number(t.totalAmount||0),0);
+                return { name: p.name.length>20?p.name.substring(0,20)+'...':p.name, spent: u-r, budget: Number(p.budget||0) };
+            }).sort((a,b)=>b.spent-a.spent).slice(0,5);
+            
+            // Biểu đồ cột TOP 5
+            topProjectsChart = new Chart(projCtx, {
+                type: 'bar', data: {
+                    labels: projects2.map(p=>p.name),
+                    datasets: [{
+                        label: 'Đã chi', data: projects2.map(p=>p.spent),
+                        backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
+                        borderRadius: 6, borderWidth: 0
+                    }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
+                    scales: { y: { ticks: { callback: (v) => formatMoneyVND(v) } } }
+                }
+            });
+            
+            // Biểu đồ tròn Ngân sách
+            const totalUsed = projects2.reduce((s,p)=>s+p.spent,0);
+            const totalBud = state.data.projects.reduce((s,p)=>s+Number(p.budget||0),0);
+            window._budgetPie = new Chart(pieCtx, {
+                type: 'doughnut', data: {
+                    labels: ['Đã dùng','Còn lại'],
+                    datasets: [{ data: [totalUsed, Math.max(0,totalBud-totalUsed)], backgroundColor: ['#F09595','#97C459'], borderWidth: 0, borderRadius: 4 }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{ position:'bottom' } }
+                }
+            });
+        }
+        
+        // === TAB NHÀ CUNG CẤP ===
+        const supCtx = document.getElementById('top-suppliers-chart');
+        const pieCtx2 = document.getElementById('supplier-pie-chart');
+        if (supCtx && pieCtx2 && supCtx.offsetParent !== null) {
+            if (topSuppliersChart) topSuppliersChart.destroy();
+            if (window._supPie) window._supPie.destroy();
+            
+            const sups2 = state.data.suppliers.map(s => {
+                const total = state.data.transactions.filter(t=>t.type==='purchase'&&t.supplierId===s.id).reduce((a,t)=>a+Number(t.totalAmount||0),0);
+                return { name: s.name.length>20?s.name.substring(0,20)+'...':s.name, total };
+            }).sort((a,b)=>b.total-a.total).slice(0,5);
+            
+            // Biểu đồ cột TOP 5 NCC
+            topSuppliersChart = new Chart(supCtx, {
+                type: 'bar', data: {
+                    labels: sups2.map(s=>s.name),
+                    datasets: [{
+                        label: 'Tổng chi', data: sups2.map(s=>s.total),
+                        backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
+                        borderRadius: 6, borderWidth: 0
+                    }]
+                },
+                options: { indexAxis: 'y', responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
+                    scales: { x: { ticks: { callback: (v) => formatMoneyVND(v) } } }
+                }
+            });
+            
+            // Biểu đồ tròn Tỷ lệ chi
+            const top5Total = sups2.reduce((s,p)=>s+p.total,0);
+            const allTotal = state.data.suppliers.reduce((s,p)=>{ const t=state.data.transactions.filter(x=>x.type==='purchase'&&x.supplierId===p.id).reduce((a,x)=>a+Number(x.totalAmount||0),0); return s+t; },0);
+            window._supPie = new Chart(pieCtx2, {
+                type: 'doughnut', data: {
+                    labels: [...sups2.map(s=>s.name), 'Khác'],
+                    datasets: [{ data: [...sups2.map(s=>s.total), Math.max(0,allTotal-top5Total)], backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth: 0, borderRadius: 4 }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{ position:'bottom', labels:{ padding:10, usePointStyle:true } } }
+                }
+            });
+        }
+    }, 400);
+
 // ========== EVENT BINDING ==========
 
 export function bindDashboardFilterEvents() {
@@ -668,3 +799,9 @@ export function bindDashboardSearchEvents() {
 
 export function renderCharts() {}
 export function renderProjectCharts() {}
+window.renderDashboardChart = renderDashboardChart;
+window.renderDashboardChart = renderDashboardChart;
+window.getFilteredTransactions = getFilteredTransactions;
+window.renderDashboardChart = renderDashboardChart;
+window.topProjectsChart = topProjectsChart;
+window.topSuppliersChart = topSuppliersChart;
