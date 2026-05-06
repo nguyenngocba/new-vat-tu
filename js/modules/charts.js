@@ -340,7 +340,7 @@ export function renderDashboard() {
     const maxSupplier = topSuppliers[0]?.total || 1;
     
     // Recent transactions
-    const recentTxns = allTxns.sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date)).slice(0, 10);
+    const recentTxns = allTxns.sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date)).slice(0, parseInt(document.getElementById('recent-limit')?.value||10));
     
     return `
         ${renderFiltersAndTabs()}
@@ -394,7 +394,7 @@ export function renderDashboard() {
         
         <!-- Recent Transactions -->
         <div class="card">
-            <div class="sec-title">📋 GIAO DỊCH GẦN ĐÂY</div>
+            <div class="sec-title" style="display:flex;justify-content:space-between;"><span>📋 GIAO DỊCH GẦN ĐÂY</span><select id="recent-limit" onchange="updateDashboardContent()" style="width:100px;"><option value="10">10</option><option value="50">50</option><option value="100">100</option></select></div>
             <div class="tbl-wrap">
                 <table style="min-width: 800px;">
                     <thead><tr><th>Thời gian</th><th>Loại</th><th>Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Thành tiền</th><th>Đối tượng</th></tr></thead>
@@ -443,8 +443,15 @@ window.switchDashboardTab = function(tab) {
     }
 };
 
+let _projLimit = 50, _supLimit = 50;
 function renderTabContent(tab) {
     const filters = renderFiltersAndTabs();
+    setTimeout(function(){
+        var pl = document.getElementById('proj-limit');
+        var sl = document.getElementById('sup-limit');
+        if (pl) { pl.value = _projLimit; pl.onchange = function(){ _projLimit = parseInt(this.value); switchDashboardTab('projects'); }; }
+        if (sl) { sl.value = _supLimit; sl.onchange = function(){ _supLimit = parseInt(this.value); switchDashboardTab('suppliers'); }; }
+    }, 50);
     
     if (tab === 'projects') {
         const projects = state.data.projects.map(p => {
@@ -452,6 +459,7 @@ function renderTabContent(tab) {
             const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(parseFloat(parseFloat(t.totalAmount))||0),0);
             return { ...p, spent: u-r, pct: p.budget>0?(u-r)/p.budget*100:0 };
         }).sort((a,b)=>b.spent-a.spent);
+        const displayProjects = projects.slice(0, _projLimit);
         
         const maxPct = Math.max(...projects.map(p=>p.pct), 1);
         
@@ -467,12 +475,12 @@ function renderTabContent(tab) {
         </div>`;
         return filters + projectKPIs + `
             <div class="card">
-                <div class="sec-title">🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</div>
+                <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏗️ CHI TIẾT TẤT CẢ CÔNG TRÌNH</span><select id="proj-limit" onchange="switchDashboardTab('projects')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
                     <table style="min-width:900px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:right;white-space:nowrap;">Ngân sách</th><th style="text-align:right;white-space:nowrap;">Đã chi</th><th style="text-align:right;white-space:nowrap;">Còn lại</th><th style="text-align:center;white-space:nowrap;">%</th><th>Tiến độ</th></tr></thead>
                         <tbody>
-                            ${projects.map(p => `
+                            ${displayProjects.map(p => `
                                 <tr style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
                                     
                                     <td style="text-align:left;white-space:nowrap;"><strong>${escapeHtml(p.name)}</strong></td>
@@ -495,6 +503,7 @@ function renderTabContent(tab) {
             const txns = state.data.transactions.filter(t=>t.type==='purchase'&&t.supplierId===s.id);
             return { ...s, total: txns.reduce((sum,t)=>sum+(parseFloat(parseFloat(t.totalAmount))||0),0), count: txns.length };
         }).sort((a,b)=>b.total-a.total);
+        const displaySuppliers = suppliers.slice(0, _supLimit);
         
         const totalSuppliers = suppliers.length;
         const totalSpentAll = suppliers.reduce((s, p) => s + Number(p.total||0), 0);
@@ -508,12 +517,12 @@ function renderTabContent(tab) {
         </div>`;
         return filters + supplierKPIs + `
             <div class="card">
-                <div class="sec-title">🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</div>
+                <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</span><select id="sup-limit" onchange="switchDashboardTab('suppliers')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
                     <table style="min-width:800px;">
                         <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
                         <tbody>
-                            ${suppliers.map(s => `
+                            ${displaySuppliers.map(s => `
                                 <tr style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
                                     
                                     <td style="text-align:left;"><strong>${escapeHtml(s.name)}</strong></td>
