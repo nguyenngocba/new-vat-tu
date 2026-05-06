@@ -603,14 +603,14 @@ export function viewSupplierHistory(sid) {
     
     showModal(`<div class="modal-hd"><span class="modal-title">📜 Lịch sử nhập hàng - ${escapeHtml(supplier?.name)}</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd"><div class="metric-card" style="margin-bottom:16px"><div class="metric-label">Tổng chi</div><div class="metric-val" style="font-size:20px">${formatMoneyVND(totalSpent)}</div></div>
-    <div class="tbl-wrap"><table class="history-table"><thead><tr><th>Thời gian</th><th>Vật tư</th><th>SL</th><th>Đơn giá</th><th>VAT</th><th>Thành tiền</th><th>Ghi chú</th><th>Hóa đơn</th></tr></thead>
+    <div class="tbl-wrap"><table class="history-table" style="min-width:900px;width:100%;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:left;">Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:center;">VAT</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th><th style="text-align:center;">File</th></tr></thead>
     <tbody>${purchaseTxns.map(t => {
         const mat = state.data.materials.find(m => m.id === t.mid);
         const invoiceHtml = t.invoiceImage ? `<a href="${t.invoiceImage}" target="_blank">📄 Xem</a>` : '—';
         return `<tr>
           <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
           <td style="text-align:left;">${mat?.name || 'N/A'}</td>
-          <td style="text-align:right;white-space:nowrap;">${(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit || ''}</td>
+          <td style="text-align:right;white-space:nowrap;">${Number(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit || ''}</td>
           <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
           <td style="text-align:center;">${t.vatRate || 0}%</td>
           <td class="amount text-warning">${formatMoneyVND(t.totalAmount)}</td>
