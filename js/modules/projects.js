@@ -247,6 +247,33 @@ export function showProjectDetail(projectId) {
     const rem = project.budget - spent;
     const pct = project.budget > 0 ? (spent/project.budget)*100 : 0;
     const allTxns = [...rTxns, ...retTxns].sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
+    // Lấy lịch sử gán vật tư từ schedule
+    const scheduleLogs = [];
+    const sched = state.data.projectSchedules?.find(s => s.projectId === projectId);
+    if (sched?.tasks?.length > 0) {
+        function getAllTasksFlat3(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(getAllTasksFlat3(t.subTasks)); } return r; }
+        for (const task of getAllTasksFlat3(sched.tasks)) {
+            if (task.materials?.length > 0) {
+                for (const mat of task.materials) {
+                    const matInfo = state.data.materials.find(m => m.id === mat.materialId);
+                    scheduleLogs.push({
+                        datetime: mat.assignedAt || sched.startDate,
+                        type: 'schedule_assign', logType: 'schedule_assign',
+                        taskName: task.name, materialId: mat.materialId,
+                        materialName: matInfo?.name || mat.materialName || 'N/A',
+                        qty: mat.quantity, unit: mat.unit || matInfo?.unit || '',
+                        note: `Gan cho cong viec: ${task.name}`
+                    });
+                }
+            }
+        }
+    }
+    // Lấy log từ Nhật ký
+    const logEntries = (state.data.logs||[]).filter(l => l.details && l.details.includes(projectId)).map(l => ({
+        datetime: l.timestamp, type: 'log', logType: 'log',
+        materialName: '', qty: 0, unit: '', note: l.action + ': ' + (l.details||'')
+    }));
+    const allLogs = [...allTxns.map(t=>({...t, logType: t.type})), ...scheduleLogs, ...logEntries].sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
     const matUsage = getMaterialUsageDetails(projectId);
     const schedule = getProjectSchedule(projectId);
     
@@ -282,7 +309,14 @@ export function showProjectDetail(projectId) {
             <div id="tab-schedule" class="tab-content" style="display:none;"><div id="schedule-view-container"></div></div>
             <div id="tab-history" class="tab-content" style="display:none;">
                 <div class="tbl-wrap"><table style="min-width:900px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Vật tư</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th><th style="text-align:center;">File</th></tr></thead>
-                <tbody>${allTxns.map(t => {
+                <tbody>${allLogs.map(item => {
+                    if (item.logType === 'log') {
+                        return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(item.datetime)}</td><td style="text-align:center;color:var(--accent-text);font-weight:bold;">📋 Log</td><td style="text-align:left;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:left;">${escapeHtml(item.note||'—')}</td><td style="text-align:center;">—</td></tr>`;
+                    }
+                    if (item.logType === 'schedule_assign') {
+                        return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(item.datetime)}</td><td style="text-align:center;color:var(--accent-text);font-weight:bold;">📅 Gan VT</td><td style="text-align:left;">${escapeHtml(item.materialName||'N/A')}</td><td style="text-align:right;">${Number(item.qty||0).toLocaleString('vi-VN')} ${item.unit||''}</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:left;">${escapeHtml(item.note||'—')}</td><td style="text-align:center;">—</td></tr>`;
+                    }
+                    const t = item;
                     const mat = state.data.materials.find(m=>m.id===t.mid);
                     const isRet = t.type === 'return';
                     return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td></tr>`;

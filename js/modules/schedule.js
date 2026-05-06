@@ -30,22 +30,20 @@ function getMaterialsExportedToProject(projectId) {
             .filter(t => t.mid === mid)
             .reduce((sum, t) => sum + (t.qty || 0), 0);
         
-// Tính số đã sử dụng từ projectMaterialUsage và schedules
-const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId && u.materialId === mid) || [];
-const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
-let usedQty = 0;
-usageRecords.forEach(r => { usedQty = Math.max(usedQty, r.usedQty || 0); });
-if (schedule?.tasks?.length > 0) {
-    function getAllTasksFlat(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(getAllTasksFlat(t.subTasks)); } return r; }
-    for (const task of getAllTasksFlat(schedule.tasks)) {
-        if (task.materials?.length > 0) {
-            for (const mat of task.materials) {
-                if (mat.materialId === mid) usedQty = Math.max(usedQty, mat.quantity || 0);
+// Tính số đã gán cho tất cả task
+    const sched = state.data.projectSchedules?.find(s => s.projectId === projectId);
+    let assignedQty = 0;
+    if (sched?.tasks?.length > 0) {
+        function getAllTasksFlat(tasks) { let r = []; for (const t of tasks) { r.push(t); if (t.subTasks?.length > 0) r = r.concat(getAllTasksFlat(t.subTasks)); } return r; }
+        for (const task of getAllTasksFlat(sched.tasks)) {
+            if (task.materials?.length > 0) {
+                for (const mat of task.materials) {
+                    if (mat.materialId === mid) assignedQty += mat.quantity || 0;
+                }
             }
         }
     }
-}
-const netAvailable = totalExported - totalReturned - usedQty;        
+    const netAvailable = totalExported - totalReturned - assignedQty;        
         return {
             id: mat.id,
             name: mat.name,
@@ -276,7 +274,7 @@ export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
                     existing.quantity += quantity;
                     existing.totalAmount = existing.quantity * existing.unitPrice;
                 } else {
-                    task.materials.push({
+                    task.materials.push({ assignedAt: new Date().toISOString(),
                         materialId: materialId,
                         materialName: material.name,
                         unit: material.unit,
@@ -287,7 +285,7 @@ export function assignMaterialToTask(projectId, taskId, materialId, quantity) {
                     });
                 }
                 saveState();
-                addLog('Gán vật tư', `Đã gán ${quantity} ${material.unit} ${material.name} cho công việc ${task.name}`);
+                addLog("Gán vật tư", projectId + " - " + material.name + ": " + quantity + " " + material.unit + " cho " + task.name);
                 return task;
             }
             if (task.subTasks) {
