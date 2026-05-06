@@ -62,7 +62,9 @@ app.get('/api/data', async (req, res) => {
         
 	const ps = await pool.query('SELECT * FROM project_schedules');
 	const pmu = await pool.query('SELECT * FROM project_material_usage');
-	const result = { success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name), projectSchedules: ps.rows, projectMaterialUsage: pmu.rows }};
+	const st = await pool.query('SELECT * FROM structures');
+        const stm = await pool.query('SELECT * FROM structure_materials');
+        const result = { success: true, data: { materials: m.rows, transactions: t.rows, projects: p.rows, suppliers: s.rows, users: u.rows, logs: l.rows, categories: c.rows.map(r=>r.name), units: un.rows.map(r=>r.name), projectSchedules: ps.rows, projectMaterialUsage: pmu.rows, structures: st.rows, structureMaterials: stm.rows }};
         await setCache('api_data', JSON.stringify(result), 30);
         res.json(result);
     } catch (err) { res.json({ success: false, error: err.message }); }
@@ -170,4 +172,97 @@ app.post('/api/project-material-usage', async (req, res) => {
     res.json({success:true});
 });
 
+
+// ========== CẤU KIỆN (BOM) ==========
+app.get('/api/structures', async (req, res) => {
+    try {
+        const s = await pool.query('SELECT * FROM structures ORDER BY name');
+        const m = await pool.query('SELECT * FROM structure_materials');
+        res.json({ success: true, structures: s.rows, materials: m.rows });
+    } catch(e) { res.json({ success: false, error: e.message }); }
+});
+
+app.post('/api/structures', async (req, res) => {
+    const s = req.body;
+    await pool.query('INSERT INTO structures (id, name, unit, qty, cost, note) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO UPDATE SET name=$2, unit=$3, qty=$4, cost=$5, note=$6', [s.id, s.name, s.unit, s.qty, s.cost, s.note||'']);
+    // Lưu BOM
+    await pool.query('DELETE FROM structure_materials WHERE structure_id=$1', [s.id]);
+    for (const m of (s.materials||[])) {
+        await pool.query('INSERT INTO structure_materials (structure_id, material_id, material_name, unit, quantity) VALUES ($1,$2,$3,$4,$5)', [s.id, m.materialId, m.materialName, m.unit, m.quantity]);
+    }
+    await clearCache();
+    res.json({ success: true });
+});
+
+app.delete('/api/structures/:id', async (req, res) => {
+    await pool.query('DELETE FROM structures WHERE id=$1', [req.params.id]);
+    await pool.query('DELETE FROM structure_materials WHERE structure_id=$1', [req.params.id]);
+    await clearCache();
+    res.json({ success: true });
+});
+
+// Xuất sản xuất: trừ vật tư, cộng cấu kiện
+app.post('/api/produce-structure', async (req, res) => {
+    const { structureId, quantity } = req.body;
+    try {
+        await pool.query('BEGIN');
+        const bom = await pool.query('SELECT * FROM structure_materials WHERE structure_id=$1', [structureId]);
+        // Kiểm tra tồn kho trước khi trừ
+        for (const item of bom.rows) {
+            const stock = await pool.query('SELECT qty FROM materials WHERE id=$1 FOR UPDATE', [item.material_id]);
+            const need = parseFloat(item.quantity) * quantity;
+            if (!stock.rows[0] || parseFloat(stock.rows[0].qty) < need) {
+                await pool.query('ROLLBACK');
+                return res.json({ success: false, error: 'Không đủ ' + item.material_name + ' trong kho! Cần ' + need + ', hiện có ' + (stock.rows[0]?.qty||0) });
+            }
+        }
+        // Trừ từng vật tư
+        for (const item of bom.rows) {
+            await pool.query('UPDATE materials SET qty = qty - $1 WHERE id=$2', [parseFloat(item.quantity) * quantity, item.material_id]);
+        }
+        // Cộng cấu kiện vào kho
+        await pool.query('UPDATE structures SET qty = qty + $1 WHERE id=$2', [quantity, structureId]);
+        // Ghi log giao dịch sản xuất
+        const tid = 'tvskh' + new Date().toISOString().replace(/[-:T.Z]/g,'').slice(2,14) + '000';
+        await pool.query('INSERT INTO transactions (id, mid, type, qty, total_amount, note, date, datetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', 
+            [tid, structureId, 'produce', quantity, 0, 'Sản xuất cấu kiện', new Date().toISOString().split('T')[0], new Date().toISOString()]);
+        await pool.query('COMMIT');
+        await clearCache();
+        res.json({ success: true });
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        res.json({ success: false, error: e.message });
+    }
+});
+
+
+app.post('/api/export-structure', async (req, res) => {
+    const { structureId, projectId, quantity, note } = req.body;
+    try {
+        await pool.query('BEGIN');
+        // Kiểm tra tồn kho cấu kiện
+        const stock = await pool.query('SELECT qty FROM structures WHERE id=$1 FOR UPDATE', [structureId]);
+        if (!stock.rows[0] || parseFloat(stock.rows[0].qty) < quantity) {
+            await pool.query('ROLLBACK');
+            return res.json({ success: false, error: 'Không đủ cấu kiện trong kho!' });
+        }
+        // Lấy đơn giá cấu kiện
+        const structure = await pool.query('SELECT cost FROM structures WHERE id=$1', [structureId]);
+        const totalCost = parseFloat(structure.rows[0]?.cost || 0) * quantity;
+        // Trừ tồn kho cấu kiện
+        await pool.query('UPDATE structures SET qty = qty - $1 WHERE id=$2', [quantity, structureId]);
+        // Ghi giao dịch xuất
+        const tid = 'tvskh' + new Date().toISOString().replace(/[-:T.Z]/g,'').slice(2,14) + '000';
+        await pool.query('INSERT INTO transactions (id, mid, project_id, type, qty, total_amount, note, date, datetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+            [tid, structureId, projectId, 'structure_export', quantity, totalCost, note || 'Xuất cấu kiện ra công trình', new Date().toISOString().split('T')[0], new Date().toISOString()]);
+        // Cập nhật spent của project
+        await pool.query('UPDATE projects SET spent = spent + $1 WHERE id=$2', [totalCost, projectId]);
+        await pool.query('COMMIT');
+        await clearCache();
+        res.json({ success: true });
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        res.json({ success: false, error: e.message });
+    }
+});
 server.listen(PORT, '0.0.0.0', () => console.log('OK'));

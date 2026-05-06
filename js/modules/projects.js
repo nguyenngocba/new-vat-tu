@@ -40,13 +40,13 @@ function getFilteredProjects() {
 }
 
 function getProjectTotalReceived(projectId) {
-    const r = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage').reduce((s, t) => s + (parseFloat(Number(t.totalAmount))||0), 0);
+    const r = state.data.transactions.filter(t => t.projectId === projectId && (t.type === 'usage' || t.type === 'structure_export' || t.type === 'structure_export')).reduce((s, t) => s + (parseFloat(Number(t.totalAmount))||0), 0);
     const rt = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return').reduce((s, t) => s + (parseFloat(Number(t.totalAmount))||0), 0);
     return r - rt;
 }
 
 function getMaterialUsageDetails(projectId) {
-    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
+    const receiveTxns = state.data.transactions.filter(t => t.projectId === projectId && (t.type === 'usage' || t.type === 'structure_export' || t.type === 'structure_export'));
     const returnTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
     const usageRecords = state.data.projectMaterialUsage?.filter(u => u.projectId === projectId) || [];
     const schedule = state.data.projectSchedules?.find(s => s.projectId === projectId);
@@ -66,7 +66,7 @@ function getMaterialUsageDetails(projectId) {
     
     const materialMap = new Map();
     receiveTxns.forEach(t => {
-        const mat = state.data.materials.find(m => m.id === t.mid);
+        const mat = state.data.materials.find(m => m.id === t.mid) || state.data.structures?.find(s => s.id === t.mid);
         if (mat) {
             if (!materialMap.has(t.mid)) materialMap.set(t.mid, { id: t.mid, name: mat.name, unit: mat.unit, totalReceived: 0, totalUsed: 0, totalReturned: 0, fromSchedule: 0, fromManualUpdate: 0, lastUnitPrice: t.unitPrice });
             materialMap.get(t.mid).totalReceived += t.qty;
@@ -87,14 +87,14 @@ function getMaterialUsageDetails(projectId) {
 
 function renderProjectHistory() {
     const transactions = state.data.transactions
-        .filter(t => (t.type === 'usage' || t.type === 'return') && t.projectId)
+        .filter(t => (t.type === 'usage' || t.type === 'structure_export' || t.type === 'return') && t.projectId)
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date))
         .slice(0, 50);
     
     if (transactions.length === 0) return '<tr><td colspan="7" style="text-align:center;">📭 Chưa có dữ liệu</td></tr>';
     
     return transactions.map(t => {
-        const mat = state.data.materials.find(m => m.id === t.mid);
+        const mat = state.data.materials.find(m => m.id === t.mid) || state.data.structures?.find(s => s.id === t.mid);
         const proj = projectById(t.projectId);
         const isReturn = t.type === 'return';
         return `<tr>
@@ -104,7 +104,7 @@ function renderProjectHistory() {
             <td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td>
             <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td>
             <td class="amount" style="text-align:right;white-space:nowrap;" ${isReturn?'text-success':'text-warning'}">${isReturn?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td>
-            <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
+            <td style="text-align:center;color:${isReturn?'var(--success-text)':'var(--accent)'}">${t.type==='structure_export'?'🏗️ Cấu kiện':isReturn?'🔄 Trả kho':'📥 Nhận từ kho'}</td>
             <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
         </tr>`;
     }).join('');
@@ -120,7 +120,7 @@ function updateProjectListDisplay() {
     }
     
     const projectsData = filtered.map(p => {
-        const r = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s+(Number(t.totalAmount)||0),0);
+        const r = state.data.transactions.filter(t => (t.projectId === p.id && t.type === 'usage') || (t.projectId === p.id && t.type === 'structure_export')).reduce((s,t) => s+(Number(t.totalAmount)||0),0);
         const rt = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s+(Number(t.totalAmount)||0),0);
         const net = r - rt; p.spent = net;
         const pct = p.budget > 0 ? (net/p.budget)*100 : 0;
@@ -250,7 +250,7 @@ export function showProjectDetail(projectId) {
     currentScheduleProjectId = projectId;
     window.currentScheduleProjectId = projectId;
     
-    const rTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'usage');
+    const rTxns = state.data.transactions.filter(t => t.projectId === projectId && (t.type === 'usage' || t.type === 'structure_export' || t.type === 'structure_export'));
     const retTxns = state.data.transactions.filter(t => t.projectId === projectId && t.type === 'return');
     const totalR = rTxns.reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
     const totalRet = retTxns.reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
@@ -328,9 +328,9 @@ export function showProjectDetail(projectId) {
                         return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(item.datetime)}</td><td style="text-align:center;color:var(--accent-text);font-weight:bold;">📅 Gan VT</td><td style="text-align:left;">${escapeHtml(item.materialName||'N/A')}</td><td style="text-align:right;">${Number(item.qty||0).toLocaleString('vi-VN')} ${item.unit||''}</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:left;">${escapeHtml(item.note||'—')}</td><td style="text-align:center;">—</td></tr>`;
                     }
                     const t = item;
-                    const mat = state.data.materials.find(m=>m.id===t.mid);
-                    const isRet = t.type === 'return';
-                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td></tr>`;
+                    const mat = state.data.materials.find(m=>m.id===t.mid) || state.data.structures?.find(s=>s.id===t.mid);
+                    const isRet = t.type === "return"; const isStructureExport = t.type === "structure_export";
+                    return `<tr><td style="text-align:left;white-space:nowrap;">${formatDateTime(t.datetime||t.date)}</td><td style="text-align:center;color:${isStructureExport?'var(--warn-text)':isRet?'var(--success-text)':'var(--accent)'};font-weight:bold;">${isStructureExport?'🏗️ CK':isRet?'🔄 Trả':'📥 Nhận'}</td><td style="text-align:left;">${escapeHtml(mat?.name||'N/A')}</td><td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</td><td style="text-align:right;white-space:nowrap;">${formatMoneyVND(t.unitPrice)}</td><td class="amount" style="text-align:right;white-space:nowrap;" ${isRet?'text-success':'text-warning'}">${isRet?'- ':''}${formatMoneyVND(Number(t.totalAmount))}</td><td style="text-align:left;">${escapeHtml(t.note||'—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td></tr>`;
                 }).join('') || '<tr><td colspan="7">📭 Chưa có giao dịch</td></tr>'}</tbody></table></div>
             </div>
             <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">

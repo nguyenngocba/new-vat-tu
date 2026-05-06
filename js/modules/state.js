@@ -5,7 +5,7 @@ export let state = {
     categories: ['Dầm thép', 'Tấm thép', 'Thép hộp', 'Thép góc', 'Vật tư tiêu hao', 'Bu lông - Ốc vít', 'Ống thép', 'Thép hình'],
     units: ['tấn', 'kg', 'cái', 'mét', 'thùng', 'tấm', 'cuộn'],
     nextMid: 1, nextTid: 1, nextPid: 1, nextSid: 1, nextLogId: 1,
-    projectMaterialUsage: [], projectSchedules: [],
+    projectMaterialUsage: [], projectSchedules: [], structures: [],
     users: [
       { id: 'u1', name: 'Admin', username: 'admin', password: 'admin123', role: 'admin', permissions: { canCreateMaterial: true, canDeleteMaterial: true, canEditMaterial: true, canImport: true, canExport: true, canDeleteProject: true, canAccessSettings: true, canManageSupplier: true } },
       { id: 'u2', name: 'Nhân viên kho', username: 'staff', password: 'staff123', role: 'user', permissions: { canImport: true, canExport: true } },
@@ -39,6 +39,12 @@ export async function loadState() {
       if (res.data.units?.length) state.data.units = res.data.units;
       if (res.data.projectSchedules?.length) state.data.projectSchedules = res.data.projectSchedules.map(s => ({...s, ...(typeof s.data === 'string' ? JSON.parse(s.data) : s.data)}));
       if (res.data.projectMaterialUsage?.length) state.data.projectMaterialUsage = res.data.projectMaterialUsage;
+      if (res.data.structures?.length) {
+        state.data.structures = res.data.structures.map(s => {
+          const mats = (res.data.structureMaterials||[]).filter(m => m.structure_id === s.id).map(m => ({ materialId: m.material_id, materialName: m.material_name, unit: m.unit, quantity: m.quantity }));
+          return { ...s, materials: mats };
+        });
+      }
     }
   } catch(e) {}
   applyTheme(state.theme);

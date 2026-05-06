@@ -6,6 +6,7 @@ window.addLog = addLog;        // THÊM DÒNG NÀY (nếu cần)
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, openMatModal, editMaterial, updateMaterial, deleteMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, openProjectModal, saveProject, deleteProject, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
+import { renderStructures } from './modules/structures.js';
 import { renderSuppliers, openSupplierModal, saveSupplier, updateSupplier, deleteSupplier, viewSupplierHistory, showSupplierDetail, exportSupplierDetail, exportAllSuppliersReport } from './modules/suppliers.js';
 import { openPurchaseModal, savePurchase, openTxnModal, saveExport, calculatePurchaseTotal, calculateExportTotal, openPurchaseModalWithSupplier, openReturnModal, saveReturn, savePurchaseWithSupplier, clearReturnAttachment } from './modules/transactions.js';
 import { renderLogs } from './modules/logs.js';
@@ -20,7 +21,8 @@ function render() {
     const currentUser = getCurrentUser();
     if (!currentUser) { root.innerHTML = renderLogin(); return; }
     const cp = state.currentPane;
-    root.innerHTML = `<div id="app-layout"><div class="sidebar">${renderSidebar()}</div><div class="main-content">${renderTopbar()}<div id="pane-entry" class="pane ${cp==='entry'?'active':''}">${renderMaterials()}</div><div id="pane-dashboard" class="pane ${cp==='dashboard'?'active':''}">${renderDashboard()}</div><div id="pane-projects" class="pane ${cp==='projects'?'active':''}">${renderProjects()}</div><div id="pane-suppliers" class="pane ${cp==='suppliers'?'active':''}">${renderSuppliers()}</div><div id="pane-logs" class="pane ${cp==='logs'?'active':''}">${renderLogs()}</div><div id="pane-settings" class="pane ${cp==='settings'?'active':''}">${renderSettings()}</div><div id="modal-area"></div></div></div>`;
+    root.innerHTML = `<div id="app-layout"><div class="sidebar">${renderSidebar()}</div><div class="main-content">${renderTopbar()}<div id="pane-entry" class="pane ${cp==='entry'?'active':''}">${renderMaterials()}</div><div id="pane-dashboard" class="pane ${cp==='dashboard'?'active':''}">${renderDashboard()}</div><div id="pane-structures" class="pane ${cp==='structures'?'active':''}">${renderStructures()}</div>
+        <div id="pane-projects" class="pane ${cp==='projects'?'active':''}">${renderProjects()}</div><div id="pane-suppliers" class="pane ${cp==='suppliers'?'active':''}">${renderSuppliers()}</div><div id="pane-logs" class="pane ${cp==='logs'?'active':''}">${renderLogs()}</div><div id="pane-settings" class="pane ${cp==='settings'?'active':''}">${renderSettings()}</div><div id="modal-area"></div></div></div>`;
     if (cp === 'dashboard') setTimeout(() => { renderDashboardChart(); bindDashboardSearchEvents(); }, 100);
 }
 

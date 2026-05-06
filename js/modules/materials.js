@@ -423,7 +423,7 @@ window.showMaterialDetail = function(mid) {
 
     // Lấy giao dịch xuất và trả
     const exportTxns = state.data.transactions
-        .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return'))
+        .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce'))
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
 
     // Tính tổng
@@ -485,9 +485,10 @@ window.showMaterialDetail = function(mid) {
                         ${exportTxns.length > 0 ? exportTxns.map(t => {
                             const proj = state.data.projects.find(p => p.id === t.projectId);
                             const isReturn = t.type === 'return';
+                            const isProduce = t.type === 'produce';
                             return `<tr>
                                 <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-                                <td style="color:${isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
+                                <td style="color:${isProduce?'var(--accent)':isReturn?'var(--success-text)':'var(--warn-text)'};font-weight:bold;">${isProduce ? '🏭 Sản xuất' : isReturn ? '🔄 Trả hàng' : '📤 Xuất kho'}</td>
                                 <td style="text-align:left;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
                                 <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
                                 <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
@@ -513,7 +514,7 @@ window.exportMaterialDetail = function(mid) {
     if (!mat) return;
 
     const purchaseTxns = state.data.transactions.filter(t => t.mid === mid && t.type === 'purchase');
-    const exportTxns = state.data.transactions.filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return'));
+    const exportTxns = state.data.transactions.filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce'));
 
     const importData = purchaseTxns.map(t => ({
         'Thời gian': formatDateTime(t.datetime || t.date),
@@ -528,7 +529,7 @@ window.exportMaterialDetail = function(mid) {
 
     const exportData = exportTxns.map(t => ({
         'Thời gian': formatDateTime(t.datetime || t.date),
-        'Loại': t.type === 'return' ? 'Trả hàng' : 'Xuất kho',
+        'Loại': t.type === 'produce' ? 'Sản xuất' : t.type === 'return' ? 'Trả hàng' : 'Xuất kho',
         'Công trình': state.data.projects.find(p => p.id === t.projectId)?.name || '',
         'Số lượng': t.qty,
         'Đơn vị': mat.unit,
