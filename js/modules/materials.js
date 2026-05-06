@@ -44,7 +44,9 @@ function updateMaterialList() {
     if (!materialListContainer) return;
     const filtered = getFilteredMaterials();
     const config = getColumnConfig();
-    const sorted = getSortedData(filtered, config.sortColumn, config.sortDirection).slice(0, 200);
+const allSorted = getSortedData(filtered, config.sortColumn, config.sortDirection);
+const displayLimit = materialListContainer.dataset.limit ? parseInt(materialListContainer.dataset.limit) : 200;
+const sorted = allSorted.slice(0, displayLimit);
     const favorites = getFavorites();
     
     if (sorted.length === 0) {
@@ -88,6 +90,10 @@ function updateMaterialList() {
                                         ${hasPermission('canDeleteMaterial') ? `<button class="sm danger-btn" onclick="event.stopPropagation();deleteMaterial('${m.id}')">🗑️ Xóa</button>` : ''}
                                        </td>`;
                                 }
+                                if (col.key === 'stt') {
+                                    const sttIndex = sorted.findIndex(function(x){return x.id===m.id;}) + 1;
+                                    return `<td style="width: ${col.width}px; text-align:center; font-weight:bold;">${sttIndex}</td>`;
+                                }
                                 if (col.key === 'id') {
                                     return `<td style="width: ${col.width}px; font-family:mono">
                                         <button class="favorite-btn ${favorites.includes(m.id) ? 'active' : ''}" onclick="event.stopPropagation();toggleFavoriteItem('${m.id}')">★</button>
@@ -125,7 +131,9 @@ function updateMaterialList() {
         </div>
     `;
     
-    if (filtered.length > 200) { materialListContainer.innerHTML += `<div class="metric-sub" style="text-align:center;padding:8px;background:var(--warn-bg);border-radius:4px;margin-top:8px;">⚠️ Đang hiển thị 200 / ${filtered.length} kết quả. Vui lòng lọc thêm!</div>`; }
+if (allSorted.length > displayLimit) {
+    materialListContainer.innerHTML += `<div class="metric-sub" style="text-align:center;padding:8px;"><button class="sm primary" onclick="window.loadMoreMaterials()">📥 Tải thêm (đang hiển thị ${displayLimit} / ${allSorted.length})</button></div>`;
+}    
     attachResizeEvents();
     attachSortEvents();
 }
@@ -425,7 +433,7 @@ window.showMaterialDetail = function(mid) {
 
     const html = `
         <div class="modal-hd" style="background: var(--accent-bg);">
-            <span class="modal-title" style="font-size:20px;">📦 Chi tiết: ${escapeHtml(mat.name)} (${mat.id})</span>
+            <span class="modal-title" style="font-size:20px;">📦 Chi tiết: ${escapeHtml(mat.name)}</span>
             <button class="xbtn" onclick="closeModal()">✕</button>
         </div>
         <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
@@ -551,4 +559,10 @@ export const addMaterial = (data) => {
     return newMat;
 };
 
+window.loadMoreMaterials = function() {
+    if (!materialListContainer) return;
+    const currentLimit = parseInt(materialListContainer.dataset.limit) || 200;
+    materialListContainer.dataset.limit = currentLimit + 200;
+    updateMaterialList();
+};
 export const getMaterials = () => state.data.materials;

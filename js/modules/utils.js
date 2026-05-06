@@ -23,6 +23,8 @@ export function getIntegerFromInput(inputElement) {
 
 export function formatMoneyVND(value) {
     let num = Number(value);
+    let isNegative = num < 0;
+    if (isNegative) num = Math.abs(num);
     if (isNaN(num)) num = 0;
     
     let parts = num.toString().split('.');
@@ -45,7 +47,7 @@ export function formatMoneyVND(value) {
         }
     }
     
-    return formatted + ' ₫';    
+    return (isNegative ? '-' : '') + formatted + ' ₫';    
 }
 export function formatRawToDisplay(rawValue) {
     if (!rawValue || rawValue === '') return '';
@@ -154,7 +156,8 @@ export const handleMoneyInput = handleIntegerInput;
 
 const COLUMN_CONFIG_KEY = 'steeltrack_column_config';
 export const DEFAULT_COLUMNS = [
-    { key: 'id', label: 'Mã', visible: true, width: 80, sortable: true },
+    { key: 'stt', label: 'STT', visible: true, width: 50, sortable: false },
+    { key: 'id', label: 'Mã', visible: false, width: 80, sortable: true },
     { key: 'name', label: 'Tên vật tư', visible: true, width: 200, sortable: true },
     { key: 'cat', label: 'Loại', visible: true, width: 120, sortable: true },
     { key: 'unit', label: 'ĐVT', visible: true, width: 80, sortable: true },
