@@ -419,12 +419,13 @@ window.showMaterialDetail = function(mid) {
     // Lấy giao dịch nhập
     const purchaseTxns = state.data.transactions
         .filter(t => t.mid === mid && t.type === 'purchase')
-        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date)).reverse();
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
 
     // Lấy giao dịch xuất và trả
     const exportTxns = state.data.transactions
-        .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce' || t.type === 'transfer_sw' || t.type === 'return_from_sw'))
+        .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce' || t.type === 'transfer_sw'))
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+
     // Tính tổng
     const totalImport = purchaseTxns.reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
     const totalExport = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
@@ -518,9 +519,7 @@ window.exportMaterialDetail = function(mid) {
     if (!mat) return;
 
     const purchaseTxns = state.data.transactions.filter(t => t.mid === mid && t.type === 'purchase');
-const exportTxns = state.data.transactions
-    .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce' || t.type === 'transfer_sw' || t.type === 'return_from_sw'))
-    .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+    const exportTxns = state.data.transactions.filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce'));
 
     const importData = purchaseTxns.map(t => ({
         'Thời gian': formatDateTime(t.datetime || t.date),
@@ -621,7 +620,6 @@ window.confirmTransferSW = function() {
     const note = document.getElementById('sw-note')?.value || '';
     const attachment = JSON.stringify(window._upPaths?.transfer_sw || []);
     
-    addLog("Chuyển kho CK", items.map(i => `${i.name}: ${i.qty} ${i.unit}`).join(", "));
     fetch('/api/transfer-to-structure-warehouse', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({items, note, attachment}) })
         .then(r => r.json())
         .then(d => {

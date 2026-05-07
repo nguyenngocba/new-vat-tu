@@ -177,9 +177,7 @@ window.produceStructure = function(sid) {
     if (!s) { alert("Không tìm thấy cấu kiện!"); return; }
     const qty = prompt("Số lượng sản xuất:", "1");
     if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
-    
-    // 🔥 KHÔNG GHI LOG Ở ĐÂY - chỉ ghi khi thành công 🔥
-    
+    addLog("Sản xuất cấu kiện", `${s.name} - SL: ${qty} ${s.unit}`);
     fetch("/api/produce-structure", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -188,8 +186,6 @@ window.produceStructure = function(sid) {
     .then(r => r.json())
     .then(d => {
         if (d.success) {
-            // 🔥 CHỈ GHI LOG KHI SẢN XUẤT THÀNH CÔNG 🔥
-            addLog("Sản xuất cấu kiện", `${s.name} - SL: ${qty} ${s.unit}`);
             alert("✅ Sản xuất thành công!");
             window.loadState().then(() => window.render());
         } else {
@@ -201,6 +197,7 @@ window.produceStructure = function(sid) {
         alert("❌ Lỗi kết nối: " + err.message);
     });
 };
+
 window.showSWDetail = function(mid) {
     fetch('/api/sw-logs/' + mid).then(r=>r.json()).then(d=>{
         if(!d.success || d.data.length===0) { alert('Chưa có lịch sử chuyển kho!'); return; }
@@ -235,53 +232,21 @@ window.showSWDetail = function(mid) {
 window.returnToMainWarehouse = function(mid) {
     const material = state.data.materials.find(m => m.id === mid);
     if (!material) return alert('Không tìm thấy vật tư!');
-    
-    fetch('/api/structure-warehouse')
-        .then(r => r.json())
-        .then(swData => {
-            const swItem = swData.data.find(w => w.material_id === mid);
-            const maxQty = swItem ? parseFloat(swItem.qty) : 0;
-            if (maxQty <= 0) {
-                alert('Kho CK không còn vật tư này để trả!');
-                return;
-            }
-            
-            const qty = prompt(`Số lượng trả lại kho chính (tối đa ${maxQty.toLocaleString('vi-VN')} ${material.unit}):`);
-            if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
-            if (parseFloat(qty) > maxQty) {
-                alert(`Không thể trả quá ${maxQty} ${material.unit}!`);
-                return;
-            }
-            
-            const note = prompt('Ghi chú (không bắt buộc):', 'Trả lại kho chính');
-            const qtyNum = parseFloat(qty);
-            
-            fetch('/api/return-from-sw', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ 
-                    material_id: mid, 
-                    qty: qtyNum,
-                    note: note || 'Trả lại kho chính'
-                }) 
-            })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    // 🔥 GHI LOG ĐẦY ĐỦ SỐ LƯỢNG SAU KHI TRẢ THÀNH CÔNG 🔥
-                    addLog("Trả lại kho chính", `${material.name} - SL: ${qtyNum.toLocaleString('vi-VN')} ${material.unit}`);
-                    alert('✅ Đã trả lại kho chính!');
-                    window.loadState().then(() => window.render());
-                } else {
-                    alert('❌ ' + d.error);
-                }
-            });
-        })
-        .catch(err => {
-            console.error('Lỗi lấy thông tin kho CK:', err);
-            alert('Có lỗi xảy ra, vui lòng thử lại!');
+    fetch('/api/structure-warehouse').then(r => r.json()).then(swData => {
+        const swItem = swData.data.find(w => w.material_id === mid);
+        const maxQty = swItem ? parseFloat(swItem.qty) : 0;
+        if (maxQty <= 0) { alert('Kho CK không còn vật tư này để trả!'); return; }
+        const qty = prompt(`Số lượng trả lại kho chính (tối đa ${maxQty.toLocaleString('vi-VN')} ${material.unit}):`);
+        if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
+        if (parseFloat(qty) > maxQty) { alert(`Không thể trả quá ${maxQty}!`); return; }
+        fetch('/api/return-from-sw', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ material_id: mid, qty: parseFloat(qty), note: 'Trả lại kho chính' }) })
+        .then(r=>r.json()).then(d=>{
+            if(d.success) { alert('✅ Đã trả lại kho chính!'); window.loadState().then(() => window.render()); }
+            else alert('❌ '+d.error);
         });
+    });
 };
+
 window.deleteStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     if (!confirm(`Xóa cấu kiện "${s?.name}"?`)) return;
@@ -316,10 +281,9 @@ window.showStructureDetail = function(sid) {
 
 window.exportStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
-    addLog("Mở modal xuất cấu kiện", `${s?.name} - Tồn: ${s?.qty} ${s?.unit}`);
     if (!s || parseFloat(s.qty) <= 0) return alert('Không có cấu kiện trong kho!');
     if (state.data.projects.length === 0) return alert('Chưa có công trình!');
-
+    
     var projOpts = state.data.projects.map(p => '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>').join('');
     showModal(`
         <div class="modal-hd"><span class="modal-title">📤 Xuất cấu kiện ra công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
@@ -341,6 +305,7 @@ window.exportStructure = function(sid) {
         }
     }, 100);
 };
+
 window.confirmExportStructure = function(sid) {
     var pid = document.getElementById('exp-proj')?.value;
     var qty = parseFloat(document.getElementById('exp-qty')?.value?.replace(/\./g,'').replace(',','.')) || 0;
@@ -351,7 +316,7 @@ window.confirmExportStructure = function(sid) {
     if (!s || parseFloat(s.qty) < qty) return alert('Không đủ cấu kiện trong kho!');
     
     var projectName = state.data.projects.find(p => p.id === pid)?.name || '';
-	addLog('Xuất cấu kiện', `${s?.name} - SL: ${qty} ${s?.unit} ra công trình ${projectName}`);    
+    addLog('Xuất cấu kiện', `${s?.name} - SL: ${qty} ${s?.unit} ra công trình ${projectName}`);
     
     fetch('/api/export-structure', { method: 'POST', headers: {'Content-Type':'application/json'}, 
         body: JSON.stringify({ structureId: sid, projectId: pid, quantity: qty, note: note }) })

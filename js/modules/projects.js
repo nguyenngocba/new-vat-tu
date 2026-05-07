@@ -467,7 +467,7 @@ window.editProject = function(pid) {
     showModal(`<div class="modal-hd"><span class="modal-title">✏️ Sửa công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd">
         <div class="form-group"><label class="form-label">Tên công trình</label><input id="edit-proj-name" value="${escapeHtml(project.name)}"></div>
-        <div class="form-group"><label class="form-label">Ngân sách (VNĐ)</label><input type="text" id="edit-proj-budget" value="${project.budget.toLocaleString('vi-VN')}" dir="ltr"></div>
+        <div class="form-group"><label class="form-label">Ngân sách (VNĐ)</label><input type="text" id="edit-proj-budget" value=" ${Math.round(project.budget).toLocaleString('vi-VN')}" dir="ltr"></div>
     </div>
     <div class="modal-ft"><button onclick="closeModal()">Hủy</button><button class="primary" onclick="window.saveEditProject('${pid}')">Cập nhật</button></div>`);
     

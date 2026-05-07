@@ -36,34 +36,10 @@ export function renderStructures() {
     }
     
     html += `</tbody></table></div></div>`;
-    html += '<div class="card" style="margin-top:16px;"><div class="sec-title" style="display:flex;justify-content:space-between;"><span>📦 KHO CẤU KIỆN</span><button class="sm" onclick="window.openTransferToSW()">+ Nhập từ kho chính</button></div><div class="tbl-wrap"><table style="min-width:650px;"><thead><tr><th>STT</th><th>Tên vật tư</th><th>Loại</th><th style="text-align:right;">Tồn CK</th><th>ĐVT</th><th style="text-align:right;">Tồn kho chính</th><th>TT</th><th>Thao tác</th></tr></thead><tbody id="sw-table-body"><tr><td colspan="8">Đang tải...</td></tr></tbody></table></div></div>';
-    
+html += '<div class="card" style="margin-top:16px;"><div class="sec-title" style="display:flex;justify-content:space-between;"><span>📦 KHO CẤU KIỆN</span><button class="sm" onclick="window.openTransferToSW()">+ Nhập từ kho chính</button></div><div class="tbl-wrap"><table style="min-width:650px;"><thead><tr><th>STT</th><th>Tên vật tư</th><th>Loại</th><th style="text-align:right;">Tồn CK</th><th>ĐVT</th><th style="text-align:right;">Tồn kho chính</th><th>TT</th><th>Thao tác</th></tr></thead><tbody id="sw-table-body"><tr><td colspan="8">Đang tải...</td></tr></tbody></table></div></div>';
     setTimeout(function(){
-        fetch('/api/structure-warehouse').then(r=>r.json()).then(d=>{
-            var tb = document.getElementById('sw-table-body');
-            if(tb && d.success) {
-                tb.innerHTML = d.data.length === 0 ? '<tr><td colspan="8">Kho rỗng</td></tr>' : d.data.map(function(m,i){
-                    var cat = (state.data.materials.find(x=>x.id===m.material_id)||{}).cat||'—';
-                    var mainQty = (state.data.materials.find(x=>x.id===m.material_id)||{}).qty||0;
-                    var sc = Number(m.qty)<=5?'b-low':'b-ok';
-                    var st = Number(m.qty)<=5?'⚠️':'✅';
-                    var name = m.material_name.replace(/ \\(Tồn:.*\\)/,'');
-                    return `<tr>
-                        <td>${i+1}</td>
-                        <td><strong style="cursor:pointer;color:var(--accent);" onclick="showSWDetail('${m.material_id}')">${name}</strong></td>
-                        <td>${cat}</td>
-                        <td style="text-align:right;">${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</td>
-                        <td>${m.unit}</td>
-                        <td style="text-align:right;">${Number(mainQty).toLocaleString('vi-VN')} ${m.unit}</td>
-                        <td><span class="badge ${sc}">${st}</span></td>
-                        <td><button class="sm" onclick="returnToMainWarehouse('${m.material_id}')">🔄 Trả lại</button></td>
-                    </tr>`;
-                }).join('');
-            }
-        });
-    }, 100);
+fetch('/api/structure-warehouse').then(function(r){return r.json();}).then(function(d){var tb=document.getElementById('sw-table-body');if(tb&&d.success)tb.innerHTML=d.data.length===0?'<tr><td colspan="8">Kho rỗng</td></tr>':d.data.map(function(m,i){var cat=(state.data.materials.find(function(x){return x.id===m.material_id;})||{}).cat||'—';var mainQty=(state.data.materials.find(function(x){return x.id===m.material_id;})||{}).qty||0;var sc=Number(m.qty)<=5?'b-low':'b-ok';var st=Number(m.qty)<=5?'⚠️':'✅';var name=m.material_name.replace(/ \\(Tồn:.*\\)/,'');return '<tr><td>'+(i+1)+'</td><td><strong style="cursor:pointer;color:var(--accent);" onclick="showSWDetail(\''+m.material_id+'\')">'+name+'</strong></td><td>'+cat+'</td><td style="text-align:right;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td>'+m.unit+'</td><td style="text-align:right;">'+Number(mainQty).toLocaleString('vi-VN')+' '+m.unit+'</td><td><span class="badge '+sc+'">'+st+'</span></td><td><button class="sm" onclick="returnToMainWarehouse(\''+m.material_id+'\')">🔄 Trả lại</button></td></tr>';}).join('');});},100);
     return html;
-}
 
 window.openStructureModal = function(sid = null) {
     const s = sid ? (state.data.structures||[]).find(x => x.id === sid) : null;
@@ -106,6 +82,7 @@ window.openStructureModal = function(sid = null) {
     
     setTimeout(() => {
         window.updateBomCost();
+        // Load options từ kho CK
         fetch('/api/sw-options').then(r=>r.text()).then(html => {
             document.querySelectorAll('.bom-mat').forEach(s => s.innerHTML = html);
         });
@@ -171,15 +148,12 @@ window.saveStructure = function(sid) {
     closeModal();
     if (window.render) window.render();
 };
-
 window.produceStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     if (!s) { alert("Không tìm thấy cấu kiện!"); return; }
     const qty = prompt("Số lượng sản xuất:", "1");
     if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
-    
-    // 🔥 KHÔNG GHI LOG Ở ĐÂY - chỉ ghi khi thành công 🔥
-    
+    addLog("Sản xuất cấu kiện", `${s.name} - SL: ${qty} ${s.unit}`);
     fetch("/api/produce-structure", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -188,8 +162,6 @@ window.produceStructure = function(sid) {
     .then(r => r.json())
     .then(d => {
         if (d.success) {
-            // 🔥 CHỈ GHI LOG KHI SẢN XUẤT THÀNH CÔNG 🔥
-            addLog("Sản xuất cấu kiện", `${s.name} - SL: ${qty} ${s.unit}`);
             alert("✅ Sản xuất thành công!");
             window.loadState().then(() => window.render());
         } else {
@@ -201,6 +173,129 @@ window.produceStructure = function(sid) {
         alert("❌ Lỗi kết nối: " + err.message);
     });
 };
+
+
+window.showSWDetail = function(mid) {
+    fetch('/api/sw-logs/' + mid).then(r=>r.json()).then(d=>{
+        if(!d.success || d.data.length===0) { alert('Chưa có lịch sử chuyển kho!'); return; }
+        var item = d.data[0];
+
+        var html = '<div class="modal-hd"><span class="modal-title">📦 Chi tiết Kho CK: '+item.material_name+'</span><button class="xbtn" onclick="closeModal()">✕</button></div>';
+        html += '<div class="modal-bd"><div class="tbl-wrap"><table style="min-width:700px;"><thead><tr><th>Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:right;">SL</th><th>ĐVT</th><th style="text-align:right;">Đơn giá</th><th>Ghi chú</th><th>File</th></tr></thead><tbody>';
+
+        d.data.forEach(function(l){
+            var dt = new Date(l.created_at).toLocaleString('vi-VN');
+            var files = '';
+            try { var att = JSON.parse(l.attachment||'[]'); att.forEach(function(f){ files += '<a href="'+f+'" target="_blank">📎</a> '; }); } catch(e){}
+
+            var typeIcon = l.type === 'return_to_main' ? '🔄 Trả lại kho chính' : '📦 Chuyển sang kho CK';
+            var typeColor = l.type === 'return_to_main' ? 'color: var(--success-text);' : 'color: var(--accent);';
+            
+            // 🔥 SỬA LỖI HIỂN THỊ SỐ LƯỢNG 🔥
+            var absQty = Math.abs(Number(l.qty));
+            var qtyDisplay = absQty.toLocaleString('vi-VN');
+            var qtySign = l.type === 'return_to_main' ? '-' : '+';
+            var qtyColor = l.type === 'return_to_main' ? 'color: var(--success-text);' : 'color: var(--accent);';
+
+            html += '<tr>' +
+                '<td style="white-space:nowrap;">'+dt+'</td>' +
+                '<td style="text-align:center; '+typeColor+' font-weight:bold;">'+typeIcon+'</td>' +
+                '<td style="text-align:right; '+qtyColor+' font-weight:bold;">'+qtySign+qtyDisplay+' '+l.unit+'</td>' +
+                '<td>'+l.unit+'</td>' +
+                '<td style="text-align:right;">'+Number(l.cost||0).toLocaleString('vi-VN')+' ₫</td>' +
+                '<td>'+ (l.note||'—') +'</td>' +
+                '<td style="text-align:center;">'+(files||'—')+'</td>' +
+                '</tr>';
+        });
+
+        html += '</tbody></table></div></div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>';
+        showModal(html);
+    });
+};
+window.returnToMainWarehouse = function(mid) {
+    // Lấy tên vật tư để hiển thị
+    const material = state.data.materials.find(m => m.id === mid);
+    if (!material) return alert('Không tìm thấy vật tư!');
+    
+    // Lấy số lượng tồn trong kho CK
+    let currentSWStock = 0;
+    fetch('/api/structure-warehouse')
+        .then(r => r.json())
+        .then(swData => {
+            const swItem = swData.data.find(w => w.material_id === mid);
+            currentSWStock = swItem ? parseFloat(swItem.qty) : 0;
+            
+            const maxQty = currentSWStock;
+            if (maxQty <= 0) {
+                alert('Kho CK không còn vật tư này để trả!');
+                return;
+            }
+            
+            const qty = prompt(`Số lượng trả lại kho chính (tối đa ${maxQty.toLocaleString('vi-VN')} ${material.unit}):`);
+            if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
+            
+            if (parseFloat(qty) > maxQty) {
+                alert(`Không thể trả quá ${maxQty} ${material.unit}!`);
+                return;
+            }
+            
+            const note = prompt('Ghi chú (không bắt buộc):', 'Trả lại kho chính');
+            
+            fetch('/api/return-from-sw', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    material_id: mid, 
+                    qty: parseFloat(qty),
+                    note: note || 'Trả lại kho chính'
+                }) 
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) { 
+                    alert('✅ Đã trả lại kho chính!');
+                    // Reload toàn bộ dữ liệu
+                    window.loadState().then(() => {
+                        window.render();
+                        // Refresh lại bảng kho CK nếu đang mở
+                        const swTable = document.getElementById('sw-table-body');
+                        if (swTable) {
+                            fetch('/api/structure-warehouse').then(res => res.json()).then(data => {
+                                if (data.success) {
+                                    swTable.innerHTML = data.data.length === 0 ? 
+                                        '<tr><td colspan="8">Kho rỗng</td></tr>' : 
+                                        data.data.map((m, i) => {
+                                            const cat = (state.data.materials.find(x => x.id === m.material_id) || {}).cat || '—';
+                                            const mainQty = (state.data.materials.find(x => x.id === m.material_id) || {}).qty || 0;
+                                            const sc = Number(m.qty) <= 5 ? 'b-low' : 'b-ok';
+                                            const st = Number(m.qty) <= 5 ? '⚠️' : '✅';
+                                            const name = m.material_name.replace(/ \\(Tồn:.*\\)/, '');
+                                            return `<tr>
+                                                <td>${i+1}</td>
+                                                <td><strong style="cursor:pointer;color:var(--accent);" onclick="showSWDetail('${m.material_id}')">${name}</strong></td>
+                                                <td>${cat}</td>
+                                                <td style="text-align:right;">${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</td>
+                                                <td>${m.unit}</td>
+                                                <td style="text-align:right;">${Number(mainQty).toLocaleString('vi-VN')} ${m.unit}</td>
+                                                <td><span class="badge ${sc}">${st}</span></td>
+                                                <td><button class="sm" onclick="returnToMainWarehouse('${m.material_id}')">🔄 Trả lại</button></td>
+                                            </tr>`;
+                                        }).join('');
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    alert('❌ ' + d.error);
+                }
+            });
+        })
+        .catch(err => {
+            console.error('Lỗi lấy thông tin kho CK:', err);
+            alert('Có lỗi xảy ra, vui lòng thử lại!');
+        });
+};
+// ========== HIỂN THỊ CHI TIẾT KHO CK ==========
 window.showSWDetail = function(mid) {
     fetch('/api/sw-logs/' + mid).then(r=>r.json()).then(d=>{
         if(!d.success || d.data.length===0) { alert('Chưa có lịch sử chuyển kho!'); return; }
@@ -225,63 +320,33 @@ window.showSWDetail = function(mid) {
                 '<td style="text-align:right;">'+Number(l.cost||0).toLocaleString('vi-VN')+' ₫</td>' +
                 '<td>'+ (l.note||'—') +'</td>' +
                 '<td style="text-align:center;">'+(files||'—')+'</td>' +
-                '</tr>';
+                '<tr>';
         });
-        html += '</tbody></table></div></div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>';
+        html += '</tbody>｜｜DSML｜｜</div></div><div class="modal-ft"><button onclick="closeModal()">Đóng</button></div>';
         showModal(html);
     });
 };
 
+// ========== TRẢ LẠI KHO CHÍNH ==========
 window.returnToMainWarehouse = function(mid) {
     const material = state.data.materials.find(m => m.id === mid);
     if (!material) return alert('Không tìm thấy vật tư!');
-    
-    fetch('/api/structure-warehouse')
-        .then(r => r.json())
-        .then(swData => {
-            const swItem = swData.data.find(w => w.material_id === mid);
-            const maxQty = swItem ? parseFloat(swItem.qty) : 0;
-            if (maxQty <= 0) {
-                alert('Kho CK không còn vật tư này để trả!');
-                return;
-            }
-            
-            const qty = prompt(`Số lượng trả lại kho chính (tối đa ${maxQty.toLocaleString('vi-VN')} ${material.unit}):`);
-            if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
-            if (parseFloat(qty) > maxQty) {
-                alert(`Không thể trả quá ${maxQty} ${material.unit}!`);
-                return;
-            }
-            
-            const note = prompt('Ghi chú (không bắt buộc):', 'Trả lại kho chính');
-            const qtyNum = parseFloat(qty);
-            
-            fetch('/api/return-from-sw', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ 
-                    material_id: mid, 
-                    qty: qtyNum,
-                    note: note || 'Trả lại kho chính'
-                }) 
-            })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    // 🔥 GHI LOG ĐẦY ĐỦ SỐ LƯỢNG SAU KHI TRẢ THÀNH CÔNG 🔥
-                    addLog("Trả lại kho chính", `${material.name} - SL: ${qtyNum.toLocaleString('vi-VN')} ${material.unit}`);
-                    alert('✅ Đã trả lại kho chính!');
-                    window.loadState().then(() => window.render());
-                } else {
-                    alert('❌ ' + d.error);
-                }
-            });
-        })
-        .catch(err => {
-            console.error('Lỗi lấy thông tin kho CK:', err);
-            alert('Có lỗi xảy ra, vui lòng thử lại!');
+    fetch('/api/structure-warehouse').then(r => r.json()).then(swData => {
+        const swItem = swData.data.find(w => w.material_id === mid);
+        const maxQty = swItem ? parseFloat(swItem.qty) : 0;
+        if (maxQty <= 0) { alert('Kho CK không còn vật tư này để trả!'); return; }
+        const qty = prompt(`Số lượng trả lại kho chính (tối đa ${maxQty.toLocaleString('vi-VN')} ${material.unit}):`);
+        if (!qty || isNaN(qty) || parseFloat(qty) <= 0) return;
+        if (parseFloat(qty) > maxQty) { alert(`Không thể trả quá ${maxQty}!`); return; }
+        fetch('/api/return-from-sw', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ material_id: mid, qty: parseFloat(qty), note: 'Trả lại kho chính' }) })
+        .then(r=>r.json()).then(d=>{
+            if(d.success) { alert('✅ Đã trả lại kho chính!'); window.loadState().then(() => window.render()); }
+            else alert('❌ '+d.error);
         });
+    });
 };
+
+// ========== XÓA CẤU KIỆN ==========
 window.deleteStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     if (!confirm(`Xóa cấu kiện "${s?.name}"?`)) return;
@@ -292,6 +357,7 @@ window.deleteStructure = function(sid) {
     if (window.render) window.render();
 };
 
+// ========== HIỂN THỊ CHI TIẾT CẤU KIỆN ==========
 window.showStructureDetail = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     if (!s) return;
@@ -308,18 +374,17 @@ window.showStructureDetail = function(sid) {
         <div class="sec-title">📦 THÀNH PHẦN (BOM)</div>
         <div class="tbl-wrap"><table style="min-width:400px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">SL / 1 cấu kiện</th><th>ĐVT</th></tr></thead><tbody>${(s.materials||[]).map(m => `<tr><td>${escapeHtml(m.materialName)}</td><td style="text-align:right;">${Number(m.quantity).toLocaleString('vi-VN')} ${m.unit}</td><td>${m.unit}</td></tr>`).join('')}</tbody></table></div>
         <div class="sec-title">🏭 LỊCH SỬ SẢN XUẤT (${produceTxns.length} lần)</div>
-        <div class="tbl-wrap"><table style="min-width:600px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:right;">SL</th><th style="text-align:left;">Ghi chú</th></tr></thead><tbody>${produceTxns.length > 0 ? produceTxns.map(t => { const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}) : t.date; return `<tr><td style="white-space:nowrap;">${dt}</td><td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(t.qty||0).toLocaleString('vi-VN')} ${s.unit}</td><td>${escapeHtml(t.note||'—')}</td></tr>`; }).join('') : '<tr><td colspan="3" style="text-align:center;">📭 Chưa có lịch sử sản xuất</td></tr>'}</tbody></table></div>
+        <div class="tbl-wrap"><table style="min-width:600px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:right;">SL</th><th style="text-align:left;">Ghi chú</th></tr></thead><tbody>${produceTxns.length > 0 ? produceTxns.map(t => { const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}) : t.date; return `<tr><td style="white-space:nowrap;">${dt}</td><td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(t.qty||0).toLocaleString('vi-VN')} ${s.unit}</td><td>${escapeHtml(t.note||'—')}</td></tr>`; }).join('') : '<tr><td colspan="3" style="text-align:center;">📭 Chưa có lịch sử sản xuất</tr>'}</tbody></table></div>
     </div>
     <div class="modal-ft"><button onclick="closeModal()">Đóng</button><button class="primary" onclick="closeModal();window.produceStructure('${sid}')">🏭 Sản xuất</button></div>`;
     showModal(html, null);
 };
-
+// ========== XUẤT CẤU KIỆN RA CÔNG TRÌNH ==========
 window.exportStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
-    addLog("Mở modal xuất cấu kiện", `${s?.name} - Tồn: ${s?.qty} ${s?.unit}`);
     if (!s || parseFloat(s.qty) <= 0) return alert('Không có cấu kiện trong kho!');
     if (state.data.projects.length === 0) return alert('Chưa có công trình!');
-
+    
     var projOpts = state.data.projects.map(p => '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>').join('');
     showModal(`
         <div class="modal-hd"><span class="modal-title">📤 Xuất cấu kiện ra công trình</span><button class="xbtn" onclick="closeModal()">✕</button></div>
@@ -341,6 +406,7 @@ window.exportStructure = function(sid) {
         }
     }, 100);
 };
+
 window.confirmExportStructure = function(sid) {
     var pid = document.getElementById('exp-proj')?.value;
     var qty = parseFloat(document.getElementById('exp-qty')?.value?.replace(/\./g,'').replace(',','.')) || 0;
@@ -351,7 +417,7 @@ window.confirmExportStructure = function(sid) {
     if (!s || parseFloat(s.qty) < qty) return alert('Không đủ cấu kiện trong kho!');
     
     var projectName = state.data.projects.find(p => p.id === pid)?.name || '';
-	addLog('Xuất cấu kiện', `${s?.name} - SL: ${qty} ${s?.unit} ra công trình ${projectName}`);    
+    addLog('Xuất cấu kiện', `${s?.name} - SL: ${qty} ${s?.unit} ra công trình ${projectName}`);
     
     fetch('/api/export-structure', { method: 'POST', headers: {'Content-Type':'application/json'}, 
         body: JSON.stringify({ structureId: sid, projectId: pid, quantity: qty, note: note }) })
@@ -364,3 +430,4 @@ window.confirmExportStructure = function(sid) {
             } else alert('❌ Lỗi: ' + d.error);
         });
 };
+}

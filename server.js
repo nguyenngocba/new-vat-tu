@@ -333,17 +333,46 @@ app.post('/api/return-from-sw', async (req, res) => {
     const { material_id, qty } = req.body;
     try {
         await pool.query('BEGIN');
+        
+        // Kiểm tra tồn kho CK
         const sw = await pool.query('SELECT * FROM structure_warehouse WHERE material_id=$1 FOR UPDATE', [material_id]);
         if (!sw.rows[0] || parseFloat(sw.rows[0].qty) < qty) {
             await pool.query('ROLLBACK');
             return res.json({ success: false, error: 'Không đủ số lượng trong kho CK!' });
         }
+        
+        // Lấy thông tin vật tư
+        const material = await pool.query('SELECT name, unit, cost FROM materials WHERE id=$1', [material_id]);
+        const materialName = material.rows[0]?.name || 'N/A';
+        const unit = material.rows[0]?.unit || 'cái';
+        const cost = material.rows[0]?.cost || 0;
+        
+        // Trừ kho CK
         await pool.query('UPDATE structure_warehouse SET qty = qty - $1 WHERE material_id=$2', [qty, material_id]);
+        
+        // Cộng lại kho chính
         await pool.query('UPDATE materials SET qty = qty + $1 WHERE id=$2', [qty, material_id]);
+        
+        // 🔥 THÊM LOG VÀO BẢNG TRANSACTIONS 🔥
+        const tid = 'tvskh' + new Date().toISOString().replace(/[-:T.Z]/g,'').slice(2,14) + String(Math.random()).slice(2,6);
+        await pool.query(`
+            INSERT INTO transactions (id, mid, type, qty, unit_price, total_amount, note, datetime, attachment)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8)
+        `, [tid, material_id, 'return_from_sw', qty, cost, qty * cost, `Trả lại từ kho CK về kho chính`, '[]']);
+        
+        // 🔥 THÊM LOG VÀO BẢNG sw_logs (để hiển thị trong lịch sử kho CK)
+        await pool.query(`
+            INSERT INTO sw_logs (material_id, material_name, qty, unit, cost, note, type, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+        `, [material_id, materialName, -qty, unit, cost, `Trả lại kho chính`, 'return_to_main']);
+        
         await pool.query('COMMIT');
         await clearCache();
+        
         res.json({ success: true });
-    } catch(e) { await pool.query('ROLLBACK'); res.json({ success: false, error: e.message }); }
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        res.json({ success: false, error: e.message });
+    }
 });
-
 server.listen(PORT, '0.0.0.0', () => console.log('OK'));
