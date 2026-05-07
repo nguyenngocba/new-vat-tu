@@ -19,60 +19,6 @@ let advancedFilters = {
 
 let currentDashboardTab = 'overview';
 
-// ========== CACHE CHO DASHBOARD ==========
-let dashboardCache = {
-    html_cache: null,
-    data_cache: null,
-    timestamp: 0,
-    ttl: 60000 // 60 giây cache
-};
-
-let transactionsCache = {
-    data: null,
-    filters: null,
-    timestamp: 0,
-    ttl: 30000 // 30 giây
-};
-
-// Hàm lấy cached transactions
-function getCachedTransactions(filters) {
-    const filterKey = JSON.stringify(filters);
-    if (transactionsCache.data && transactionsCache.filters === filterKey && 
-        (Date.now() - transactionsCache.timestamp) < transactionsCache.ttl) {
-        return transactionsCache.data;
-    }
-    return null;
-}
-
-function setCachedTransactions(filters, data) {
-    transactionsCache.data = data;
-    transactionsCache.filters = JSON.stringify(filters);
-    transactionsCache.timestamp = Date.now();
-}
-
-// Hàm lấy cached dashboard HTML
-function getCachedDashboardHTML() {
-    if (dashboardCache.html_cache && (Date.now() - dashboardCache.timestamp) < dashboardCache.ttl) {
-        return dashboardCache.html_cache;
-    }
-    return null;
-}
-
-function setCachedDashboardHTML(html) {
-    dashboardCache.html_cache = html;
-    dashboardCache.timestamp = Date.now();
-}
-
-// Clear cache
-function clearDashboardCache() {
-    dashboardCache.html_cache = null;
-    dashboardCache.data_cache = null;
-    dashboardCache.timestamp = 0;
-    transactionsCache.data = null;
-    transactionsCache.filters = null;
-    console.log('🗑️ Đã xóa cache dashboard');
-}
-
 // ========== HELPER FUNCTIONS ==========
 
 function getCurrentMonth() {
@@ -91,21 +37,7 @@ function getMonthName(monthKey) {
     return `T${parseInt(month)}/${year}`;
 }
 
-function getFilteredTransactions(useCache = true) {
-    const currentFilters = {
-        dateFrom: advancedFilters.dateFrom,
-        dateTo: advancedFilters.dateTo,
-        transactionType: advancedFilters.transactionType,
-        materialCategory: advancedFilters.materialCategory,
-        projectId: advancedFilters.projectId,
-        supplierId: advancedFilters.supplierId
-    };
-    
-    if (useCache) {
-        const cached = getCachedTransactions(currentFilters);
-        if (cached) return cached;
-    }
-    
+function getFilteredTransactions() {
     let transactions = [...state.data.transactions];
     
     if (advancedFilters.dateFrom) {
@@ -134,7 +66,6 @@ function getFilteredTransactions(useCache = true) {
         transactions = transactions.filter(t => t.supplierId === advancedFilters.supplierId);
     }
     
-    setCachedTransactions(currentFilters, transactions);
     return transactions;
 }
 
@@ -289,7 +220,6 @@ function applyFilters() {
     advancedFilters.materialCategory = document.getElementById('filter-material-category')?.value || 'all';
     advancedFilters.projectId = document.getElementById('filter-project')?.value || 'all';
     advancedFilters.supplierId = document.getElementById('filter-supplier')?.value || 'all';
-    clearDashboardCache();
     updateDashboardContent();
 }
 
@@ -299,7 +229,6 @@ function resetFilters() {
         const el = document.getElementById(id);
         if (el) el.value = 'all';
     });
-    clearDashboardCache();
     updateDashboardContent();
 }
 
@@ -313,28 +242,13 @@ function updateDashboardContent() {
 
 // ========== KPI CARDS ==========
 
-function getLowStockHTML() {
-    const lowStockItems = state.data.materials.filter(m => parseFloat(m.qty) <= parseFloat(m.low || 0));
-    if (lowStockItems.length === 0) return '';
-    return `<div class="card" style="margin-bottom:18px;border-left:3px solid var(--danger);">
-        <div class="sec-title" style="color:var(--danger-text);">⚠️ SẮP HẾT HÀNG (${lowStockItems.length} mặt hàng)</div>
-        <div class="tbl-wrap"><table class="dashboard-table" style="min-width:600px;">
-            <thead><tr><th>Tên vật tư</th><th style="text-align:right;">Tồn kho</th><th style="text-align:right;">Ngưỡng</th><th style="text-align:right;">Cần nhập</th></tr></thead>
-            <tbody>${lowStockItems.slice(0,10).map(m => {
-                const need = parseFloat(m.low) - parseFloat(m.qty);
-                return '<tr style="cursor:pointer;" onclick="window.showMaterialDetail(\''+m.id+'\')"><td><strong>'+escapeHtml(m.name)+'</strong></td><td style="text-align:right;color:var(--danger-text);font-weight:bold;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;">'+Number(m.low).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;color:var(--accent);">'+Number(need).toLocaleString('vi-VN')+' '+m.unit+'</td></tr>';
-            }).join('')}</tbody>
-        </table></div>
-        ${lowStockItems.length > 10 ? '<div class="metric-sub" style="text-align:center;">Còn '+(lowStockItems.length-10)+' mặt hàng khác...</div>' : ''}
-    </div>`;
-}
-
 function renderKPICards() {
     const allTxns = getFilteredTransactions();
     const { totalImport, totalExport, totalReturn, netSpent } = getTotalsForPeriod(allTxns);
     const totalInventory = state.data.materials.reduce((s, m) => s + (m.qty * m.cost), 0);
     const lowStockCount = state.data.materials.filter(m => m.qty <= parseFloat(m.low)).length;
     
+    // So sánh với tháng trước
     const lastMonthTxns = state.data.transactions.filter(t => {
         const d = new Date(t.datetime || t.date);
         const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -384,17 +298,48 @@ function renderKPICards() {
             </div>
         </div>
     `;
+    // Danh sách sắp hết
+    const lowStockItems = state.data.materials.filter(m => parseFloat(m.qty) <= parseFloat(m.low || 0));
+    let lowStockHTML = '';
+    if (lowStockItems.length > 0) {
+        lowStockHTML = `<div class="card" style="margin-bottom:18px;border-left:3px solid var(--danger);">
+            <div class="sec-title" style="color:var(--danger-text);">⚠️ SẮP HẾT HÀNG (${lowStockItems.length} mặt hàng)</div>
+            <div class="tbl-wrap"><table class="dashboard-table" style="min-width:600px;">
+                <thead><tr><th>Tên vật tư</th><th style="text-align:right;">Tồn kho</th><th style="text-align:right;">Ngưỡng</th><th style="text-align:right;">Cần nhập</th></tr></thead>
+                <tbody>${lowStockItems.slice(0,10).map(m => {
+                    const need = parseFloat(m.low) - parseFloat(m.qty);
+                    return `<tr style="cursor:pointer;" onclick="window.showMaterialDetail('${m.id}')">
+                        <td><strong>${escapeHtml(m.name)}</strong></td>
+                        <td style="text-align:right;color:var(--danger-text);font-weight:bold;">${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</td>
+                        <td style="text-align:right;">${Number(m.low).toLocaleString('vi-VN')} ${m.unit}</td>
+                        <td style="text-align:right;color:var(--accent);">${Number(need).toLocaleString('vi-VN')} ${m.unit}</td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table></div>
+            ${lowStockItems.length > 10 ? `<div class="metric-sub" style="text-align:center;">Còn ${lowStockItems.length - 10} mặt hàng khác...</div>` : ''}
+        </div>`;
+    }
+}
+
+function getLowStockHTML() {
+    const lowStockItems = state.data.materials.filter(m => parseFloat(m.qty) <= parseFloat(m.low || 0));
+    if (lowStockItems.length === 0) return '';
+    return `<div class="card" style="margin-bottom:18px;border-left:3px solid var(--danger);">
+        <div class="sec-title" style="color:var(--danger-text);">⚠️ SẮP HẾT HÀNG (${lowStockItems.length} mặt hàng)</div>
+        <div class="tbl-wrap"><table class="dashboard-table" style="min-width:600px;">
+            <thead><tr><th>Tên vật tư</th><th style="text-align:right;">Tồn kho</th><th style="text-align:right;">Ngưỡng</th><th style="text-align:right;">Cần nhập</th></tr></thead>
+            <tbody>${lowStockItems.slice(0,10).map(m => {
+                const need = parseFloat(m.low) - parseFloat(m.qty);
+                return '<tr style="cursor:pointer;" onclick="window.showMaterialDetail(\''+m.id+'\')"><td><strong>'+escapeHtml(m.name)+'</strong></td><td style="text-align:right;color:var(--danger-text);font-weight:bold;">'+Number(m.qty).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;">'+Number(m.low).toLocaleString('vi-VN')+' '+m.unit+'</td><td style="text-align:right;color:var(--accent);">'+Number(need).toLocaleString('vi-VN')+' '+m.unit+'</td></tr>';
+            }).join('')}</tbody>
+        </table></div>
+        ${lowStockItems.length > 10 ? '<div class="metric-sub" style="text-align:center;">Còn '+(lowStockItems.length-10)+' mặt hàng khác...</div>' : ''}
+    </div>`;
 }
 
 // ========== RENDER DASHBOARD ==========
 
 export function renderDashboard() {
-    // Kiểm tra cache
-    const cachedHtml = getCachedDashboardHTML();
-    if (cachedHtml) {
-        return cachedHtml;
-    }
-    
     const monthlyData = getMonthlyData();
     const allTxns = getFilteredTransactions();
     
@@ -434,11 +379,12 @@ export function renderDashboard() {
     // Recent transactions
     const recentTxns = allTxns.sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date)).slice(0, parseInt(document.getElementById('recent-limit')?.value||10));
     
-    const html = `
+    return `
         ${renderFiltersAndTabs()}
         ${renderKPICards()}
         ${getLowStockHTML()}
         
+        <!-- Biểu đồ chính -->
         <div class="grid2" style="margin-bottom: 18px;">
             <div class="card">
                 <div class="sec-title">📈 XU HƯỚNG NHẬP / XUẤT 6 THÁNG GẦN NHẤT</div>
@@ -450,6 +396,7 @@ export function renderDashboard() {
             </div>
         </div>
         
+        <!-- Top + Chart -->
         <div class="grid2" style="margin-bottom: 18px;">
             <div class="card">
                 <div class="sec-title">🏗️ TOP 5 CÔNG TRÌNH TIÊU THỤ NHIỀU NHẤT</div>
@@ -483,6 +430,7 @@ export function renderDashboard() {
             </div>
         </div>
         
+        <!-- Recent Transactions -->
         <div class="card">
             <div class="sec-title" style="display:flex;justify-content:space-between;"><span>📋 GIAO DỊCH GẦN ĐÂY</span><select id="recent-limit" onchange="updateDashboardContent()" style="width:100px;"><option value="10">10</option><option value="50">50</option><option value="100">100</option></select></div>
             <div class="tbl-wrap">
@@ -500,22 +448,17 @@ export function renderDashboard() {
                                 <td style="white-space:nowrap;">${dt}</td>
                                 <td><span class="status-badge ${t.type==='purchase'?'status-good':t.type==='usage'?'status-warn':'status-danger'}" style="font-size:11px;">${icon} ${label}</span></td>
                                 <td>${escapeHtml(mat?.name||'N/A')}</td>
-                                <td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit||''}</td>
+				<td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat?.unit||''}</td>	                                
                                 <td style="text-align:right;font-weight:500;">${formatMoneyVND(parseFloat(parseFloat(t.totalAmount)))}</td>
                                 <td>${escapeHtml(target)}</td>
                             </tr>`;
                         }).join('')}
-                        ${recentTxns.length === 0 ? '<tr><td colspan="6" style="text-align:center;">📭 Chưa có giao dịch</td>' : ''}
+                        ${recentTxns.length === 0 ? '<tr><td colspan="6" style="text-align:center;">📭 Chưa có giao dịch</td></tr>' : ''}
                     </tbody>
                 </table>
             </div>
         </div>
     `;
-    
-    // Lưu vào cache
-    setCachedDashboardHTML(html);
-    
-    return html;
 }
 
 function renderFiltersAndTabs() {
@@ -531,44 +474,43 @@ function renderFiltersAndTabs() {
 
 window.switchDashboardTab = function(tab) {
     currentDashboardTab = tab;
-    clearDashboardCache();
     if (tab === 'projects' || tab === 'suppliers') {
         document.getElementById('pane-dashboard').innerHTML = renderTabContent(tab);
-        setTimeout(function(){
-            if (tab === 'projects') {
-                var ctx1 = document.getElementById('top-projects-chart');
-                var ctx2 = document.getElementById('budget-pie-chart');
-                if (ctx1 && ctx2) {
-                    if (topProjectsChart) topProjectsChart.destroy();
-                    if (window._bp) window._bp.destroy();
-                    var pdata = state.data.projects.map(function(p){
-                        var u = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='usage'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
-                        var r = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='return'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
-                        return { name: p.name.length>20?p.name.substring(0,20):p.name, spent: u-r };
-                    }).sort(function(a,b){return b.spent-a.spent}).slice(0,5);
-                    topProjectsChart = new Chart(ctx1, { type:'bar', data:{ labels:pdata.map(function(p){return p.name}), datasets:[{ label:'Chi', data:pdata.map(function(p){return p.spent}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
-                    var tu = pdata.reduce(function(s,p){return s+p.spent},0);
-                    var tb = state.data.projects.reduce(function(s,p){return s+Number(p.budget||0)},0);
-                    window._bp = new Chart(ctx2, { type:'doughnut', data:{ labels:['Dung','Con'], datasets:[{ data:[tu, Math.max(0,tb-tu)], backgroundColor:['#F09595','#97C459'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
-                }
+    setTimeout(function(){
+        if (tab === 'projects') {
+            var ctx1 = document.getElementById('top-projects-chart');
+            var ctx2 = document.getElementById('budget-pie-chart');
+            if (ctx1 && ctx2) {
+                if (topProjectsChart) topProjectsChart.destroy();
+                if (window._bp) window._bp.destroy();
+                var pdata = state.data.projects.map(function(p){
+                    var u = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='usage'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
+                    var r = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='return'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
+                    return { name: p.name.length>20?p.name.substring(0,20):p.name, spent: u-r };
+                }).sort(function(a,b){return b.spent-a.spent}).slice(0,5);
+                topProjectsChart = new Chart(ctx1, { type:'bar', data:{ labels:pdata.map(function(p){return p.name}), datasets:[{ label:'Chi', data:pdata.map(function(p){return p.spent}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+                var tu = pdata.reduce(function(s,p){return s+p.spent},0);
+                var tb = state.data.projects.reduce(function(s,p){return s+Number(p.budget||0)},0);
+                window._bp = new Chart(ctx2, { type:'doughnut', data:{ labels:['Dung','Con'], datasets:[{ data:[tu, Math.max(0,tb-tu)], backgroundColor:['#F09595','#97C459'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
             }
-            if (tab === 'suppliers') {
-                var ctx1 = document.getElementById('top-suppliers-chart');
-                var ctx2 = document.getElementById('supplier-pie-chart');
-                if (ctx1 && ctx2) {
-                    if (topSuppliersChart) topSuppliersChart.destroy();
-                    if (window._sp) window._sp.destroy();
-                    var sdata = state.data.suppliers.map(function(s){
-                        var t = state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===s.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0);
-                        return { name: s.name.length>20?s.name.substring(0,20):s.name, total: t };
-                    }).sort(function(a,b){return b.total-a.total}).slice(0,5);
-                    topSuppliersChart = new Chart(ctx1, { type:'bar', data:{ labels:sdata.map(function(s){return s.name}), datasets:[{ label:'Tong chi', data:sdata.map(function(s){return s.total}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
-                    var t5 = sdata.reduce(function(s,p){return s+p.total},0);
-                    var at = state.data.suppliers.reduce(function(s,p){ var t=state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===p.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0); return s+t; },0);
-                    window._sp = new Chart(ctx2, { type:'doughnut', data:{ labels:sdata.map(function(s){return s.name}).concat(['Khac']), datasets:[{ data:sdata.map(function(s){return s.total}).concat([Math.max(0,at-t5)]), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
-                }
+        }
+        if (tab === 'suppliers') {
+            var ctx1 = document.getElementById('top-suppliers-chart');
+            var ctx2 = document.getElementById('supplier-pie-chart');
+            if (ctx1 && ctx2) {
+                if (topSuppliersChart) topSuppliersChart.destroy();
+                if (window._sp) window._sp.destroy();
+                var sdata = state.data.suppliers.map(function(s){
+                    var t = state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===s.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0);
+                    return { name: s.name.length>20?s.name.substring(0,20):s.name, total: t };
+                }).sort(function(a,b){return b.total-a.total}).slice(0,5);
+                topSuppliersChart = new Chart(ctx1, { type:'bar', data:{ labels:sdata.map(function(s){return s.name}), datasets:[{ label:'Tong chi', data:sdata.map(function(s){return s.total}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
+                var t5 = sdata.reduce(function(s,p){return s+p.total},0);
+                var at = state.data.suppliers.reduce(function(s,p){ var t=state.data.transactions.filter(function(x){return x.type==='purchase'&&x.supplierId===p.id}).reduce(function(a,x){return a+Number(x.totalAmount||0)},0); return s+t; },0);
+                window._sp = new Chart(ctx2, { type:'doughnut', data:{ labels:sdata.map(function(s){return s.name}).concat(['Khac']), datasets:[{ data:sdata.map(function(s){return s.total}).concat([Math.max(0,at-t5)]), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
             }
-        }, 500);
+        }
+    }, 500);
     } else {
         updateDashboardContent();
     }
@@ -617,6 +559,7 @@ function renderTabContent(tab) {
                         <tbody>
                             ${displayProjects.map(p => `
                                 <tr style="cursor:pointer;" onclick="window.showProjectDetail('${p.id}')">
+                                    
                                     <td style="text-align:left;white-space:nowrap;"><strong>${escapeHtml(p.name)}</strong></td>
                                     <td style="text-align:right;white-space:nowrap;">${formatMoneyVND(parseFloat(p.budget))}</td>
                                     <td style="text-align:right;white-space:nowrap;" class="text-warning">${formatMoneyVND(parseFloat(p.spent))}</td>
@@ -658,10 +601,11 @@ function renderTabContent(tab) {
             <div class="sec-title" style="display:flex;justify-content:space-between;"><span>🏭 CHI TIẾT TẤT CẢ NHÀ CUNG CẤP</span><select id="sup-limit" onchange="switchDashboardTab('suppliers')" style="width:100px;"><option value="50">50</option><option value="100">100</option><option value="500">500</option><option value="9999">All</option></select></div>
                 <div class="tbl-wrap">
                     <table class="dashboard-table" style="min-width:800px;">
-                        <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th><table></thead>
+                        <thead><tr><th style="text-align:left;">Tên</th><th style="text-align:left;">SĐT</th><th style="text-align:left;">Email</th><th style="text-align:right;">Tổng chi</th><th style="text-align:center;">Số lần</th><th style="text-align:right;">TB/Lần</th></tr></thead>
                         <tbody>
                             ${displaySuppliers.map(s => `
                                 <tr style="cursor:pointer;" onclick="window.showSupplierDetail('${s.id}')">
+                                    
                                     <td style="text-align:left;"><strong>${escapeHtml(s.name)}</strong></td>
                                     <td style="text-align:left;">${s.phone||'—'}</td>
                                     <td style="text-align:left;">${s.email||'—'}</td>
@@ -685,6 +629,7 @@ function renderTabContent(tab) {
 export function renderDashboardChart() {
     const monthlyData = getMonthlyData();
     
+    // Monthly chart
     const monthlyCtx = document.getElementById('monthly-chart');
     if (monthlyCtx) {
         if (monthlyChart) monthlyChart.destroy();
@@ -711,10 +656,12 @@ export function renderDashboardChart() {
         });
     }
     
+    // Category Pie chart
     const catCtx = document.getElementById('category-pie-chart');
     if (catCtx) {
         if (categoryPieChart) categoryPieChart.destroy();
         
+        // Tổng tồn kho theo danh mục
         const catInventory = {};
         state.data.materials.forEach(m => {
             if (!catInventory[m.cat]) catInventory[m.cat] = 0;
@@ -749,86 +696,93 @@ export function renderDashboardChart() {
     }
 }
 
-setTimeout(() => {
-    const projCtx = document.getElementById('top-projects-chart');
-    const pieCtx = document.getElementById('budget-pie-chart');
-    if (projCtx && pieCtx && projCtx.offsetParent !== null) {
-        if (topProjectsChart) topProjectsChart.destroy();
-        if (window._budgetPie) window._budgetPie.destroy();
+// Vẽ biểu đồ cho tab projects & suppliers
+    setTimeout(() => {
+        // === TAB CÔNG TRÌNH ===
+        const projCtx = document.getElementById('top-projects-chart');
+        const pieCtx = document.getElementById('budget-pie-chart');
+        if (projCtx && pieCtx && projCtx.offsetParent !== null) {
+            if (topProjectsChart) topProjectsChart.destroy();
+            if (window._budgetPie) window._budgetPie.destroy();
+            
+            const projects2 = state.data.projects.map(p => {
+                const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+Number(t.totalAmount||0),0);
+                const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+Number(t.totalAmount||0),0);
+                return { name: p.name.length>20?p.name.substring(0,20)+'...':p.name, spent: u-r, budget: Number(p.budget||0) };
+            }).sort((a,b)=>b.spent-a.spent).slice(0,5);
+            
+            // Biểu đồ cột TOP 5
+            topProjectsChart = new Chart(projCtx, {
+                type: 'bar', data: {
+                    labels: projects2.map(p=>p.name),
+                    datasets: [{
+                        label: 'Đã chi', data: projects2.map(p=>p.spent),
+                        backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
+                        borderRadius: 6, borderWidth: 0
+                    }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
+                    scales: { y: { ticks: { callback: (v) => formatMoneyVND(v) } } }
+                }
+            });
+            
+            // Biểu đồ tròn Ngân sách
+            const totalUsed = projects2.reduce((s,p)=>s+p.spent,0);
+            const totalBud = state.data.projects.reduce((s,p)=>s+Number(p.budget||0),0);
+            window._budgetPie = new Chart(pieCtx, {
+                type: 'doughnut', data: {
+                    labels: ['Đã dùng','Còn lại'],
+                    datasets: [{ data: [totalUsed, Math.max(0,totalBud-totalUsed)], backgroundColor: ['#F09595','#97C459'], borderWidth: 0, borderRadius: 4 }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{ position:'bottom' } }
+                }
+            });
+        }
         
-        const projects2 = state.data.projects.map(p => {
-            const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+Number(t.totalAmount||0),0);
-            const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+Number(t.totalAmount||0),0);
-            return { name: p.name.length>20?p.name.substring(0,20)+'...':p.name, spent: u-r, budget: Number(p.budget||0) };
-        }).sort((a,b)=>b.spent-a.spent).slice(0,5);
-        
-        topProjectsChart = new Chart(projCtx, {
-            type: 'bar', data: {
-                labels: projects2.map(p=>p.name),
-                datasets: [{
-                    label: 'Đã chi', data: projects2.map(p=>p.spent),
-                    backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
-                    borderRadius: 6, borderWidth: 0
-                }]
-            },
-            options: { responsive:true, maintainAspectRatio:false,
-                plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
-                scales: { y: { ticks: { callback: (v) => formatMoneyVND(v) } } }
-            }
-        });
-        
-        const totalUsed = projects2.reduce((s,p)=>s+p.spent,0);
-        const totalBud = state.data.projects.reduce((s,p)=>s+Number(p.budget||0),0);
-        window._budgetPie = new Chart(pieCtx, {
-            type: 'doughnut', data: {
-                labels: ['Đã dùng','Còn lại'],
-                datasets: [{ data: [totalUsed, Math.max(0,totalBud-totalUsed)], backgroundColor: ['#F09595','#97C459'], borderWidth: 0, borderRadius: 4 }]
-            },
-            options: { responsive:true, maintainAspectRatio:false,
-                plugins: { legend:{ position:'bottom' } }
-            }
-        });
-    }
-    
-    const supCtx = document.getElementById('top-suppliers-chart');
-    const pieCtx2 = document.getElementById('supplier-pie-chart');
-    if (supCtx && pieCtx2 && supCtx.offsetParent !== null) {
-        if (topSuppliersChart) topSuppliersChart.destroy();
-        if (window._supPie) window._supPie.destroy();
-        
-        const sups2 = state.data.suppliers.map(s => {
-            const total = state.data.transactions.filter(t=>t.type==='purchase'&&t.supplierId===s.id).reduce((a,t)=>a+Number(t.totalAmount||0),0);
-            return { name: s.name.length>20?s.name.substring(0,20)+'...':s.name, total };
-        }).sort((a,b)=>b.total-a.total).slice(0,5);
-        
-        topSuppliersChart = new Chart(supCtx, {
-            type: 'bar', data: {
-                labels: sups2.map(s=>s.name),
-                datasets: [{
-                    label: 'Tổng chi', data: sups2.map(s=>s.total),
-                    backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
-                    borderRadius: 6, borderWidth: 0
-                }]
-            },
-            options: { indexAxis: 'y', responsive:true, maintainAspectRatio:false,
-                plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
-                scales: { x: { ticks: { callback: (v) => formatMoneyVND(v) } } }
-            }
-        });
-        
-        const top5Total = sups2.reduce((s,p)=>s+p.total,0);
-        const allTotal = state.data.suppliers.reduce((s,p)=>{ const t=state.data.transactions.filter(x=>x.type==='purchase'&&x.supplierId===p.id).reduce((a,x)=>a+Number(x.totalAmount||0),0); return s+t; },0);
-        window._supPie = new Chart(pieCtx2, {
-            type: 'doughnut', data: {
-                labels: [...sups2.map(s=>s.name), 'Khác'],
-                datasets: [{ data: [...sups2.map(s=>s.total), Math.max(0,allTotal-top5Total)], backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth: 0, borderRadius: 4 }]
-            },
-            options: { responsive:true, maintainAspectRatio:false,
-                plugins: { legend:{ position:'bottom', labels:{ padding:10, usePointStyle:true } } }
-            }
-        });
-    }
-}, 400);
+        // === TAB NHÀ CUNG CẤP ===
+        const supCtx = document.getElementById('top-suppliers-chart');
+        const pieCtx2 = document.getElementById('supplier-pie-chart');
+        if (supCtx && pieCtx2 && supCtx.offsetParent !== null) {
+            if (topSuppliersChart) topSuppliersChart.destroy();
+            if (window._supPie) window._supPie.destroy();
+            
+            const sups2 = state.data.suppliers.map(s => {
+                const total = state.data.transactions.filter(t=>t.type==='purchase'&&t.supplierId===s.id).reduce((a,t)=>a+Number(t.totalAmount||0),0);
+                return { name: s.name.length>20?s.name.substring(0,20)+'...':s.name, total };
+            }).sort((a,b)=>b.total-a.total).slice(0,5);
+            
+            // Biểu đồ cột TOP 5 NCC
+            topSuppliersChart = new Chart(supCtx, {
+                type: 'bar', data: {
+                    labels: sups2.map(s=>s.name),
+                    datasets: [{
+                        label: 'Tổng chi', data: sups2.map(s=>s.total),
+                        backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'],
+                        borderRadius: 6, borderWidth: 0
+                    }]
+                },
+                options: { indexAxis: 'y', responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: (ctx) => formatMoneyVND(ctx.raw) } } },
+                    scales: { x: { ticks: { callback: (v) => formatMoneyVND(v) } } }
+                }
+            });
+            
+            // Biểu đồ tròn Tỷ lệ chi
+            const top5Total = sups2.reduce((s,p)=>s+p.total,0);
+            const allTotal = state.data.suppliers.reduce((s,p)=>{ const t=state.data.transactions.filter(x=>x.type==='purchase'&&x.supplierId===p.id).reduce((a,x)=>a+Number(x.totalAmount||0),0); return s+t; },0);
+            window._supPie = new Chart(pieCtx2, {
+                type: 'doughnut', data: {
+                    labels: [...sups2.map(s=>s.name), 'Khác'],
+                    datasets: [{ data: [...sups2.map(s=>s.total), Math.max(0,allTotal-top5Total)], backgroundColor: ['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth: 0, borderRadius: 4 }]
+                },
+                options: { responsive:true, maintainAspectRatio:false,
+                    plugins: { legend:{ position:'bottom', labels:{ padding:10, usePointStyle:true } } }
+                }
+            });
+        }
+    }, 400);
 
 // ========== EVENT BINDING ==========
 
@@ -845,17 +799,9 @@ export function bindDashboardSearchEvents() {
 
 export function renderCharts() {}
 export function renderProjectCharts() {}
-
-// Lắng nghe sự kiện từ socket.io để clear cache
-if (typeof window !== 'undefined' && window.socket) {
-    window.socket.on('dataChanged', function() {
-        clearDashboardCache();
-        console.log('🔄 Socket: dataChanged - cache cleared');
-    });
-}
-
-window.clearDashboardCache = clearDashboardCache;
+window.renderDashboardChart = renderDashboardChart;
 window.renderDashboardChart = renderDashboardChart;
 window.getFilteredTransactions = getFilteredTransactions;
+window.renderDashboardChart = renderDashboardChart;
 window.topProjectsChart = topProjectsChart;
 window.topSuppliersChart = topSuppliersChart;

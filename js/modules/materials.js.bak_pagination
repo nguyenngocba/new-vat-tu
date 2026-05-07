@@ -412,98 +412,23 @@ export function deleteMaterial(mid) {
 }
 
 // ========== XEM CHI TIẾT VẬT TƯ ==========
-window.showMaterialDetail = function(mid, page = 1, limit = 20) {
+window.showMaterialDetail = function(mid) {
     const mat = matById(mid);
     if (!mat) return;
 
     // Lấy giao dịch nhập
-    let purchaseTxns = state.data.transactions
+    const purchaseTxns = state.data.transactions
         .filter(t => t.mid === mid && t.type === 'purchase')
-        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
-    
-    const totalPurchase = purchaseTxns.length;
-    const purchasePages = Math.ceil(totalPurchase / limit);
-    const purchaseStart = (page - 1) * limit;
-    const purchaseEnd = purchaseStart + limit;
-    const paginatedPurchase = purchaseTxns.slice(purchaseStart, purchaseEnd);
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date)).reverse();
 
     // Lấy giao dịch xuất và trả
-    let exportTxns = state.data.transactions
+    const exportTxns = state.data.transactions
         .filter(t => t.mid === mid && (t.type === 'usage' || t.type === 'return' || t.type === 'produce' || t.type === 'transfer_sw' || t.type === 'return_from_sw'))
         .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
-    
-    const totalExport = exportTxns.length;
-    const exportPages = Math.ceil(totalExport / limit);
-    const exportStart = (page - 1) * limit;
-    const exportEnd = exportStart + limit;
-    const paginatedExport = exportTxns.slice(exportStart, exportEnd);
-
     // Tính tổng
     const totalImport = purchaseTxns.reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
-    const totalExportSum = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
+    const totalExport = exportTxns.filter(t => t.type === 'usage').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
     const totalReturn = exportTxns.filter(t => t.type === 'return').reduce((s, t) => s + Number(Number(t.totalAmount || 0)), 0);
-
-    // Tạo HTML cho bảng nhập
-    let purchaseHtml = '';
-    if (paginatedPurchase.length > 0) {
-        purchaseHtml = paginatedPurchase.map(t => {
-            const sup = state.data.suppliers.find(s => s.id === t.supplierId);
-            return `<tr>
-                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-                <td style="text-align:left;"><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
-                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
-                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
-                <td style="text-align:center;">${parseFloat(t.vatRate||0)}%</td>
-                <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
-                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
-                <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
-            </tr>`;
-        }).join('');
-    } else {
-        purchaseHtml = '<tr><td colspan="8" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>';
-    }
-
-    // Tạo HTML cho bảng xuất
-    let exportHtml = '';
-    if (paginatedExport.length > 0) {
-        exportHtml = paginatedExport.map(t => {
-            const proj = state.data.projects.find(p => p.id === t.projectId);
-            const isReturn = t.type === 'return';
-            const isTransferSW = t.type === 'transfer_sw';
-            const isReturnFromSW = t.type === 'return_from_sw';
-            const isProduce = t.type === 'produce';
-            return `<tr>
-                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
-                <td style="color:${isProduce?'var(--accent)':isReturn?'var(--success-text)':isTransferSW?'var(--accent-text)':'var(--warn-text)'};font-weight:bold;">
-                    ${isProduce ? '🏭 Sản xuất' : isReturn ? '🔄 Trả hàng' : isTransferSW ? (isReturnFromSW ? "🔄 Trả về kho chính" : '📦 Chuyển kho CK') : '📤 Xuất kho'}
-                </td>
-                <td><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
-                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
-                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
-                <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
-                <td>${escapeHtml(t.note || '—')}</td>
-                <td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
-            </tr>`;
-        }).join('');
-    } else {
-        exportHtml = '<tr><td colspan="8" style="text-align:center;">📭 Chưa có giao dịch xuất</td></tr>';
-    }
-
-    // Tạo phân trang HTML
-    const maxPages = Math.max(purchasePages, exportPages);
-    const paginationHtml = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 12px; background: var(--surface2); border-radius: 8px;">
-            <button class="sm" onclick="window.showMaterialDetail('${mid}', ${page-1}, ${limit})" ${page <= 1 ? 'disabled' : ''}>◀ Trang trước</button>
-            <span>Trang ${page} / ${maxPages}</span>
-            <button class="sm" onclick="window.showMaterialDetail('${mid}', ${page+1}, ${limit})" ${page >= maxPages ? 'disabled' : ''}>Trang sau ▶</button>
-            <select id="pagination-limit" onchange="window.showMaterialDetail('${mid}', 1, parseInt(this.value))" style="width: 80px;">
-                <option value="20" ${limit === 20 ? 'selected' : ''}>20</option>
-                <option value="50" ${limit === 50 ? 'selected' : ''}>50</option>
-                <option value="100" ${limit === 100 ? 'selected' : ''}>100</option>
-                <option value="500" ${limit === 500 ? 'selected' : ''}>500</option>
-            </select>
-        </div>
-    `;
 
     const html = `
         <div class="modal-hd" style="background: var(--accent-bg);">
@@ -512,19 +437,72 @@ window.showMaterialDetail = function(mid, page = 1, limit = 20) {
         </div>
         <div class="modal-bd" style="max-height: 70vh; overflow-y: auto;">
             <div class="grid4" style="margin-bottom: 20px;">
-                <div class="metric-card"><div class="metric-label">📦 TỒN KHO</div><div class="metric-val">${parseFloat(mat.qty).toLocaleString('vi-VN')} ${mat.unit}</div></div>
-                <div class="metric-card"><div class="metric-label">💰 ĐƠN GIÁ</div><div class="metric-val">${formatMoneyVND(mat.cost)}</div></div>
-                <div class="metric-card"><div class="metric-label">📥 TỔNG NHẬP</div><div class="metric-val" style="color: var(--success-text);">${formatMoneyVND(totalImport)}</div></div>
-                <div class="metric-card"><div class="metric-label">📤 TỔNG XUẤT</div><div class="metric-val" style="color: var(--warn-text);">${formatMoneyVND(totalExportSum - totalReturn)}</div></div>
+                <div class="metric-card">
+                    <div class="metric-label">📦 TỒN KHO</div>
+                    <div class="metric-val" style="font-size:18px;">${parseFloat(mat.qty).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">💰 ĐƠN GIÁ</div>
+                    <div class="metric-val" style="font-size:18px;">${formatMoneyVND(mat.cost)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📥 TỔNG NHẬP</div>
+                    <div class="metric-val" style="font-size:18px; color: var(--success-text);">${formatMoneyVND(totalImport)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">📤 TỔNG XUẤT</div>
+                    <div class="metric-val" style="font-size:18px; color: var(--warn-text);">${formatMoneyVND(totalExport - totalReturn)}</div>
+                </div>
             </div>
 
-            <div class="sec-title">📥 LỊCH SỬ NHẬP KHO (${totalPurchase} giao dịch)</div>
-            <div class="tbl-wrap"><table style="min-width: 750px;"><thead><tr><th>Thời gian</th><th>Nhà cung cấp</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:center;">VAT</th><th style="text-align:right;">Thành tiền</th><th>Ghi chú</th><th>File</th></tr></thead><tbody>${purchaseHtml}</tbody></table></div>
+            <div class="sec-title">📥 LỊCH SỬ NHẬP KHO (${purchaseTxns.length} giao dịch)</div>
+            <div class="tbl-wrap" style="margin-bottom: 20px;">
+                <table style="min-width: 750px;">
+                    <thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:left;">Nhà cung cấp</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:center;">VAT</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th><th style="text-align:center;">File</th></tr></thead>
+                    <tbody>
+                        ${purchaseTxns.length > 0 ? purchaseTxns.map(t => {
+                            const sup = state.data.suppliers.find(s => s.id === t.supplierId);
+                            return `<tr>
+                                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
+                                <td style="text-align:left;"><strong>${escapeHtml(sup?.name || 'N/A')}</strong></td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
+                                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
+                                <td style="text-align:center;">${parseFloat(t.vatRate||0)}%</td>
+                                <td style="text-align:right;color:var(--success-text);font-weight:bold;">${formatMoneyVND(t.totalAmount)}</td>
+				<td style="text-align:left;">${escapeHtml(t.note || '—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>                              	
+                            </tr>`;
+                        }).join('') : '<tr><td colspan="8" style="text-align:center;">📭 Chưa có giao dịch nhập</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
 
-            <div class="sec-title">📤 LỊCH SỬ XUẤT KHO (${totalExport} giao dịch)</div>
-            <div class="tbl-wrap"><table style="min-width: 750px;"><thead><tr><th>Thời gian</th><th style="text-align:center;">Loại</th><th>Công trình</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th>Ghi chú</th><th>File</th></tr></thead><tbody>${exportHtml}</tbody></table></div>
-            
-            ${paginationHtml}
+            <div class="sec-title">📤 LỊCH SỬ XUẤT KHO (${exportTxns.length} giao dịch)</div>
+            <div class="tbl-wrap">
+                <table style="min-width: 750px;">
+                    <thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:center;">Loại</th><th style="text-align:left;">Công trình</th><th style="text-align:right;">SL</th><th style="text-align:right;">Đơn giá</th><th style="text-align:right;">Thành tiền</th><th style="text-align:left;">Ghi chú</th><th style="text-align:center;">File</th></tr></thead>
+                    <tbody>
+                        ${exportTxns.length > 0 ? exportTxns.map(t => {
+                            const proj = state.data.projects.find(p => p.id === t.projectId);
+                            const isReturn = t.type === 'return';
+			    const isTransferSW = t.type === 'transfer_sw';                            
+                            const isReturnFromSW = t.type === 'return_from_sw';
+			    const isProduce = t.type === 'produce';
+                            return `<tr>
+                                <td style="white-space:nowrap;">${formatDateTime(t.datetime || t.date)}</td>
+<td style="color:${isProduce?'var(--accent)':isReturn?'var(--success-text)':isTransferSW?'var(--accent-text)':'var(--warn-text)'};font-weight:bold;">
+    ${isProduce ? '🏭 Sản xuất' : isReturn ? '🔄 Trả hàng' : isTransferSW ? isReturnFromSW ? "🔄 Trả về kho chính" : '📦 Chuyển kho CK' : '📤 Xuất kho'}
+</td>
+                               
+                                <td style="text-align:left;"><strong>${escapeHtml(proj?.name || 'N/A')}</strong></td>
+                                <td style="text-align:right;">${parseFloat(t.qty||0).toLocaleString('vi-VN', {minimumFractionDigits:0, maximumFractionDigits:3})} ${mat.unit}</td>
+                                <td style="text-align:right;">${formatMoneyVND(parseFloat(t.unitPrice))}</td>
+                                <td style="text-align:right;font-weight:bold;color:${isReturn?'var(--success-text)':'var(--warn-text)'};">${isReturn?'- ':''}${formatMoneyVND(t.totalAmount)}</td>
+                                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td><td style="text-align:center;">${t.attachment && t.attachment !== '[]' && t.attachment !== 'null' && t.attachment !== '' ? JSON.parse(t.attachment).map(f => `<a href="${f}" target="_blank">📎</a>`).join(' ') : '—'}</td>
+                            </tr>`;
+                        }).join('') : '<tr><td colspan="8" style="text-align:center;">📭 Chưa có giao dịch xuất</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="modal-ft">
             <button onclick="closeModal()">Đóng</button>
@@ -533,6 +511,7 @@ window.showMaterialDetail = function(mid, page = 1, limit = 20) {
 
     showModal(html, null);
 };
+
 // ========== XUẤT EXCEL CHI TIẾT VẬT TƯ ==========
 window.exportMaterialDetail = function(mid) {
     const mat = matById(mid);
