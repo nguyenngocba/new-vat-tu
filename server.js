@@ -181,17 +181,48 @@ app.get('/api/structures', async (req, res) => {
         res.json({ success: true, structures: s.rows, materials: m.rows });
     } catch(e) { res.json({ success: false, error: e.message }); }
 });
-
 app.post('/api/structures', async (req, res) => {
     const s = req.body;
-    await pool.query('INSERT INTO structures (id, name, unit, qty, cost, note) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO UPDATE SET name=$2, unit=$3, qty=$4, cost=$5, note=$6', [s.id, s.name, s.unit, s.qty, s.cost, s.note||'']);
-    // Lưu BOM
-    await pool.query('DELETE FROM structure_materials WHERE structure_id=$1', [s.id]);
-    for (const m of (s.materials||[])) {
-        await pool.query('INSERT INTO structure_materials (structure_id, material_id, material_name, unit, quantity) VALUES ($1,$2,$3,$4,$5)', [s.id, m.materialId, m.materialName, m.unit, m.quantity]);
+    try {
+        await pool.query('BEGIN');
+        
+        // Lưu cấu kiện
+        await pool.query(`
+            INSERT INTO structures (id, name, unit, qty, cost, note) 
+            VALUES ($1, $2, $3, $4, $5, $6) 
+            ON CONFLICT (id) DO UPDATE SET 
+                name = EXCLUDED.name, 
+                unit = EXCLUDED.unit, 
+                qty = EXCLUDED.qty, 
+                cost = EXCLUDED.cost, 
+                note = EXCLUDED.note
+        `, [s.id, s.name, s.unit, s.qty || 0, s.cost || 0, s.note || '']);
+        
+        // Xóa BOM cũ (chỉ xóa khi có dữ liệu)
+        if (s.materials && s.materials.length > 0) {
+            await pool.query('DELETE FROM structure_materials WHERE structure_id = $1', [s.id]);
+            
+            // Thêm BOM mới
+            for (const m of s.materials) {
+                await pool.query(`
+                    INSERT INTO structure_materials (structure_id, material_id, material_name, unit, quantity) 
+                    VALUES ($1, $2, $3, $4, $5)
+                    ON CONFLICT (structure_id, material_id) DO UPDATE SET
+                        material_name = EXCLUDED.material_name,
+                        unit = EXCLUDED.unit,
+                        quantity = EXCLUDED.quantity
+                `, [s.id, m.materialId, m.materialName, m.unit, m.quantity]);
+            }
+        }
+        
+        await pool.query('COMMIT');
+        await clearCache();
+        res.json({ success: true });
+    } catch(e) {
+        await pool.query('ROLLBACK');
+        console.error('Lỗi save structure:', e);
+        res.json({ success: false, error: e.message });
     }
-    await clearCache();
-    res.json({ success: true });
 });
 
 app.delete('/api/structures/:id', async (req, res) => {

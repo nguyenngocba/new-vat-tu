@@ -295,104 +295,25 @@ window.deleteStructure = function(sid) {
 window.showStructureDetail = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     if (!s) return;
-    
-    // Lấy lịch sử sản xuất
-    const produceTxns = state.data.transactions
-        .filter(t => t.mid === sid && t.type === 'produce')
-        .sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
-    
-    // Lấy lịch sử xuất cấu kiện ra công trình
-    const exportTxns = state.data.transactions
-        .filter(t => t.mid === sid && t.type === 'structure_export')
-        .sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
-    
+    const produceTxns = state.data.transactions.filter(t => t.mid === sid && t.type === 'produce').sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
     const totalProduced = produceTxns.reduce((sum, t) => sum + Number(t.qty||0), 0);
-    const totalExported = exportTxns.reduce((sum, t) => sum + Number(t.qty||0), 0);
-    const currentStock = Number(s.qty || 0);
-    
-    // Kết hợp cả 2 loại lịch sử
-    const allHistory = [...produceTxns.map(t => ({ ...t, historyType: 'produce' })), ...exportTxns.map(t => ({ ...t, historyType: 'export' }))]
-        .sort((a,b) => new Date(b.datetime||b.date) - new Date(a.datetime||a.date));
-    
-    let historyHtml = '';
-    if (allHistory.length > 0) {
-        historyHtml = allHistory.map(t => {
-            const isProduce = t.historyType === 'produce';
-            const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}) : t.date;
-            const projectName = !isProduce ? (state.data.projects.find(p => p.id === t.projectId)?.name || 'N/A') : '';
-            return `<tr>
-                <td style="white-space:nowrap;">${dt}</td>
-                <td style="text-align:center; ${isProduce ? 'color:var(--accent);' : 'color:var(--warn-text);'} font-weight:bold;">
-                    ${isProduce ? '🏭 Sản xuất' : '📤 Xuất ra CT'}
-                </td>
-                <td style="text-align:center;">${!isProduce ? escapeHtml(projectName) : '—'}</td>
-                <td style="text-align:right;">${Number(t.qty||0).toLocaleString('vi-VN')} ${s.unit}</td>
-                <td style="text-align:left;">${escapeHtml(t.note || '—')}</td>
-            </tr>`;
-        }).join('');
-    } else {
-        historyHtml = '<tr><td colspan="5" style="text-align:center;">📭 Chưa có lịch sử</td></tr>';
-    }
-    
-    let html = `<div class="modal-hd" style="background:var(--accent-bg);">
-        <span class="modal-title" style="font-size:20px;">🏗️ Cấu kiện: ${escapeHtml(s.name)} (${s.id})</span>
-        <button class="xbtn" onclick="closeModal()">✕</button>
-    </div>
+    let html = `<div class="modal-hd" style="background:var(--accent-bg);"><span class="modal-title" style="font-size:20px;">🏗️ Cấu kiện: ${escapeHtml(s.name)} (${s.id})</span><button class="xbtn" onclick="closeModal()">✕</button></div>
     <div class="modal-bd" style="max-height:70vh;overflow-y:auto;">
         <div class="grid4" style="margin-bottom:20px;">
-            <div class="metric-card">
-                <div class="metric-label">📦 TỒN KHO</div>
-                <div class="metric-val" style="font-size:18px;">${currentStock.toLocaleString('vi-VN')} ${s.unit}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">💰 ĐƠN GIÁ</div>
-                <div class="metric-val" style="font-size:18px;">${formatMoneyVND(s.cost)}</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">🏭 ĐÃ SẢN XUẤT</div>
-                <div class="metric-val" style="font-size:18px;color:var(--accent);">${totalProduced.toLocaleString('vi-VN')} ${s.unit}</div>
-                <div class="metric-sub">${produceTxns.length} lần sản xuất</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">📤 ĐÃ XUẤT CT</div>
-                <div class="metric-val" style="font-size:18px;color:var(--warn-text);">${totalExported.toLocaleString('vi-VN')} ${s.unit}</div>
-                <div class="metric-sub">${exportTxns.length} lần xuất</div>
-            </div>
+            <div class="metric-card"><div class="metric-label">📦 TỒN KHO</div><div class="metric-val" style="font-size:18px;">${Number(s.qty||0).toLocaleString('vi-VN')} ${s.unit}</div></div>
+            <div class="metric-card"><div class="metric-label">💰 ĐƠN GIÁ</div><div class="metric-val" style="font-size:18px;">${formatMoneyVND(s.cost)}</div></div>
+            <div class="metric-card"><div class="metric-label">🏭 ĐÃ SẢN XUẤT</div><div class="metric-val" style="font-size:18px;color:var(--accent);">${totalProduced} ${s.unit}</div></div>
+            <div class="metric-card"><div class="metric-label">📋 SỐ LẦN</div><div class="metric-val" style="font-size:18px;">${produceTxns.length}</div></div>
         </div>
-        
         <div class="sec-title">📦 THÀNH PHẦN (BOM)</div>
-        <div class="tbl-wrap" style="margin-bottom:20px;">
-            <table style="min-width:400px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">SL / 1 cấu kiện</th><th>ĐVT</th></tr></thead>
-                <tbody>${(s.materials||[]).map(m => `<tr><td style="text-align:left;">${escapeHtml(m.materialName)}</td><td style="text-align:right;">${Number(m.quantity).toLocaleString('vi-VN')}</td><td>${m.unit}</td></tr>`).join('')}</tbody>
-            </table>
-        </div>
-        
-        <div class="sec-title">📜 LỊCH SỬ (${allHistory.length} giao dịch)</div>
-        <div class="tbl-wrap">
-            <table style="min-width:600px;">
-                <thead>
-                    <tr>
-                        <th style="text-align:left;">Thời gian</th>
-                        <th style="text-align:center;">Loại</th>
-                        <th style="text-align:center;">Công trình</th>
-                        <th style="text-align:right;">Số lượng</th>
-                        <th style="text-align:left;">Ghi chú</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${historyHtml}
-                </tbody>
-            </table>
-        </div>
+        <div class="tbl-wrap"><table style="min-width:400px;"><thead><tr><th>Vật tư</th><th style="text-align:right;">SL / 1 cấu kiện</th><th>ĐVT</th></tr></thead><tbody>${(s.materials||[]).map(m => `<tr><td>${escapeHtml(m.materialName)}</td><td style="text-align:right;">${Number(m.quantity).toLocaleString('vi-VN')} ${m.unit}</td><td>${m.unit}</td></tr>`).join('')}</tbody></table></div>
+        <div class="sec-title">🏭 LỊCH SỬ SẢN XUẤT (${produceTxns.length} lần)</div>
+        <div class="tbl-wrap"><table style="min-width:600px;"><thead><tr><th style="text-align:left;">Thời gian</th><th style="text-align:right;">SL</th><th style="text-align:left;">Ghi chú</th></tr></thead><tbody>${produceTxns.length > 0 ? produceTxns.map(t => { const dt = t.datetime ? new Date(t.datetime).toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}) : t.date; return `<tr><td style="white-space:nowrap;">${dt}</td><td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(t.qty||0).toLocaleString('vi-VN')} ${s.unit}</td><td>${escapeHtml(t.note||'—')}</td></tr>`; }).join('') : '<tr><td colspan="3" style="text-align:center;">📭 Chưa có lịch sử sản xuất</td></tr>'}</tbody></table></div>
     </div>
-    <div class="modal-ft">
-        <button onclick="closeModal()">Đóng</button>
-        <button class="primary" onclick="closeModal();window.produceStructure('${sid}')">🏭 Sản xuất</button>
-        <button class="primary" style="background:var(--warn);" onclick="closeModal();window.exportStructure('${sid}')">📤 Xuất cấu kiện</button>
-    </div>`;
-    
+    <div class="modal-ft"><button onclick="closeModal()">Đóng</button><button class="primary" onclick="closeModal();window.produceStructure('${sid}')">🏭 Sản xuất</button></div>`;
     showModal(html, null);
 };
+
 window.exportStructure = function(sid) {
     const s = (state.data.structures||[]).find(x => x.id === sid);
     addLog("Mở modal xuất cấu kiện", `${s?.name} - Tồn: ${s?.qty} ${s?.unit}`);
