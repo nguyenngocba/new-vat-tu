@@ -181,6 +181,7 @@ app.get('/api/structures', async (req, res) => {
         res.json({ success: true, structures: s.rows, materials: m.rows });
     } catch(e) { res.json({ success: false, error: e.message }); }
 });
+
 app.post('/api/structures', async (req, res) => {
     const s = req.body;
     try {
@@ -198,20 +199,18 @@ app.post('/api/structures', async (req, res) => {
                 note = EXCLUDED.note
         `, [s.id, s.name, s.unit, s.qty || 0, s.cost || 0, s.note || '']);
         
-        // Xóa BOM cũ (chỉ xóa khi có dữ liệu)
-        if (s.materials && s.materials.length > 0) {
-            await pool.query('DELETE FROM structure_materials WHERE structure_id = $1', [s.id]);
-            
-            // Thêm BOM mới
+        // Xóa BOM cũ
+        await pool.query('DELETE FROM structure_materials WHERE structure_id = $1', [s.id]);
+        
+        // Thêm BOM mới
+        if (s.materials && Array.isArray(s.materials) && s.materials.length > 0) {
             for (const m of s.materials) {
-                await pool.query(`
-                    INSERT INTO structure_materials (structure_id, material_id, material_name, unit, quantity) 
-                    VALUES ($1, $2, $3, $4, $5)
-                    ON CONFLICT (structure_id, material_id) DO UPDATE SET
-                        material_name = EXCLUDED.material_name,
-                        unit = EXCLUDED.unit,
-                        quantity = EXCLUDED.quantity
-                `, [s.id, m.materialId, m.materialName, m.unit, m.quantity]);
+                if (m.materialId && m.quantity) {
+                    await pool.query(`
+                        INSERT INTO structure_materials (structure_id, material_id, material_name, unit, quantity) 
+                        VALUES ($1, $2, $3, $4, $5)
+                    `, [s.id, m.materialId, m.materialName || '', m.unit || '', m.quantity]);
+                }
             }
         }
         
@@ -224,7 +223,6 @@ app.post('/api/structures', async (req, res) => {
         res.json({ success: false, error: e.message });
     }
 });
-
 app.delete('/api/structures/:id', async (req, res) => {
     await pool.query('DELETE FROM structures WHERE id=$1', [req.params.id]);
     await pool.query('DELETE FROM structure_materials WHERE structure_id=$1', [req.params.id]);
