@@ -522,6 +522,7 @@ export function renderDashboard() {
 function renderFiltersAndTabs() {
     return `
         <div class="dashboard-tabs">
+	    <div class="dashboard-tab ${currentDashboardTab==='forecast'?'active':''}" onclick="window.switchDashboardTab('forecast')">📈 Dự báo</div>
             <div class="dashboard-tab ${currentDashboardTab==='overview'?'active':''}" onclick="window.switchDashboardTab('overview')">📊 Tổng quan</div>
             <div class="dashboard-tab ${currentDashboardTab==='projects'?'active':''}" onclick="window.switchDashboardTab('projects')">🏗️ Công trình</div>
             <div class="dashboard-tab ${currentDashboardTab==='suppliers'?'active':''}" onclick="window.switchDashboardTab('suppliers')">🏭 Nhà cung cấp</div>
@@ -533,7 +534,7 @@ function renderFiltersAndTabs() {
 window.switchDashboardTab = function(tab) {
     currentDashboardTab = tab;
     clearDashboardCache();   
- if (tab === 'projects' || tab === 'suppliers' || tab === 'structures') {
+ if (tab === 'projects' || tab === 'suppliers' || tab === 'structures' || tab === 'forecast') {
         document.getElementById('pane-dashboard').innerHTML = renderTabContent(tab);
         setTimeout(function(){
             if (tab === 'projects') {
@@ -570,8 +571,11 @@ window.switchDashboardTab = function(tab) {
                 }
             }
 	    if (tab === 'structures') {
-                renderStructureDashboardCharts();
+                renderStructureDashboardCharts();            
 		}
+		if (tab === 'forecast') {
+		 loadForecast();
+            }
         }, 500);
     } else {
         updateDashboardContent();
@@ -726,6 +730,21 @@ function renderTabContent(tab) {
                 ${renderStructureInventory(stats)}
             </div>
         `;
+    }
+    if (tab === 'forecast') {
+        return `
+            ${renderFiltersAndTabs()}
+            <div class="card">
+                <div class="sec-title">📦 DỰ BÁO NHU CẦU VẬT TƯ (3 tháng gần nhất)</div>
+                <div id="forecast-container">
+                    <div class="metric-sub" style="text-align:center;">Đang tải dữ liệu...</div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tab === 'forecast') {
+        return ;
     }
 
     return '';
@@ -910,3 +929,66 @@ window.renderDashboardChart = renderDashboardChart;
 window.getFilteredTransactions = getFilteredTransactions;
 window.topProjectsChart = topProjectsChart;
 window.topSuppliersChart = topSuppliersChart;
+// ========== DỰ BÁO NHU CẦU ==========
+async function loadForecast() {
+    console.log('🔍 loadForecast called');
+    const container = document.getElementById('forecast-container');
+    console.log('📦 container:', container);
+    if (!container) {
+        console.log('❌ forecast-container not found');
+        return;
+    }
+    
+    container.innerHTML = '<div class="metric-sub" style="text-align:center;">🔄 Đang tải dữ liệu...</div>';
+    
+    try {
+        console.log('📡 Gọi API /api/forecast...');
+        const res = await fetch('/api/forecast');
+        const data = await res.json();
+        console.log('📊 API response:', data);
+        
+        if (!data.success || !data.data || data.data.length === 0) {
+            container.innerHTML = '<div class="metric-sub" style="text-align:center;">📭 Chưa có dữ liệu dự báo</div>';
+            return;
+        }
+        
+        let html = '<div class="tbl-wrap"><table style="min-width:800px;"><thead><tr>' +
+            '<th>Vật tư</th><th>ĐVT</th><th style="text-align:right;">Tồn kho</th>' +
+            '<th style="text-align:right;">TB tháng</th><th style="text-align:right;">Đề xuất nhập</th>' +
+            '<th>Trạng thái</th><th>Gợi ý</th>' +
+            '</thead><tbody>';
+        
+        data.data.forEach(item => {
+            const statusClass = item.warning_level === 'danger' ? 'b-danger' : item.warning_level === 'warning' ? 'b-low' : 'b-ok';
+            let suggestion = '';
+            if (item.current_stock <= item.min_stock) {
+                suggestion = '⚠️ Cần nhập gấp!';
+            } else if (item.total_exported > 0 && item.current_stock < item.avg_monthly_usage) {
+                suggestion = `📦 Nên nhập ${item.suggested_order} ${item.unit}`;
+            } else {
+                suggestion = '✅ Tạm ổn';
+            }
+            
+            html += `<tr onclick="window.showMaterialDetail('${item.id}')" style="cursor:pointer;">
+                <td><strong>${escapeHtml(item.name)}</strong></td>
+                <td>${item.unit}</span></td>
+                <td style="text-align:right; ${item.warning_level !== 'good' ? 'color:var(--danger-text);font-weight:bold;' : ''}">${Number(item.current_stock).toLocaleString('vi-VN')}</span></td>
+                <td style="text-align:right;">${Number(item.avg_monthly_usage).toLocaleString('vi-VN')}</span></td>
+                <td style="text-align:right;color:var(--accent);font-weight:bold;">${Number(item.suggested_order).toLocaleString('vi-VN')} ${item.unit}</span></td>
+                <td><span class="badge ${statusClass}">${item.status}</span></span></td>
+                <td>${suggestion}</span></td>
+              </tr>`;
+        });
+        
+        html += '</tbody></table></div>';
+        html += '<div class="metric-sub" style="margin-top:12px;">📌 Dự báo dựa trên nhu cầu 3 tháng gần nhất (trung bình tháng × 2 - tồn kho)</div>';
+        container.innerHTML = html;
+        console.log('✅ Forecast rendered successfully');
+    } catch(e) {
+        console.error('❌ Forecast error:', e);
+        container.innerHTML = '<div class="metric-sub" style="text-align:center;">❌ Lỗi tải dữ liệu: ' + e.message + '</div>';
+    }
+}
+
+// Export global
+window.loadForecast = loadForecast;

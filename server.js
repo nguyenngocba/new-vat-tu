@@ -404,4 +404,68 @@ app.post('/api/return-from-sw', async (req, res) => {
         res.json({ success: false, error: e.message });
     }
 });
+// ========== DỰ BÁO NHU CẦU VẬT TƯ ==========
+app.get('/api/forecast', async (req, res) => {
+    console.log('📊 Forecast API called');
+    try {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        
+        console.log('📊 Forecast API called, 3 months ago:', threeMonthsAgo);
+        
+        const forecast = await pool.query(`
+            SELECT 
+                m.id, 
+                m.name, 
+                m.unit, 
+                m.qty as current_stock, 
+                m.low as min_stock,
+                COALESCE(SUM(CASE WHEN t.type = 'usage' AND t.datetime >= $1 THEN t.qty ELSE 0 END), 0) as total_exported
+            FROM materials m
+            LEFT JOIN transactions t ON t.mid = m.id
+            GROUP BY m.id, m.name, m.unit, m.qty, m.low
+            ORDER BY m.name
+        `, [threeMonthsAgo]);
+        
+        console.log('📊 Query returned:', forecast.rows.length, 'rows');
+        
+        const result = forecast.rows.map(row => {
+            const avgMonthlyUsage = row.total_exported / 3;
+            const suggestedOrder = Math.max(0, Math.ceil((avgMonthlyUsage * 2) - Number(row.current_stock)));
+            
+            let status = 'ĐỦ';
+            let warningLevel = 'good';
+            
+            if (Number(row.current_stock) <= Number(row.min_stock)) {
+                status = 'CẦN NHẬP NGAY';
+                warningLevel = 'danger';
+            } else if (row.total_exported > 0 && Number(row.current_stock) < avgMonthlyUsage) {
+                status = 'SẮP HẾT';
+                warningLevel = 'warning';
+            } else if (row.total_exported === 0) {
+                status = 'CHƯA XUẤT';
+                warningLevel = 'info';
+            }
+            
+            return {
+                id: row.id,
+                name: row.name,
+                unit: row.unit,
+                current_stock: Number(row.current_stock),
+                min_stock: Number(row.min_stock),
+                total_exported: Number(row.total_exported),
+                avg_monthly_usage: Math.ceil(avgMonthlyUsage),
+                suggested_order: suggestedOrder,
+                status: status,
+                warning_level: warningLevel
+            };
+        });
+        
+console.log('📊 Sending response with', result.length, 'items');
+        res.json({ success: true, data: result });
+    } catch(e) {
+        console.error('❌ Forecast API error:', e);
+        res.status(500).json({ success: false, error: e.message });
+    }
+});
 server.listen(PORT, '0.0.0.0', () => console.log('OK'));
