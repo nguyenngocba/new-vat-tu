@@ -680,27 +680,36 @@ function renderTabContent(tab) {
             </div>
         `;
     }
-       if (tab === 'structures') {
-        const stats = getStructureStats();
-        return filters + renderStructureKPIs(stats) + `
-            <div class="grid2" style="margin-bottom:18px;">
-                <div class="card">
-                    <div class="sec-title">📈 XU HƯỚNG SẢN XUẤT 6 THÁNG</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="top-structures-chart"></canvas></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="sec-title">📦 TỒN KHO CẤU KIỆN</div>
-                ${renderStructureInventory(stats)}
-            </div>
-        `;
-    } 
     if (tab === 'structures') {
         const stats = getStructureStats();
+        
+        // Tạo bảng top cấu kiện thay vì biểu đồ tròn
+        let topListHtml = '<div class="metric-sub" style="text-align:center;padding:20px;">📭 Chưa có dữ liệu sản xuất</div>';
+        if (stats.topProduced && stats.topProduced.length > 0) {
+            topListHtml = `
+                <div class="tbl-wrap">
+                    <table style="min-width: 300px;">
+                        <thead>
+                            <tr>
+                                <th>Tên cấu kiện</th>
+                                <th style="text-align:right;">Số lượng</th>
+                                <th>ĐVT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${stats.topProduced.map(p => `
+                                <tr>
+                                    <td><strong>${escapeHtml(p.name)}</strong></td>
+                                    <td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(p.qty).toLocaleString('vi-VN')}</td>
+                                    <td>${p.unit}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
         return filters + renderStructureKPIs(stats) + `
             <div class="grid2" style="margin-bottom:18px;">
                 <div class="card">
@@ -708,12 +717,12 @@ function renderTabContent(tab) {
                     <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
                 </div>
                 <div class="card">
-                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="top-structures-chart"></canvas></div>
+                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT NHIỀU NHẤT</div>
+                    ${topListHtml}
                 </div>
             </div>
             <div class="card">
-                <div class="sec-title">📦 TỒN KHO CẤU KIỆN</div>
+                <div class="sec-title">📦 TỒN KHO CẤU KIỆN CHI TIẾT</div>
                 ${renderStructureInventory(stats)}
             </div>
         `;

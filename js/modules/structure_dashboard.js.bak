@@ -6,7 +6,7 @@ let productionChart = null;
 
 // ========== LẤY DỮ LIỆU THỐNG KÊ ==========
 export function getStructureStats() {
-const structures = state.data.structures || [];
+    const structures = state.data.structures || [];
     const transactions = state.data.transactions || [];
     
     // Thống kê tồn kho cấu kiện
@@ -14,35 +14,35 @@ const structures = state.data.structures || [];
         id: s.id,
         name: s.name,
         unit: s.unit,
-        qty: Number(s.qty) || 0,
-        cost: Number(s.cost) || 0,
-        totalValue: (Number(s.qty) || 0) * (Number(s.cost) || 0)
+        qty: s.qty || 0,
+        cost: s.cost || 0,
+        totalValue: (s.qty || 0) * (s.cost || 0)
     })).sort((a, b) => b.totalValue - a.totalValue);
     
-    // Lọc giao dịch sản xuất (produce) - KHÔNG phân biệt chữ hoa/thường
-    const produceTxns = transactions.filter(t => t.type && t.type.toLowerCase() === 'produce');
-    const exportTxns = transactions.filter(t => t.type && t.type.toLowerCase() === 'structure_export');
-    
-    const totalProduced = produceTxns.reduce((sum, t) => sum + (Number(t.qty) || 0), 0);
+    // Thống kê sản xuất
+    const produceTxns = transactions.filter(t => t.type === 'produce');
+    const totalProduced = produceTxns.reduce((sum, t) => sum + (t.qty || 0), 0);
     const totalProductionRuns = produceTxns.length;
-    const totalExported = exportTxns.reduce((sum, t) => sum + (Number(t.qty) || 0), 0);
-    const totalExportValue = exportTxns.reduce((sum, t) => sum + (Number(t.totalAmount) || 0), 0);
+    
+    // Thống kê xuất cấu kiện ra công trình
+    const exportTxns = transactions.filter(t => t.type === 'structure_export');
+    const totalExported = exportTxns.reduce((sum, t) => sum + (t.qty || 0), 0);
+    const totalExportValue = exportTxns.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
     
     // Top cấu kiện sản xuất nhiều nhất
     const productionStats = {};
     produceTxns.forEach(t => {
         const structure = structures.find(s => s.id === t.mid);
         if (structure) {
-            const name = structure.name;
-            if (!productionStats[name]) {
-                productionStats[name] = { name: name, unit: structure.unit, qty: 0 };
+            if (!productionStats[structure.id]) {
+                productionStats[structure.id] = { name: structure.name, unit: structure.unit, qty: 0 };
             }
-            productionStats[name].qty += Number(t.qty) || 0;
+            productionStats[structure.id].qty += t.qty || 0;
         }
     });
     const topProduced = Object.values(productionStats).sort((a, b) => b.qty - a.qty).slice(0, 5);
     
-    // Sản xuất theo tháng (6 tháng)
+    // Sản xuất theo tháng (6 tháng gần nhất)
     const monthlyProduction = {};
     const now = new Date();
     for (let i = 5; i >= 0; i--) {
@@ -55,7 +55,7 @@ const structures = state.data.structures || [];
         const d = new Date(t.datetime || t.date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         if (monthlyProduction[key]) {
-            monthlyProduction[key].produce += Number(t.qty) || 0;
+            monthlyProduction[key].produce += t.qty || 0;
         }
     });
     
@@ -63,26 +63,20 @@ const structures = state.data.structures || [];
         const d = new Date(t.datetime || t.date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         if (monthlyProduction[key]) {
-            monthlyProduction[key].export += Number(t.qty) || 0;
+            monthlyProduction[key].export += t.qty || 0;
         }
     });
-    
-    const result = {
+    return {
         stockStats,
-        totalProduced,
-        totalProductionRuns,
-        totalExported,
-        totalExportValue,
+        totalProduced: Number(totalProduced) || 0,
+        totalProductionRuns: Number(totalProductionRuns) || 0,
+        totalExported: Number(totalExported) || 0,
+        totalExportValue: Number(totalExportValue) || 0,
         topProduced,
-        monthlyProduction: Object.values(monthlyProduction),
-        totalStructures: structures.length,
-        stockValue: stockStats.reduce((sum, s) => sum + s.totalValue, 0),
-        lowStockCount: stockStats.filter(s => s.qty < 10).length
-    };
-    
-    console.log('📊 Structure Stats:', result);
-    return result;
+        monthlyProduction: Object.values(monthlyProduction)
+    };    
 }
+
 // ========== RENDER KPI CARDS ==========
 export function renderStructureKPIs(stats) {
     const stockValue = stats.stockStats.reduce((sum, s) => sum + s.totalValue, 0);
