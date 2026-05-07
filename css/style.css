@@ -635,3 +635,14 @@ input[type=text][dir=ltr] {
     .tbl-wrap table { min-width: auto !important; }
     @page { margin: 0.8cm; size: A4 landscape; }
 }
+/* Structure Dashboard */
+.structure-dashboard .b-warning { background: var(--warn-bg); color: var(--warn-text); }
+.structure-dashboard .kpi-card:hover { transform: translateY(-3px); transition: all 0.2s; }
+
+
+/* Warning badge */
+.b-warning {
+    background: var(--warn-bg);
+    color: var(--warn-text);
+}
+

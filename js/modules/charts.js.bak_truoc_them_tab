@@ -1,5 +1,4 @@
 import { state, formatMoney, escapeHtml } from './state.js';
-import { getStructureStats, renderStructureKPIs, renderStructureInventory, renderStructureDashboardCharts } from './structure_dashboard.js';
 import { formatMoneyVND } from './utils.js?v=1777963068';
 
 let stockChart = null;
@@ -525,15 +524,15 @@ function renderFiltersAndTabs() {
             <div class="dashboard-tab ${currentDashboardTab==='overview'?'active':''}" onclick="window.switchDashboardTab('overview')">📊 Tổng quan</div>
             <div class="dashboard-tab ${currentDashboardTab==='projects'?'active':''}" onclick="window.switchDashboardTab('projects')">🏗️ Công trình</div>
             <div class="dashboard-tab ${currentDashboardTab==='suppliers'?'active':''}" onclick="window.switchDashboardTab('suppliers')">🏭 Nhà cung cấp</div>
-            <div class="dashboard-tab ${currentDashboardTab==='structures'?'active':''}" onclick="window.switchDashboardTab('structures')">🏗️ Cấu kiện</div>
         </div>
         ${renderAdvancedFilters()}
     `;
 }
+
 window.switchDashboardTab = function(tab) {
     currentDashboardTab = tab;
-    clearDashboardCache();   
- if (tab === 'projects' || tab === 'suppliers' || tab === 'structures') {
+    clearDashboardCache();
+    if (tab === 'projects' || tab === 'suppliers') {
         document.getElementById('pane-dashboard').innerHTML = renderTabContent(tab);
         setTimeout(function(){
             if (tab === 'projects') {
@@ -569,9 +568,6 @@ window.switchDashboardTab = function(tab) {
                     window._sp = new Chart(ctx2, { type:'doughnut', data:{ labels:sdata.map(function(s){return s.name}).concat(['Khac']), datasets:[{ data:sdata.map(function(s){return s.total}).concat([Math.max(0,at-t5)]), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB','#BA7517'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
                 }
             }
-	    if (tab === 'structures') {
-                renderStructureDashboardCharts();
-		}
         }, 500);
     } else {
         updateDashboardContent();
@@ -680,45 +676,7 @@ function renderTabContent(tab) {
             </div>
         `;
     }
-       if (tab === 'structures') {
-        const stats = getStructureStats();
-        return filters + renderStructureKPIs(stats) + `
-            <div class="grid2" style="margin-bottom:18px;">
-                <div class="card">
-                    <div class="sec-title">📈 XU HƯỚNG SẢN XUẤT 6 THÁNG</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="top-structures-chart"></canvas></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="sec-title">📦 TỒN KHO CẤU KIỆN</div>
-                ${renderStructureInventory(stats)}
-            </div>
-        `;
-    } 
-    if (tab === 'structures') {
-        const stats = getStructureStats();
-        return filters + renderStructureKPIs(stats) + `
-            <div class="grid2" style="margin-bottom:18px;">
-                <div class="card">
-                    <div class="sec-title">📈 XU HƯỚNG SẢN XUẤT 6 THÁNG</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="top-structures-chart"></canvas></div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="sec-title">📦 TỒN KHO CẤU KIỆN</div>
-                ${renderStructureInventory(stats)}
-            </div>
-        `;
-    }
-
+    
     return '';
 }
 
