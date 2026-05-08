@@ -27,27 +27,19 @@ export function formatMoneyVND(value) {
     if (isNegative) num = Math.abs(num);
     if (isNaN(num)) num = 0;
     
-    let parts = num.toString().split('.');
-    let integerPart = parts[0];
-    let decimalPart = parts[1] || '';
+    // Làm tròn về số nguyên (VNĐ không có tiền lẻ)
+    num = Math.round(num);
     
+    let str = num.toString();
     let formatted = '', count = 0;
-    for (let i = integerPart.length - 1; i >= 0; i--) {
-        formatted = integerPart[i] + formatted;
+    
+    for (let i = str.length - 1; i >= 0; i--) {
+        formatted = str[i] + formatted;
         count++;
         if (count % 3 === 0 && i > 0) formatted = '.' + formatted;
     }
     
-    // Chỉ hiện thập phân nếu có giá trị != 0
-    if (decimalPart && parseFloat('0.' + decimalPart) > 0) {
-        // Cắt bỏ số 0 thừa ở cuối
-        decimalPart = decimalPart.replace(/0+$/, '');
-        if (decimalPart) {
-            formatted += ',' + decimalPart;
-        }
-    }
-    
-    return (isNegative ? '-' : '') + formatted + ' ₫';    
+    return (isNegative ? '-' : '') + formatted + ' ₫';
 }
 export function formatRawToDisplay(rawValue) {
     if (!rawValue || rawValue === '') return '';

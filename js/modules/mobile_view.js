@@ -1,328 +1,556 @@
-import { state, saveState, addLog, formatMoney, escapeHtml, showModal, closeModal } from './state.js';
+import { state, saveState, addLog, formatMoney, escapeHtml } from './state.js';
 import { formatMoneyVND } from './utils.js';
 
-let currentMobileTab = 'import';
-
-// ========== RENDER GIAO DIỆN MOBILE ==========
-export function renderMobileView() {
-    return `
-        <div class="mobile-app">
-            <!-- Header -->
-            <div class="mobile-header">
-                <div class="mobile-header-title">
-                    <img src="/images/logo.png" alt="TRIVIET STEEL" style="height: 32px;">
-                    <span>TRIVIET STEEL</span>
-                </div>
-                <div class="mobile-header-user">
-                    <span>👤 ${escapeHtml(state.currentUser?.name || 'User')}</span>
-                </div>
-            </div>
-            
-            <!-- Nội dung chính -->
-            <div class="mobile-content">
-                <div id="mobile-tab-content">
-                    ${renderMobileTabContent()}
-                </div>
-            </div>
-            
-            <!-- Bottom Navigation -->
-            <div class="mobile-bottom-nav">
-                <div class="mobile-nav-item ${currentMobileTab === 'import' ? 'active' : ''}" data-tab="import">
-                    <span>📥</span>
-                    <span>Nhập kho</span>
-                </div>
-                <div class="mobile-nav-item ${currentMobileTab === 'export' ? 'active' : ''}" data-tab="export">
-                    <span>📤</span>
-                    <span>Xuất kho</span>
-                </div>
-                <div class="mobile-nav-item ${currentMobileTab === 'stock' ? 'active' : ''}" data-tab="stock">
-                    <span>📦</span>
-                    <span>Tồn kho</span>
-                </div>
-                <div class="mobile-nav-item ${currentMobileTab === 'project' ? 'active' : ''}" data-tab="project">
-                    <span>🏗️</span>
-                    <span>Công trình</span>
-                </div>
-            </div>
-        </div>
-    `;
+// ========== DETECT MOBILE ==========
+export function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || window.innerWidth < 768;
 }
 
-function renderMobileTabContent() {
-    if (currentMobileTab === 'import') {
-        return renderImportTab();
-    }
-    if (currentMobileTab === 'export') {
-        return renderExportTab();
-    }
-    if (currentMobileTab === 'stock') {
-        return renderStockTab();
-    }
-    if (currentMobileTab === 'project') {
-        return renderProjectTab();
-    }
-    return '<div class="mobile-card">Đang phát triển...</div>';
-}
-
-// ========== TAB NHẬP KHO ==========
-function renderImportTab() {
-    const suppliers = state.data.suppliers || [];
+let sidebarOpen = false;
+let txnPage = 1;
+let txnLimit = 10;
+// ========== RENDER ==========
+function renderRecentTxns(transactions, page, limit) {
     const materials = state.data.materials || [];
+    const txns = [...transactions].sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date));
+    const totalItems = txns.length;
+    const totalPages = Math.ceil(totalItems / limit) || 1;
+    if (page > totalPages) page = totalPages;
+    if (page < 1) page = 1;
     
-    return `
-        <div class="mobile-card">
-            <div class="mobile-card-title">📥 NHẬP KHO</div>
-            <div class="mobile-form-group">
-                <label>Nhà cung cấp</label>
-                <select id="mobile-supplier">
-                    <option value="">-- Chọn nhà cung cấp --</option>
-                    ${suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}
-                </select>
-            </div>
-            <div class="mobile-form-group">
-                <label>Vật tư</label>
-                <select id="mobile-material">
-                    <option value="">-- Chọn vật tư --</option>
-                    ${materials.map(m => `<option value="${m.id}" data-unit="${m.unit}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}
-                </select>
-            </div>
-            <div class="mobile-form-group">
-                <label>Số lượng</label>
-                <input type="number" id="mobile-qty" placeholder="Nhập số lượng" step="any">
-            </div>
-            <div class="mobile-form-group">
-                <label>Đơn giá (VNĐ)</label>
-                <input type="number" id="mobile-price" placeholder="Nhập đơn giá">
-            </div>
-            <div class="mobile-form-group">
-                <label>VAT (%)</label>
-                <input type="number" id="mobile-vat" value="10" step="0.1">
-            </div>
-            <button class="mobile-btn primary" id="mobile-import-btn" style="width:100%;">✅ XÁC NHẬN NHẬP</button>
-        </div>
-        
-        <div class="mobile-card">
-            <div class="mobile-card-title">📋 NHẬP GẦN ĐÂY</div>
-            <div id="mobile-recent-imports"></div>
-        </div>
-    `;
-}
-
-// ========== TAB XUẤT KHO ==========
-function renderExportTab() {
-    const materials = state.data.materials || [];
-    const projects = state.data.projects || [];
+    const start = (page - 1) * limit;
+    const paginated = txns.slice(start, start + limit);
     
-    return `
-        <div class="mobile-card">
-            <div class="mobile-card-title">📤 XUẤT KHO</div>
-            <div class="mobile-form-group">
-                <label>Công trình</label>
-                <select id="mobile-project">
-                    <option value="">-- Chọn công trình --</option>
-                    ${projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}
-                </select>
-            </div>
-            <div class="mobile-form-group">
-                <label>Vật tư</label>
-                <select id="mobile-export-material">
-                    <option value="">-- Chọn vật tư --</option>
-                    ${materials.map(m => `<option value="${m.id}" data-unit="${m.unit}" data-price="${m.cost}">${escapeHtml(m.name)} (Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}
-                </select>
-            </div>
-            <div class="mobile-form-group">
-                <label>Số lượng</label>
-                <input type="number" id="mobile-export-qty" placeholder="Nhập số lượng sử dụng" step="any">
-            </div>
-            <div class="mobile-form-group">
-                <label>Ghi chú</label>
-                <input type="text" id="mobile-export-note" placeholder="Vị trí sử dụng...">
-            </div>
-            <button class="mobile-btn primary" id="mobile-export-btn" style="width:100%;">✅ XÁC NHẬN XUẤT</button>
-        </div>
-        
-        <div class="mobile-card">
-            <div class="mobile-card-title">📋 XUẤT GẦN ĐÂY</div>
-            <div id="mobile-recent-exports"></div>
-        </div>
-    `;
-}
-
-// ========== TAB TỒN KHO ==========
-function renderStockTab() {
-    const materials = state.data.materials || [];
-    const lowStock = materials.filter(m => m.qty <= m.low);
+    if (paginated.length === 0) return '<div class="m-empty">Chưa có giao dịch</div>';
     
-    return `
-        <div class="mobile-card">
-            <div class="mobile-card-title">⚠️ CẢNH BÁO TỒN THẤP</div>
-            <div id="mobile-low-stock">
-                ${lowStock.length === 0 ? '<div class="mobile-item">✅ Tất cả đều ổn</div>' : lowStock.map(m => `
-                    <div class="mobile-item" onclick="window.showMaterialDetail('${m.id}')">
-                        <div><strong>${escapeHtml(m.name)}</strong></div>
-                        <div class="mobile-item-value" style="color:var(--danger-text);">Tồn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</div>
-                    </div>
-                `).join('')}
+    let html = '';
+    paginated.forEach(t => {
+        const mat = materials.find(m => m.id === t.mid);
+        const isImport = t.type === 'purchase';
+        const time = new Date(t.datetime || t.date).toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit'});
+        html += `
+            <div class="m-txn-item">
+                <div class="m-txn-icon">${isImport ? '📥' : t.type === 'return' ? '🔄' : '📤'}</div>
+                <div class="m-txn-info">
+                    <div class="m-txn-name">${escapeHtml(mat?.name || 'N/A')}</div>
+                    <div class="m-txn-meta">${time} · ${isImport ? 'Nhập' : t.type === 'return' ? 'Trả' : 'Xuất'} · ${Number(t.qty||0).toLocaleString('vi-VN')} ${mat?.unit||''}</div>
+                </div>
+                <div class="m-txn-amount" style="color:${isImport ? '#16a34a' : '#dc2626'}">${isImport ? '+' : '-'}${formatMoneyVND(t.totalAmount)}</div>
             </div>
-        </div>
-        
-        <div class="mobile-card">
-            <div class="mobile-card-title">📦 DANH SÁCH VẬT TƯ</div>
-            <div id="mobile-material-list">
-                ${materials.slice(0, 20).map(m => `
-                    <div class="mobile-item" onclick="window.showMaterialDetail('${m.id}')">
-                        <div><strong>${escapeHtml(m.name)}</strong></div>
-                        <div class="mobile-item-value">${Number(m.qty).toLocaleString('vi-VN')} ${m.unit}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// ========== TAB CÔNG TRÌNH ==========
-function renderProjectTab() {
-    const projects = state.data.projects || [];
-    
-    return `
-        <div class="mobile-card">
-            <div class="mobile-card-title">🏗️ DANH SÁCH CÔNG TRÌNH</div>
-            <div id="mobile-project-list">
-                ${projects.map(p => {
-                    const spent = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
-                    const pct = p.budget > 0 ? (spent/p.budget)*100 : 0;
-                    return `
-                        <div class="mobile-item" onclick="window.showProjectDetail('${p.id}')">
-                            <div><strong>${escapeHtml(p.name)}</strong></div>
-                            <div class="mobile-item-value">💰 ${formatMoneyVND(spent)}</div>
-                            <div class="progress-bar" style="margin-top:4px;"><div class="progress-fill" style="width:${Math.min(100,pct)}%;"></div></div>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-    `;
-}
-
-// ========== KHỞI TẠO SỰ KIỆN ==========
-export function initMobileEvents() {
-    // Tab navigation
-    document.querySelectorAll('.mobile-nav-item').forEach(item => {
-        item.onclick = () => {
-            currentMobileTab = item.dataset.tab;
-            document.querySelectorAll('.mobile-nav-item').forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            const content = document.getElementById('mobile-tab-content');
-            if (content) content.innerHTML = renderMobileTabContent();
-            bindMobileEvents();
-        };
+        `;
     });
     
-    bindMobileEvents();
+    // Phân trang
+    html += '<div class="m-pagination">';
+    html += `<select class="m-page-limit" onchange="changeTxnLimit(this.value)">`;
+    html += `<option value="10" ${limit===10?'selected':''}>10</option>`;
+    html += `<option value="20" ${limit===20?'selected':''}>20</option>`;
+    html += `<option value="50" ${limit===50?'selected':''}>50</option>`;
+    html += `</select>`;
+    html += '<div class="m-page-btns">';
+    html += `<button class="m-page-btn" onclick="changeTxnPage(${page-1})" ${page<=1?'disabled':''}>◀</button>`;
+    html += `<span class="m-page-info">${page}/${totalPages} (${totalItems})</span>`;
+    html += `<button class="m-page-btn" onclick="changeTxnPage(${page+1})" ${page>=totalPages?'disabled':''}>▶</button>`;
+    html += '</div></div>';
+    
+    return html;
+}
+// ========== RENDER CHÍNH ==========
+export function renderMobileView() {
+    const materials = state.data.materials || [];
+    const suppliers = state.data.suppliers || [];
+    const projects = state.data.projects || [];
+    const transactions = state.data.transactions || [];
+    const lowStockCount = materials.filter(m => m.qty <= m.low).length;
+    const currentUser = state.currentUser || {};
+    
+    // 5 giao dịch gần nhất
+    const recentTxns = [...transactions]
+        .sort((a, b) => new Date(b.datetime || b.date) - new Date(a.datetime || a.date))
+        .slice(0, 5);
+    
+    return `
+ <div class="mobile-app dark" id="mobile-app-container">        
+            <!-- SIDEBAR TRƯỢT TRÁI -->
+            <div class="m-sidebar-overlay ${sidebarOpen ? 'show' : ''}" onclick="toggleMSidebar()"></div>
+            <div class="m-sidebar ${sidebarOpen ? 'open' : ''}">
+                <div class="m-sidebar-header">
+                    <img src="/images/logo-tv.png" style="height:24px;">
+                    <span>TRÍ VIỆT STEEL</span>
+                </div>
+                <div class="m-sidebar-user">
+                    <div class="m-avatar">${escapeHtml(currentUser.name?.charAt(0) || 'U')}</div>
+                    <div>
+                        <div class="m-uname">${escapeHtml(currentUser.name || 'User')}</div>
+                        <div class="m-urole">${currentUser.role === 'admin' ? 'Admin' : 'Nhân viên'}</div>
+                    </div>
+                </div>
+                <div class="m-sidebar-nav">
+                    <div class="m-nav-item active" onclick="toggleMSidebar()">
+                        <span>🏠</span><span>Trang chủ</span>
+                    </div>
+                    <div class="m-nav-item" onclick="toggleMSidebar();showMobileStock()">
+                        <span>📦</span><span>Quản lý kho</span>
+                    </div>
+                    <div class="m-nav-item" onclick="toggleMSidebar();showMobileProjects()">
+                        <span>🏗️</span><span>Công trình</span>
+                    </div>
+                    <div class="m-nav-item" onclick="toggleMSidebar();showMobileLowStock()">
+                        <span>⚠️</span><span>Sắp hết hàng</span>
+                    </div>
+                    <div class="m-nav-item" onclick="toggleMSidebar();switchMobileMode('desktop')">
+                        <span>💻</span><span>Chế độ Desktop</span>
+                    </div>
+                </div>
+                <div class="m-sidebar-footer">
+                    <div class="m-nav-item" onclick="logout()">
+                        <span>🚪</span><span>Đăng xuất</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- HEADER -->
+            <div class="m-header">
+                <div class="m-header-left">
+                    <button class="m-hamburger" onclick="toggleMSidebar()">☰</button>
+                    <img src="/images/logo-tv.png" style="height:24px;">
+                    <span>TRÍ VIỆT STEEL</span>
+                </div>
+                <div class="m-header-right" onclick="showMobileMenu()">
+                    <span>${escapeHtml(currentUser.name?.charAt(0) || 'U')}</span>
+                </div>
+            </div>
+            
+            <!-- 6 NÚT CHÍNH -->
+            <div class="m-grid">
+                <div class="m-btn m-btn-blue" onclick="showMobileImport()">
+                    <span class="m-btn-icon">📥</span>
+                    <span class="m-btn-label">NHẬP KHO</span>
+                </div>
+                <div class="m-btn m-btn-red" onclick="showMobileExport()">
+                    <span class="m-btn-icon">📤</span>
+                    <span class="m-btn-label">XUẤT KHO</span>
+                </div>
+                <div class="m-btn m-btn-green" onclick="showMobileStock()">
+                    <span class="m-btn-icon">📦</span>
+                    <span class="m-btn-label">TỒN KHO</span>
+                    <span class="m-btn-sub">${materials.length} món</span>
+                </div>
+                <div class="m-btn m-btn-purple" onclick="showMobileProjects()">
+                    <span class="m-btn-icon">🏗️</span>
+                    <span class="m-btn-label">CÔNG TRÌNH</span>
+                    <span class="m-btn-sub">${projects.length} CT</span>
+                </div>
+                <div class="m-btn m-btn-orange" onclick="showMobileLowStock()">
+                    <span class="m-btn-icon">⚠️</span>
+                    <span class="m-btn-label">SẮP HẾT</span>
+                    ${lowStockCount > 0 ? `<span class="m-badge">${lowStockCount}</span>` : '<span class="m-btn-sub">0 món</span>'}
+                </div>
+                <div class="m-btn m-btn-teal" onclick="showMobileReturn()">
+                    <span class="m-btn-icon">🔄</span>
+                    <span class="m-btn-label">TRẢ HÀNG</span>
+                </div>
+            </div>
+            
+            <!-- GIAO DỊCH GẦN ĐÂY -->
+            <div class="m-section">
+                <div class="m-section-title">📋 GIAO DỊCH GẦN ĐÂY</div>
+				<div id="m-txn-list">
+				${renderRecentTxns(transactions, txnPage, txnLimit)}
+				 </div>
+				</div>
+            </div>
+            
+            <!-- MENU POPUP -->
+            <div id="m-menu" class="m-menu" style="display:none;" onclick="event.stopPropagation()">
+                <div class="m-menu-item" onclick="switchMobileMode('desktop')">🖥️ Chuyển Desktop</div>
+                <div class="m-menu-item" onclick="logout()">🚪 Đăng xuất</div>
+            </div>
+        </div>
+    `;
 }
 
-function bindMobileEvents() {
-    // Nút nhập kho
-    const importBtn = document.getElementById('mobile-import-btn');
-    if (importBtn) {
-        importBtn.onclick = async () => {
-            const supplierId = document.getElementById('mobile-supplier')?.value;
-            const mid = document.getElementById('mobile-material')?.value;
-            const qty = parseFloat(document.getElementById('mobile-qty')?.value);
-            const price = parseFloat(document.getElementById('mobile-price')?.value);
-            const vat = parseFloat(document.getElementById('mobile-vat')?.value) || 10;
-            
-            if (!supplierId || !mid || !qty) {
-                alert('Vui lòng nhập đầy đủ thông tin');
-                return;
-            }
-            
-            const total = qty * price;
-            const vatAmount = total * vat / 100;
-            
-            // Gọi API nhập kho
-            const res = await fetch('/api/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: 'mobile_' + Date.now(),
-                    mid, supplierId,
-                    type: 'purchase',
-                    qty, unitPrice: price, vatRate: vat,
-                    subtotal: total, vatAmount, totalAmount: total + vatAmount,
-                    note: 'Nhập từ mobile',
-                    date: new Date().toISOString().split('T')[0],
-                    datetime: new Date().toISOString()
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert('✅ Nhập kho thành công!');
-                window.loadState().then(() => {
-                    const content = document.getElementById('mobile-tab-content');
-                    if (content) content.innerHTML = renderMobileTabContent();
-                    bindMobileEvents();
-                });
-            } else {
-                alert('❌ Lỗi: ' + data.error);
-            }
-        };
+// ========== SIDEBAR TOGGLE ==========
+window.toggleMSidebar = function() {
+    sidebarOpen = !sidebarOpen;
+    const overlay = document.querySelector('.m-sidebar-overlay');
+    const sidebar = document.querySelector('.m-sidebar');
+    if (overlay) overlay.classList.toggle('show', sidebarOpen);
+    if (sidebar) sidebar.classList.toggle('open', sidebarOpen);
+};
+
+// ========== MODAL NHẬP KHO ==========
+window.showMobileImport = function() {
+    const materials = state.data.materials || [];
+    const suppliers = state.data.suppliers || [];
+    
+    if (materials.length === 0) { alert('Chưa có vật tư!'); return; }
+    if (suppliers.length === 0) { alert('Chưa có nhà cung cấp!'); return; }
+    
+    const html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>📥 NHẬP KHO</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd">
+                <div class="m-field">
+                    <label>Nhà cung cấp</label>
+                    <select id="mi-supplier">${suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+                </div>
+                <div class="m-field">
+                    <label>Vật tư</label>
+                    <select id="mi-material" onchange="updateMPrice()">${materials.map(m => `<option value="${m.id}" data-cost="${m.cost}" data-unit="${m.unit}">${escapeHtml(m.name)} (${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}</select>
+                </div>
+                <div class="m-field">
+                    <label>Số lượng</label>
+                    <div class="m-qty-box">
+                        <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
+                        <input type="text" id="mi-qty" value="1" dir="ltr" class="m-qty-input">
+                        <button class="m-qty-btn" onclick="changeMQty(1)">+</button>
+                    </div>
+                    <div class="m-qty-presets">
+                        <span onclick="setMQty(1)">1</span>
+                        <span onclick="setMQty(5)">5</span>
+                        <span onclick="setMQty(10)">10</span>
+                        <span onclick="setMQty(100)">100</span>
+                    </div>
+                </div>
+                <div class="m-field">
+                    <label>Đơn giá (VNĐ)</label>
+                    <input type="text" id="mi-price" value="0" dir="ltr">
+                </div>
+                <div class="m-summary">
+                    VAT 10% · Thành tiền: <strong id="mi-total" style="color:var(--green);">0 ₫</strong>
+                </div>
+                <button class="m-submit" onclick="doMobileImport()">✅ XÁC NHẬN NHẬP KHO</button>
+            </div>
+        </div>
+    `;
+    document.getElementById('root').innerHTML = html;
+    setTimeout(() => {
+        const sel = document.getElementById('mi-material');
+        if (sel) { const opt = sel.options[sel.selectedIndex]; document.getElementById('mi-price').value = Number(opt?.dataset?.cost || 0).toLocaleString('vi-VN'); }
+        updateMobileTotal();
+    }, 100);
+};
+
+// ========== MODAL XUẤT KHO ==========
+window.showMobileExport = function() {
+    const materials = state.data.materials || [];
+    const projects = state.data.projects || [];
+    
+    if (materials.length === 0) { alert('Chưa có vật tư!'); return; }
+    if (projects.length === 0) { alert('Chưa có công trình!'); return; }
+    
+    const html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>📤 XUẤT KHO</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd">
+                <div class="m-field">
+                    <label>Công trình</label>
+                    <select id="me-project">${projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
+                </div>
+                <div class="m-field">
+                    <label>Vật tư</label>
+                    <select id="me-material">${materials.map(m => `<option value="${m.id}" data-cost="${m.cost}" data-unit="${m.unit}" data-qty="${m.qty}">${escapeHtml(m.name)} (Còn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}</select>
+                </div>
+                <div class="m-field">
+                    <label>Số lượng</label>
+                    <div class="m-qty-box">
+                        <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
+                        <input type="text" id="me-qty" value="1" dir="ltr" class="m-qty-input">
+                        <button class="m-qty-btn" onclick="changeMQty(1)">+</button>
+                    </div>
+                </div>
+                <div class="m-field">
+                    <label>Ghi chú</label>
+                    <input type="text" id="me-note" placeholder="Vị trí sử dụng...">
+                </div>
+                <button class="m-submit" style="background:var(--red);" onclick="doMobileExport()">✅ XÁC NHẬN XUẤT KHO</button>
+            </div>
+        </div>
+    `;
+    document.getElementById('root').innerHTML = html;
+};
+
+// ========== MODAL TỒN KHO ==========
+window.showMobileStock = function() {
+    const materials = state.data.materials || [];
+    
+    let html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>📦 TỒN KHO (${materials.length})</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd" style="padding:0;">
+                <div style="padding:12px;"><input type="text" id="ms-search" class="m-search" placeholder="🔍 Tìm vật tư..." oninput="filterMStock()"></div>
+                <div id="ms-list">
+    `;
+    
+    materials.forEach(m => {
+        const low = m.qty <= m.low;
+        html += `
+            <div class="m-stock-item" data-name="${escapeHtml(m.name).toLowerCase()}" onclick="window.showMaterialDetail('${m.id}')">
+                <div class="m-stock-info">
+                    <div class="m-stock-name">${low ? '⚠️ ' : ''}${escapeHtml(m.name)}</div>
+                    <div class="m-stock-meta">${m.cat || ''} · ${formatMoneyVND(m.cost)}/${m.unit}</div>
+                </div>
+                <div class="m-stock-qty ${low ? 'm-text-red' : ''}">
+                    <div class="m-stock-qty-val">${Number(m.qty).toLocaleString('vi-VN')}</div>
+                    <div class="m-stock-qty-unit">${m.unit}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `</div></div></div>`;
+    document.getElementById('root').innerHTML = html;
+};
+
+// ========== MODAL SẮP HẾT ==========
+window.showMobileLowStock = function() {
+    const materials = state.data.materials.filter(m => m.qty <= m.low);
+    
+    let html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>⚠️ SẮP HẾT HÀNG</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd" style="padding:0;">
+    `;
+    
+    if (materials.length === 0) {
+        html += '<div class="m-empty">✅ Tất cả đều ổn, không có hàng sắp hết!</div>';
+    } else {
+        materials.forEach(m => {
+            html += `
+                <div class="m-stock-item" onclick="window.showMaterialDetail('${m.id}')">
+                    <div class="m-stock-info">
+                        <div class="m-stock-name">⚠️ ${escapeHtml(m.name)}</div>
+                        <div class="m-stock-meta">Cần nhập thêm ${Number(m.low - m.qty).toLocaleString('vi-VN')} ${m.unit}</div>
+                    </div>
+                    <div class="m-stock-qty m-text-red">
+                        <div class="m-stock-qty-val">${Number(m.qty).toLocaleString('vi-VN')}</div>
+                        <div class="m-stock-qty-unit">${m.unit}</div>
+                    </div>
+                </div>
+            `;
+        });
     }
     
-    // Nút xuất kho
-    const exportBtn = document.getElementById('mobile-export-btn');
-    if (exportBtn) {
-        exportBtn.onclick = async () => {
-            const projectId = document.getElementById('mobile-project')?.value;
-            const mid = document.getElementById('mobile-export-material')?.value;
-            const qty = parseFloat(document.getElementById('mobile-export-qty')?.value);
-            const note = document.getElementById('mobile-export-note')?.value;
-            
-            if (!projectId || !mid || !qty) {
-                alert('Vui lòng nhập đầy đủ thông tin');
-                return;
-            }
-            
-            const material = state.data.materials.find(m => m.id === mid);
-            if (material && material.qty < qty) {
-                alert(`Không đủ tồn kho! Còn ${material.qty} ${material.unit}`);
-                return;
-            }
-            
-            const res = await fetch('/api/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: 'mobile_' + Date.now(),
-                    mid, projectId,
-                    type: 'usage',
-                    qty, unitPrice: material?.cost || 0,
-                    totalAmount: qty * (material?.cost || 0),
-                    note: note || 'Xuất từ mobile',
-                    date: new Date().toISOString().split('T')[0],
-                    datetime: new Date().toISOString()
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                alert('✅ Xuất kho thành công!');
-                window.loadState().then(() => {
-                    const content = document.getElementById('mobile-tab-content');
-                    if (content) content.innerHTML = renderMobileTabContent();
-                    bindMobileEvents();
-                });
-            } else {
-                alert('❌ Lỗi: ' + data.error);
-            }
-        };
+    html += `</div></div>`;
+    document.getElementById('root').innerHTML = html;
+};
+
+// ========== MODAL CÔNG TRÌNH ==========
+window.showMobileProjects = function() {
+    const projects = state.data.projects || [];
+    
+    let html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>🏗️ CÔNG TRÌNH</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd" style="padding:0;">
+    `;
+    
+    projects.forEach(p => {
+        const spent = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
+        const ret = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
+        const net = spent - ret;
+        const pct = p.budget > 0 ? Math.min(100, (net / p.budget) * 100) : 0;
+        
+        html += `
+            <div class="m-project-item" onclick="window.showProjectDetail('${p.id}')">
+                <div class="m-project-info">
+                    <div class="m-project-name">${escapeHtml(p.name)}</div>
+                    <div class="m-project-meta">${formatMoneyVND(net)} / ${formatMoneyVND(p.budget)}</div>
+                    <div class="m-project-bar"><div class="m-project-fill" style="width:${pct}%;background:${pct>90?'var(--red)':pct>70?'var(--orange)':'var(--blue)'};"></div></div>
+                </div>
+                <div class="m-project-pct">${pct.toFixed(0)}%</div>
+            </div>
+        `;
+    });
+    
+    html += `</div></div>`;
+    document.getElementById('root').innerHTML = html;
+};
+
+// ========== MODAL TRẢ HÀNG ==========
+window.showMobileReturn = function() {
+    const projects = state.data.projects.filter(p => state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage'));
+    
+    if (projects.length === 0) { alert('Chưa có công trình nào được xuất kho!'); return; }
+    
+    let html = `
+        <div class="m-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>🔄 TRẢ HÀNG</span>
+                <div></div>
+            </div>
+            <div class="m-modal-bd">
+                <div class="m-field">
+                    <label>Công trình</label>
+                    <select id="mr-project" onchange="loadReturnMaterials()">${projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
+                </div>
+                <div class="m-field">
+                    <label>Vật tư</label>
+                    <select id="mr-material" onchange="updateRPrice()"></select>
+                </div>
+                <div class="m-field">
+                    <label>Số lượng</label>
+                    <div class="m-qty-box">
+                        <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
+                        <input type="text" id="mr-qty" value="1" dir="ltr" class="m-qty-input">
+                        <button class="m-qty-btn" onclick="changeMQty(1)">+</button>
+                    </div>
+                </div>
+                <div class="m-field">
+                    <label>Đơn giá</label>
+                    <input type="text" id="mr-price" value="0" dir="ltr" readonly>
+                </div>
+                <button class="m-submit" style="background:var(--teal);" onclick="doMobileReturn()">✅ XÁC NHẬN TRẢ HÀNG</button>
+            </div>
+        </div>
+    `;
+    document.getElementById('root').innerHTML = html;
+    setTimeout(() => loadReturnMaterials(), 100);
+};
+
+// ========== CÁC HÀM XỬ LÝ ==========
+window.changeMQty = function(delta) {
+    const input = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty');
+    if (input) {
+        let val = parseFloat(input.value.replace(',', '.')) || 0;
+        val = Math.max(0, val + delta);
+        input.value = val;
+        updateMobileTotal();
     }
-}
+};
 
-export function switchMobileTab(tab) {
-    currentMobileTab = tab;
-    const content = document.getElementById('mobile-tab-content');
-    if (content) content.innerHTML = renderMobileTabContent();
-    bindMobileEvents();
-}
+window.setMQty = function(val) {
+    const input = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty');
+    if (input) { input.value = val; updateMobileTotal(); }
+};
 
-window.switchMobileTab = switchMobileTab;
+window.updateMPrice = function() { const sel = document.getElementById('mi-material'); const priceInput = document.getElementById('mi-price'); if (sel && priceInput) { priceInput.value = Number(sel.options[sel.selectedIndex]?.dataset?.cost || 0).toLocaleString('vi-VN'); } updateMobileTotal(); };
+
+function updateMobileTotal() { const qtyInput = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty'); const priceInput = document.getElementById('mi-price') || document.getElementById('mr-price'); const totalEl = document.getElementById('mi-total'); if (qtyInput && priceInput && totalEl) { const qty = parseFloat(qtyInput.value.replace(',', '.')) || 0; const price = parseFloat(priceInput.value.replace(/\./g, '').replace(',', '.')) || 0; totalEl.textContent = formatMoneyVND(qty * price * 1.1); } }
+
+window.doMobileImport = async function() {
+    const supplierId = document.getElementById('mi-supplier')?.value;
+    const mid = document.getElementById('mi-material')?.value;
+    const qty = parseFloat(document.getElementById('mi-qty')?.value?.replace(',', '.')) || 0;
+    const price = parseFloat(document.getElementById('mi-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
+    if (!supplierId || !mid || !qty || !price) { alert('Vui lòng nhập đầy đủ!'); return; }
+    const total = qty * price;
+    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, supplierId, type: 'purchase', qty, unitPrice: price, vatRate: 10, subtotal: total, vatAmount: total * 0.1, totalAmount: total * 1.1, note: 'Nhập từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    const data = await res.json();
+    if (data.success) { if (navigator.vibrate) navigator.vibrate(50); window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+};
+
+window.doMobileExport = async function() {
+    const projectId = document.getElementById('me-project')?.value;
+    const mid = document.getElementById('me-material')?.value;
+    const qty = parseFloat(document.getElementById('me-qty')?.value?.replace(',', '.')) || 0;
+    const note = document.getElementById('me-note')?.value;
+    if (!projectId || !mid || !qty) { alert('Vui lòng nhập đầy đủ!'); return; }
+    const mat = state.data.materials.find(m => m.id === mid);
+    if (mat && mat.qty < qty) { alert(`Không đủ tồn! Còn ${mat.qty} ${mat.unit}`); return; }
+    const total = qty * (mat?.cost || 0);
+    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, projectId, type: 'usage', qty, unitPrice: mat?.cost || 0, totalAmount: total, note: note || 'Xuất từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    const data = await res.json();
+    if (data.success) { if (navigator.vibrate) navigator.vibrate([50, 50, 50]); window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+};
+
+window.loadReturnMaterials = function() {
+    const pid = document.getElementById('mr-project')?.value;
+    const sel = document.getElementById('mr-material');
+    if (!pid || !sel) return;
+    const uT = state.data.transactions.filter(t => t.projectId === pid && t.type === 'usage');
+    const rT = state.data.transactions.filter(t => t.projectId === pid && t.type === 'return');
+    const map = new Map();
+    uT.forEach(t => { const m = state.data.materials.find(x => x.id === t.mid); if (m) { if (!map.has(t.mid)) map.set(t.mid, { id: t.mid, name: m.name, unit: m.unit, rec: 0, ret: 0, price: t.unitPrice }); map.get(t.mid).rec += t.qty; } });
+    rT.forEach(t => { if (map.has(t.mid)) map.get(t.mid).ret += t.qty; });
+    const list = Array.from(map.values()).map(i => ({ ...i, avail: i.rec - i.ret })).filter(i => i.avail > 0);
+    if (list.length === 0) { sel.innerHTML = '<option value="">✅ Đã trả hết</option>'; return; }
+    sel.innerHTML = list.map(m => `<option value="${m.id}" data-price="${m.price}">${escapeHtml(m.name)} (Có thể trả: ${m.avail} ${m.unit})</option>`).join('');
+    updateRPrice();
+};
+
+window.updateRPrice = function() { const sel = document.getElementById('mr-material'); const p = document.getElementById('mr-price'); if (sel && p) { p.value = Number(sel.options[sel.selectedIndex]?.dataset?.price || 0).toLocaleString('vi-VN'); } };
+
+window.doMobileReturn = async function() {
+    const pid = document.getElementById('mr-project')?.value;
+    const mid = document.getElementById('mr-material')?.value;
+    const qty = parseFloat(document.getElementById('mr-qty')?.value?.replace(',', '.')) || 0;
+    const price = parseFloat(document.getElementById('mr-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
+    if (!pid || !mid || !qty) { alert('Vui lòng nhập đầy đủ!'); return; }
+    const total = qty * price;
+    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, projectId: pid, type: 'return', qty, unitPrice: price, totalAmount: total, note: 'Trả từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    const data = await res.json();
+    if (data.success) { window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+};
+
+window.filterMStock = function() { const kw = document.getElementById('ms-search')?.value?.toLowerCase() || ''; document.querySelectorAll('#ms-list .m-stock-item').forEach(el => { el.style.display = (el.dataset.name || '').includes(kw) ? '' : 'none'; }); };
+
+window.showMobileMenu = function() { const menu = document.getElementById('m-menu'); if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; };
+
+window.renderMobileViewOnly = function() { window.loadState().then(() => { document.getElementById('root').innerHTML = renderMobileView(); sidebarOpen = false; }); };
+
+window.switchMobileMode = function(mode) { if (mode === 'desktop') { localStorage.setItem('steeltrack_ui_mode', 'desktop'); window.location.reload(); } };
+
+// Export global cho app.js
+window.renderMobileView = renderMobileView;
+window.renderMobileViewOnly = renderMobileViewOnly;
+// Chuyen trang
+window.changeTxnPage = function(page) {
+    txnPage = page;
+    const listEl = document.getElementById('m-txn-list');
+    if (listEl) {
+        listEl.innerHTML = renderRecentTxns(state.data.transactions || [], txnPage, txnLimit);
+    }
+};
+
+window.changeTxnLimit = function(limit) {
+    txnLimit = parseInt(limit);
+    txnPage = 1;
+    const listEl = document.getElementById('m-txn-list');
+    if (listEl) {
+        listEl.innerHTML = renderRecentTxns(state.data.transactions || [], txnPage, txnLimit);
+    }
+};
+// ========== INIT ==========
+export function initMobileEvents() {
+// Fix chiều cao trên điện thoại thật
+    function fixMobileHeight() {
+        const app = document.getElementById('mobile-app-container');
+        if (app) {
+            app.style.height = window.innerHeight + 'px';
+        }
+    }
+    fixMobileHeight();
+    window.addEventListener('resize', fixMobileHeight);
+    window.addEventListener('orientationchange', function() {
+        setTimeout(fixMobileHeight, 300);
+    });
+    
+    // Click outside menu    
+document.addEventListener('click', function(e) {
+        const menu = document.getElementById('m-menu');
+        if (menu && !e.target.closest('.m-header-right')) { menu.style.display = 'none'; }
+    });
+}

@@ -1056,31 +1056,32 @@ window.getFilteredTransactions = getFilteredTransactions;
 window.topProjectsChart = topProjectsChart;
 window.topSuppliersChart = topSuppliersChart;
 // ========== DỰ BÁO NHU CẦU ==========
+let forecastDataCache = null;
+let forecastPage = 1;
+let forecastLimit = 50;
+
 async function loadForecast() {
     console.log('🔍 loadForecast called');
     const container = document.getElementById('forecast-container');
-    console.log('📦 container:', container);
-    if (!container) {
-        console.log('❌ forecast-container not found');
-        return;
-    }
+    if (!container) return;
     
     container.innerHTML = '<div class="metric-sub" style="text-align:center;">🔄 Đang tải dữ liệu...</div>';
     
     try {
-        console.log('📡 Gọi API /api/forecast...');
         const res = await fetch('/api/forecast');
         const data = await res.json();
-        console.log('📊 API response:', data);
         
         if (!data.success || !data.data || data.data.length === 0) {
             container.innerHTML = '<div class="metric-sub" style="text-align:center;">📭 Chưa có dữ liệu dự báo</div>';
-            // Reset KPIs
             document.getElementById('forecast-urgent-count').textContent = '0';
             document.getElementById('forecast-warning-count').textContent = '0';
             document.getElementById('forecast-good-count').textContent = '0';
             return;
         }
+        
+        // Cache dữ liệu
+        forecastDataCache = data.data;
+        forecastPage = 1;
         
         // Cập nhật KPI cards
         const urgentCount = data.data.filter(item => item.warning_level === 'danger').length;
@@ -1095,46 +1096,84 @@ async function loadForecast() {
         if (warningEl) warningEl.textContent = warningCount;
         if (goodEl) goodEl.textContent = goodCount;
         
-        let html = '<div class="tbl-wrap"><table style="min-width:800px;"><thead><tr>' +
-            '<th>Vật tư</th><th>ĐVT</th><th style="text-align:right;">Tồn kho</th>' +
-            '<th style="text-align:right;">TB tháng</th><th style="text-align:right;">Đề xuất nhập</th>' +
-            '<th>Trạng thái</th><th>Gợi ý</th>' +
-            '</tr></thead><tbody>';
-        
-        data.data.forEach(item => {
-            const statusClass = item.warning_level === 'danger' ? 'status-danger' : 
-                               item.warning_level === 'warning' ? 'status-warn' : 
-                               item.warning_level === 'info' ? 'status-good' : 'status-good';
-            let suggestion = '';
-            if (item.current_stock <= item.min_stock) {
-                suggestion = '⚠️ Cần nhập gấp!';
-            } else if (item.total_exported > 0 && item.current_stock < item.avg_monthly_usage) {
-                suggestion = `📦 Nên nhập ${item.suggested_order} ${item.unit}`;
-            } else if (item.total_exported === 0) {
-                suggestion = '💤 Chưa có nhu cầu';
-            } else {
-                suggestion = '✅ Tạm ổn';
-            }
-            
-            html += `<tr onclick="window.showMaterialDetail('${item.id}')" style="cursor:pointer;">
-                <td><strong>${escapeHtml(item.name)}</strong></td>
-                <td>${item.unit}</td>
-                <td style="text-align:right; ${item.warning_level === 'danger' ? 'color:var(--danger-text);font-weight:bold;' : ''}">${Number(item.current_stock).toLocaleString('vi-VN')}</td>
-                <td style="text-align:right;">${Number(item.avg_monthly_usage).toLocaleString('vi-VN')}</td>
-                <td style="text-align:right;color:var(--accent);font-weight:bold;">${Number(item.suggested_order).toLocaleString('vi-VN')} ${item.unit}</td>
-                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-                <td>${suggestion}</td>
-            </tr>`;
-        });
-        
-        html += '</tbody></table></div>';
-        html += '<div class="metric-sub" style="margin-top:12px;">📌 Dự báo dựa trên nhu cầu 3 tháng gần nhất (trung bình tháng × 2 - tồn kho hiện tại)</div>';
-        container.innerHTML = html;
-        console.log('✅ Forecast rendered successfully');
+        // Render bảng với phân trang
+        renderForecastTable();
     } catch(e) {
         console.error('❌ Forecast error:', e);
         container.innerHTML = '<div class="metric-sub" style="text-align:center;">❌ Lỗi tải dữ liệu: ' + e.message + '</div>';
     }
 }
+
+function renderForecastTable() {
+    const container = document.getElementById('forecast-container');
+    if (!container || !forecastDataCache) return;
+    
+    const totalItems = forecastDataCache.length;
+    const totalPages = Math.ceil(totalItems / forecastLimit) || 1;
+    if (forecastPage > totalPages) forecastPage = totalPages;
+    if (forecastPage < 1) forecastPage = 1;
+    
+    const startIdx = (forecastPage - 1) * forecastLimit;
+    const paginatedData = forecastDataCache.slice(startIdx, startIdx + forecastLimit);
+    
+    let html = '<div class="tbl-wrap"><table style="min-width:800px;"><thead><tr>' +
+        '<th>Vật tư</th><th>ĐVT</th><th style="text-align:right;">Tồn kho</th>' +
+        '<th style="text-align:right;">TB tháng</th><th style="text-align:right;">Đề xuất nhập</th>' +
+        '<th>Trạng thái</th><th>Gợi ý</th>' +
+        '</tr></thead><tbody>';
+    
+    paginatedData.forEach(item => {
+        const statusClass = item.warning_level === 'danger' ? 'status-danger' : 
+                           item.warning_level === 'warning' ? 'status-warn' : 
+                           item.warning_level === 'info' ? 'status-good' : 'status-good';
+        let suggestion = '';
+        if (item.current_stock <= item.min_stock) {
+            suggestion = '⚠️ Cần nhập gấp!';
+        } else if (item.total_exported > 0 && item.current_stock < item.avg_monthly_usage) {
+            suggestion = '📦 Nên nhập ' + item.suggested_order + ' ' + item.unit;
+        } else if (item.total_exported === 0) {
+            suggestion = '💤 Chưa có nhu cầu';
+        } else {
+            suggestion = '✅ Tạm ổn';
+        }
+        
+        html += '<tr onclick="window.showMaterialDetail(\'' + item.id + '\')" style="cursor:pointer;">' +
+            '<td><strong>' + escapeHtml(item.name) + '</strong></td>' +
+            '<td>' + item.unit + '</td>' +
+            '<td style="text-align:right;' + (item.warning_level === 'danger' ? 'color:var(--danger-text);font-weight:bold;' : '') + '">' + Number(item.current_stock).toLocaleString('vi-VN') + '</td>' +
+            '<td style="text-align:right;">' + Number(item.avg_monthly_usage).toLocaleString('vi-VN') + '</td>' +
+            '<td style="text-align:right;color:var(--accent);font-weight:bold;">' + Number(item.suggested_order).toLocaleString('vi-VN') + ' ' + item.unit + '</td>' +
+            '<td><span class="status-badge ' + statusClass + '">' + item.status + '</span></td>' +
+            '<td>' + suggestion + '</td>' +
+            '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    
+    // Phân trang
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:8px 12px;background:var(--surface2);border-radius:8px;">';
+    html += '<div style="display:flex;gap:8px;align-items:center;">';
+    html += '<span class="metric-sub">Hiển thị:</span>';
+    html += '<select id="forecast-limit" onchange="forecastLimit=parseInt(this.value);forecastPage=1;renderForecastTable()" style="width:80px;">';
+    html += '<option value="20"' + (forecastLimit===20?' selected':'') + '>20</option>';
+    html += '<option value="50"' + (forecastLimit===50?' selected':'') + '>50</option>';
+    html += '<option value="100"' + (forecastLimit===100?' selected':'') + '>100</option>';
+    html += '<option value="500"' + (forecastLimit===500?' selected':'') + '>500</option>';
+    html += '</select>';
+    html += '</div>';
+    
+    html += '<div style="display:flex;gap:8px;align-items:center;">';
+    html += '<button class="sm" onclick="forecastPage=' + (forecastPage-1) + ';renderForecastTable()"' + (forecastPage<=1?' disabled style="opacity:0.5;cursor:not-allowed;"':'') + '>◀ Trang trước</button>';
+    html += '<span class="metric-sub">Trang ' + forecastPage + ' / ' + totalPages + ' (' + totalItems + ' vật tư)</span>';
+    html += '<button class="sm" onclick="forecastPage=' + (forecastPage+1) + ';renderForecastTable()"' + (forecastPage>=totalPages?' disabled style="opacity:0.5;cursor:not-allowed;"':'') + '>Trang sau ▶</button>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<div class="metric-sub" style="margin-top:8px;">📌 Dự báo dựa trên nhu cầu 3 tháng gần nhất (trung bình tháng × 2 - tồn kho hiện tại)</div>';
+    
+    container.innerHTML = html;
+}
+
 // Export global
 window.loadForecast = loadForecast;
+window.renderForecastTable = renderForecastTable;
