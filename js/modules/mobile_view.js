@@ -89,6 +89,9 @@ export function renderMobileView() {
                     <div class="m-nav-item active" onclick="toggleMSidebar()">
                         <span>🏠</span><span>Trang chủ</span>
                     </div>
+		    <div class="m-nav-item" onclick="toggleMSidebar();showMobileDashboard()">
+                        <span>📊</span><span>Thống kê</span>
+                    </div>
                     <div class="m-nav-item" onclick="toggleMSidebar();showMobileStock()">
                         <span>📦</span><span>Quản lý kho</span>
                     </div>
@@ -146,6 +149,10 @@ export function renderMobileView() {
                 <div class="m-btn m-btn-teal" onclick="showMobileReturn()">
                     <span class="m-btn-icon">🔄</span>
                     <span class="m-btn-label">TRẢ HÀNG</span>
+                </div>
+		<div class="m-btn m-btn-cyan" onclick="showMobileDashboard()">
+                    <span class="m-btn-icon">📊</span>
+                    <span class="m-btn-label">THỐNG KÊ</span>
                 </div>
             </div>
             
@@ -612,32 +619,44 @@ window.loadReturnMaterials = function() {
 window.updateRPrice = function() { const sel = document.getElementById('mr-material'); const p = document.getElementById('mr-price'); if (sel && p) { p.value = Number(sel.options[sel.selectedIndex]?.dataset?.price || 0).toLocaleString('vi-VN'); } };
 
 window.doMobileReturn = async function() {
-    const pid = document.getElementById('mr-project')?.value;
-    const mid = document.getElementById('mr-material')?.value;
-    const dt = document.getElementById('mr-datetime')?.value || new Date().toISOString();
-    const qty = parseFloat(document.getElementById('mr-qty')?.value?.replace(',', '.')) || 0;
-    const price = parseFloat(document.getElementById('mr-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
-    const note = document.getElementById('mr-note')?.value || '';
+    var pid = document.getElementById('mr-project')?.value;
+    var mid = document.getElementById('mr-material')?.value;
+    var dt = document.getElementById('mr-datetime')?.value || new Date().toISOString();
+    var qty = parseFloat(document.getElementById('mr-qty')?.value?.replace(',', '.')) || 0;
+    var price = parseFloat(document.getElementById('mr-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
+    var note = document.getElementById('mr-note')?.value || '';
     
     if (!pid || !mid || !qty) { alert('Vui lòng nhập đầy đủ!'); return; }
     
-    const total = qty * price;
-    const attachment = JSON.stringify((window._upPaths && window._upPaths.return) || []);
+    // Kiểm tra số lượng có thể trả
+    var uT = state.data.transactions.filter(function(t) { return t.projectId === pid && t.mid === mid && t.type === 'usage'; });
+    var rT = state.data.transactions.filter(function(t) { return t.projectId === pid && t.mid === mid && t.type === 'return'; });
+    var totalReceived = uT.reduce(function(s, t) { return s + Number(t.qty||0); }, 0);
+    var totalReturned = rT.reduce(function(s, t) { return s + Number(t.qty||0); }, 0);
+    var avail = totalReceived - totalReturned;
     
-    const res = await fetch('/api/transactions', {
+    if (qty > avail) {
+        alert('Không thể trả quá số lượng đã nhận!\nĐã nhận: ' + Number(totalReceived).toLocaleString('vi-VN') + '\nĐã trả: ' + Number(totalReturned).toLocaleString('vi-VN') + '\nCó thể trả tối đa: ' + Number(avail).toLocaleString('vi-VN'));
+        return;
+    }
+    
+    var total = qty * price;
+    var attachment = JSON.stringify((window._upPaths && window._upPaths.return) || []);
+    
+    var res = await fetch('/api/transactions', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            id: 'm_' + Date.now(), mid, projectId: pid, type: 'return',
-            qty, unitPrice: price, totalAmount: total,
+            id: 'm_' + Date.now(), mid: mid, projectId: pid, type: 'return',
+            qty: qty, unitPrice: price, totalAmount: total,
             note: note || 'Trả từ mobile',
             date: dt.split('T')[0], datetime: dt,
             attachment: attachment
         })
     });
-    const data = await res.json();
+    var data = await res.json();
     if (data.success) {
         window._upPaths = {};
-        window.loadState().then(() => renderMobileViewOnly());
+        window.loadState().then(function() { renderMobileViewOnly(); });
     } else {
         alert('❌ ' + (data.error || 'Lỗi'));
     }
@@ -704,6 +723,254 @@ window.handleMobileFiles = function(input, type) {
             });
     }
 };
+
+// ========== MODAL THỐNG KÊ (CEO DASHBOARD) ==========
+window.showMobileDashboard = function() {
+    const materials = state.data.materials || [];
+    const transactions = state.data.transactions || [];
+    const projects = state.data.projects || [];
+    const suppliers = state.data.suppliers || [];
+    
+    const html = `
+        <div class="m-modal" id="m-dashboard-modal">
+            <div class="m-modal-hd">
+                <button class="m-back" onclick="renderMobileViewOnly()">←</button>
+                <span>📊 THỐNG KÊ</span>
+                <div></div>
+            </div>
+            
+            <!-- Tab bar -->
+            <div class="m-tab-bar">
+                <div class="m-tab active" onclick="switchMDashTab('overview')" id="mtab-overview">📊 Tổng quan</div>
+                <div class="m-tab" onclick="switchMDashTab('projects')" id="mtab-projects">🏗️ Công trình</div>
+                <div class="m-tab" onclick="switchMDashTab('forecast')" id="mtab-forecast">🔮 Dự báo</div>
+                <div class="m-tab" onclick="switchMDashTab('structures')" id="mtab-structures">🏗️ Cấu kiện</div>
+            </div>
+            
+            <div id="m-dash-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;">
+                ${renderMDashOverview()}
+            </div>
+        </div>
+    `;
+    document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
+};
+// ========== SWITCH TAB THỐNG KÊ ==========
+window.switchMDashTab = function(tab) {
+    document.querySelectorAll('.m-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.getElementById('mtab-' + tab).classList.add('active');
+    var content = document.getElementById('m-dash-content');
+    if (tab === 'overview') content.innerHTML = renderMDashOverview();
+    if (tab === 'projects') { content.innerHTML = renderMDashProjects(); setTimeout(drawDonutChart, 200); }
+    if (tab === 'forecast') { content.innerHTML = '<div class="m-empty">Đang tải...</div>'; renderMDashForecast().then(function(h) { content.innerHTML = h; }); }
+    if (tab === 'structures') content.innerHTML = renderMDashStructures();
+};
+// ========== TAB TỔNG QUAN ==========
+function renderMDashOverview() {
+    var materials = state.data.materials || [];
+    var transactions = state.data.transactions || [];
+    var projects = state.data.projects || [];
+    var suppliers = state.data.suppliers || [];
+    var totalImport = transactions.filter(function(t) { return t.type === 'purchase'; }).reduce(function(s, t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var totalExport = transactions.filter(function(t) { return t.type === 'usage'; }).reduce(function(s, t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var totalInventory = materials.reduce(function(s, m) { return s + (m.qty * m.cost); }, 0);
+    var lowStockCount = materials.filter(function(m) { return m.qty <= m.low; }).length;
+    var maxFlow = Math.max(totalImport, totalExport, 1);
+    var importPct = (totalImport / maxFlow * 100).toFixed(0);
+    var exportPct = (totalExport / maxFlow * 100).toFixed(0);
+    
+    var projectStats = projects.map(function(p) {
+        var spent = transactions.filter(function(t) { return t.projectId === p.id && t.type === 'usage'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+        var ret = transactions.filter(function(t) { return t.projectId === p.id && t.type === 'return'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+        return { name: p.name, spent: spent - ret, budget: p.budget };
+    }).sort(function(a,b) { return b.spent - a.spent; }).slice(0, 5);
+    var maxProjectSpent = Math.max.apply(null, projectStats.map(function(p) { return p.spent; }).concat([1]));
+    
+    var supplierStats = suppliers.map(function(s) {
+        var total = transactions.filter(function(t) { return t.type === 'purchase' && t.supplierId === s.id; }).reduce(function(sum, t) { return sum + (Number(t.totalAmount)||0); }, 0);
+        return { name: s.name, total: total };
+    }).sort(function(a,b) { return b.total - a.total; }).slice(0, 5);
+    var maxSupplierTotal = Math.max.apply(null, supplierStats.map(function(s) { return s.total; }).concat([1]));
+    
+    var html = '<div class="m-kpi-grid">' +
+        '<div class="m-kpi-card" style="border-left:3px solid #378ADD;"><div class="m-kpi-label">📥 TỔNG NHẬP</div><div class="m-kpi-value">' + formatMoneyVND(totalImport) + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid #dc2626;"><div class="m-kpi-label">📤 TỔNG XUẤT</div><div class="m-kpi-value">' + formatMoneyVND(totalExport) + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid #16a34a;"><div class="m-kpi-label">📦 TỒN KHO</div><div class="m-kpi-value">' + formatMoneyVND(totalInventory) + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid ' + (lowStockCount > 0 ? '#ea580c' : '#16a34a') + ';"><div class="m-kpi-label">⚠️ SẮP HẾT</div><div class="m-kpi-value" style="color:' + (lowStockCount > 0 ? '#dc2626' : '#16a34a') + ';">' + lowStockCount + '</div></div>' +
+        '</div>';
+    
+    // Biểu đồ cột so sánh
+    html += '<div class="m-section"><div class="m-section-title">📊 SO SÁNH NHẬP - XUẤT</div><div class="m-chart-card">' +
+        '<div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>📥 Nhập</span><span style="font-weight:700;">' + formatMoneyVND(totalImport) + '</span></div><div class="m-bar-wrap"><div class="m-bar-fill" style="width:' + importPct + '%;background:linear-gradient(90deg,#378ADD,#85B7EB);box-shadow:0 0 8px rgba(55,138,221,0.3);"></div></div></div>' +
+        '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>📤 Xuất</span><span style="font-weight:700;">' + formatMoneyVND(totalExport) + '</span></div><div class="m-bar-wrap"><div class="m-bar-fill" style="width:' + exportPct + '%;background:linear-gradient(90deg,#dc2626,#F09595);box-shadow:0 0 8px rgba(220,38,38,0.3);"></div></div></div>' +
+        '</div></div>';
+    
+    if (projectStats.length > 0) {
+        html += '<div class="m-section"><div class="m-section-title">🏗️ TOP CÔNG TRÌNH</div><div class="m-chart-card">';
+        projectStats.forEach(function(p, i) {
+            var pct = (p.spent / maxProjectSpent * 100).toFixed(0);
+            html += '<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-weight:600;">' + (i+1) + '. ' + escapeHtml(p.name) + '</span><span style="font-weight:700;">' + formatMoneyVND(p.spent) + '</span></div><div class="m-bar-wrap"><div class="m-bar-fill" style="width:' + pct + '%;background:#378ADD;"></div></div></div>';
+        });
+        html += '</div></div>';
+    }
+    
+    if (supplierStats.length > 0) {
+        html += '<div class="m-section"><div class="m-section-title">🏭 TOP NHÀ CUNG CẤP</div><div class="m-chart-card">';
+        supplierStats.forEach(function(s, i) {
+            var pct = (s.total / maxSupplierTotal * 100).toFixed(0);
+            html += '<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-weight:600;">' + (i+1) + '. ' + escapeHtml(s.name) + '</span><span style="font-weight:700;">' + formatMoneyVND(s.total) + '</span></div><div class="m-bar-wrap"><div class="m-bar-fill" style="width:' + pct + '%;background:#16a34a;"></div></div></div>';
+        });
+        html += '</div></div>';
+    }
+    
+    return html;
+}
+// ========== TAB CÔNG TRÌNH ==========
+function renderMDashProjects() {
+    var projects = state.data.projects || [];
+    var transactions = state.data.transactions || [];
+    var totalBudget = projects.reduce(function(s, p) { return s + Number(p.budget||0); }, 0);
+    var totalSpent = transactions.filter(function(t) { return t.type === 'usage'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var totalReturn = transactions.filter(function(t) { return t.type === 'return'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var net = totalSpent - totalReturn;
+    var remainPct = totalBudget > 0 ? ((totalBudget - net) / totalBudget * 100).toFixed(1) : 0;
+    var spentPct = totalBudget > 0 ? (net / totalBudget * 100).toFixed(1) : 0;
+    
+    var projectStats = projects.map(function(p) {
+        var spent = transactions.filter(function(t) { return t.projectId === p.id && t.type === 'usage'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+        var ret = transactions.filter(function(t) { return t.projectId === p.id && t.type === 'return'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+        var netSpent = spent - ret;
+        var pct = p.budget > 0 ? (netSpent / p.budget * 100) : 0;
+        return { name: p.name, spent: netSpent, budget: p.budget, pct: pct };
+    }).sort(function(a,b) { return b.spent - a.spent; });
+    
+    var maxSpent = Math.max.apply(null, projectStats.map(function(p) { return p.spent; }).concat([1]));
+    
+    var html = '<div class="m-kpi-grid">' +
+        '<div class="m-kpi-card" style="border-left:3px solid #378ADD;"><div class="m-kpi-label">🏗️ TỔNG CT</div><div class="m-kpi-value">' + projects.length + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid #16a34a;"><div class="m-kpi-label">💰 NGÂN SÁCH</div><div class="m-kpi-value">' + formatMoneyVND(totalBudget) + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid #dc2626;"><div class="m-kpi-label">💸 ĐÃ CHI</div><div class="m-kpi-value">' + formatMoneyVND(net) + '</div></div>' +
+        '<div class="m-kpi-card" style="border-left:3px solid #0891b2;"><div class="m-kpi-label">📊 CÒN LẠI</div><div class="m-kpi-value">' + formatMoneyVND(totalBudget - net) + '</div></div>' +
+        '</div>';
+    
+    // Biểu đồ tròn ngân sách (vẽ bằng Canvas nhỏ)
+    html += '<div class="m-section"><div class="m-section-title">🎯 TỔNG QUAN NGÂN SÁCH</div><div class="m-chart-card" style="text-align:center;">' +
+        '<canvas id="m-donut-canvas" width="150" height="150" style="display:block;margin:0 auto;"></canvas>' +
+        '<div style="display:flex;justify-content:center;gap:20px;margin-top:8px;">' +
+            '<div style="font-size:12px;"><span style="display:inline-block;width:12px;height:12px;background:#dc2626;border-radius:50%;margin-right:6px;"></span>Đã chi: ' + formatMoneyVND(net) + '</div>' +
+            '<div style="font-size:12px;"><span style="display:inline-block;width:12px;height:12px;background:#16a34a;border-radius:50%;margin-right:6px;"></span>Còn lại: ' + formatMoneyVND(totalBudget - net) + '</div>' +
+        '</div></div></div>';    
+    // Chi tiết từng công trình
+    html += '<div class="m-section"><div class="m-section-title">🏗️ CHI TIẾT CÔNG TRÌNH</div><div class="m-chart-card">';
+    projectStats.forEach(function(p, i) {
+        var barPct = (p.spent / maxSpent * 100).toFixed(0);
+        var isLast = i === projectStats.length - 1;
+        var color = p.pct > 90 ? '#dc2626' : p.pct > 70 ? '#ea580c' : '#378ADD';
+        var bgColor = p.pct > 90 ? 'rgba(220,38,38,0.15)' : p.pct > 70 ? 'rgba(234,88,12,0.15)' : 'rgba(55,138,221,0.15)';
+        html += '<div style="margin-bottom:12px;' + (isLast ? '' : 'border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:10px;') + '">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+                '<span style="font-weight:600;">' + (i+1) + '. ' + escapeHtml(p.name) + '</span>' +
+                '<span style="background:' + bgColor + ';color:' + color + ';padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;">' + p.pct.toFixed(1) + '%</span>' +
+            '</div>' +
+            '<div class="m-bar-wrap"><div class="m-bar-fill" style="width:' + barPct + '%;background:' + color + ';"></div></div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:11px;color:#7a8099;margin-top:4px;"><span>💰 ' + formatMoneyVND(p.spent) + ' / ' + formatMoneyVND(p.budget) + '</span><span>Còn ' + formatMoneyVND(p.budget - p.spent) + '</span></div>' +
+            '</div>';
+    });
+    html += '</div></div>';
+    return html;
+}
+// ========== TAB DỰ BÁO ==========
+async function renderMDashForecast() {
+    try {
+        const res = await fetch('/api/forecast');
+        const data = await res.json();
+        if (!data.success || !data.data) return '<div class="m-empty">Chưa có dữ liệu</div>';
+        
+        const urgent = data.data.filter(i => i.warning_level === 'danger').length;
+        const warning = data.data.filter(i => i.warning_level === 'warning').length;
+        const good = data.data.filter(i => i.warning_level === 'good' || i.warning_level === 'info').length;
+        
+        return `
+            <div class="m-kpi-grid">
+                <div class="m-kpi-card" style="border-left:3px solid #dc2626;"><div class="m-kpi-label">⚠️ CẦN NHẬP GẤP</div><div class="m-kpi-value" style="color:#dc2626;">${urgent}</div></div>
+                <div class="m-kpi-card" style="border-left:3px solid #ea580c;"><div class="m-kpi-label">📦 SẮP HẾT</div><div class="m-kpi-value" style="color:#ea580c;">${warning}</div></div>
+                <div class="m-kpi-card" style="border-left:3px solid #16a34a;"><div class="m-kpi-label">✅ ĐỦ HÀNG</div><div class="m-kpi-value" style="color:#16a34a;">${good}</div></div>
+                <div class="m-kpi-card" style="border-left:3px solid #378ADD;"><div class="m-kpi-label">📊 TỔNG</div><div class="m-kpi-value">${data.data.length}</div></div>
+            </div>
+            <div class="m-section"><div class="m-section-title">📦 DỰ BÁO NHU CẦU</div><div class="m-chart-card">${data.data.map(item => { const cls = item.warning_level === 'danger' ? 'm-text-red' : item.warning_level === 'warning' ? '' : ''; return `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span class="${cls}" style="font-weight:600;">${escapeHtml(item.name)}</span><span>${item.status}</span></div><div style="display:flex;justify-content:space-between;font-size:11px;color:#7a8099;"><span>Tồn: ${Number(item.current_stock).toLocaleString('vi-VN')} | TB: ${Number(item.avg_monthly_usage).toLocaleString('vi-VN')}</span><span style="color:#378ADD;">Nhập: ${Number(item.suggested_order).toLocaleString('vi-VN')} ${item.unit}</span></div></div>`}).join('')}</div></div>
+        `;
+    } catch(e) {
+        return '<div class="m-empty">❌ Lỗi tải dữ liệu</div>';
+    }
+}
+
+// ========== TAB CẤU KIỆN ==========
+function renderMDashStructures() {
+    const structures = state.data.structures || [];
+    const transactions = state.data.transactions || [];
+    
+    const produceTxns = transactions.filter(t => t.type === 'produce');
+    const exportTxns = transactions.filter(t => t.type === 'structure_export');
+    const totalProduced = produceTxns.reduce((s,t) => s + Number(t.qty||0), 0);
+    const totalExported = exportTxns.reduce((s,t) => s + Number(t.qty||0), 0);
+    const stockValue = structures.reduce((s, st) => s + (Number(st.qty||0) * Number(st.cost||0)), 0);
+    
+    const maxQty = Math.max(...structures.map(s => Number(s.qty||0)), 1);
+    
+    return `
+        <div class="m-kpi-grid">
+            <div class="m-kpi-card" style="border-left:3px solid #378ADD;"><div class="m-kpi-label">🏗️ TỔNG CK</div><div class="m-kpi-value">${structures.length}</div></div>
+            <div class="m-kpi-card" style="border-left:3px solid #16a34a;"><div class="m-kpi-label">🏭 ĐÃ SX</div><div class="m-kpi-value">${Number(totalProduced).toLocaleString('vi-VN')}</div></div>
+            <div class="m-kpi-card" style="border-left:3px solid #dc2626;"><div class="m-kpi-label">📤 ĐÃ XUẤT</div><div class="m-kpi-value">${Number(totalExported).toLocaleString('vi-VN')}</div></div>
+            <div class="m-kpi-card" style="border-left:3px solid #0891b2;"><div class="m-kpi-label">💰 GIÁ TRỊ</div><div class="m-kpi-value">${formatMoneyVND(stockValue)}</div></div>
+        </div>
+        <div class="m-section"><div class="m-section-title">🏗️ TỒN KHO CẤU KIỆN</div><div class="m-chart-card">${structures.map(s => `<div style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05);"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:600;">${escapeHtml(s.name)}</span><span>${Number(s.qty||0).toLocaleString('vi-VN')} ${s.unit}</span></div><div class="m-bar-wrap"><div class="m-bar-fill" style="width:${(Number(s.qty||0)/maxQty*100).toFixed(0)}%;background:#378ADD;"></div></div><div style="font-size:10px;color:#7a8099;margin-top:2px;">${formatMoneyVND(s.cost)}/${s.unit} · Tổng: ${formatMoneyVND(Number(s.qty||0)*Number(s.cost||0))}</div></div>`).join('')}</div></div>
+    `;
+}
+
+function drawDonutChart() {
+    var canvas = document.getElementById('m-donut-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var projects = state.data.projects || [];
+    var transactions = state.data.transactions || [];
+    var totalBudget = projects.reduce(function(s, p) { return s + Number(p.budget||0); }, 0);
+    var totalSpent = transactions.filter(function(t) { return t.type === 'usage'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var totalReturn = transactions.filter(function(t) { return t.type === 'return'; }).reduce(function(s,t) { return s + (Number(t.totalAmount)||0); }, 0);
+    var net = totalSpent - totalReturn;
+    var spentPct = totalBudget > 0 ? Math.min(100, (net / totalBudget * 100)) : 0;
+    var remainPct = 100 - spentPct;
+    
+    var cx = 75, cy = 75, r = 55, w = 20;
+    
+    // Xóa canvas
+    ctx.clearRect(0, 0, 150, 150);
+    
+    // Vẽ phần đã chi (màu đỏ)
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + (spentPct/100) * Math.PI*2);
+    ctx.lineWidth = w;
+    ctx.strokeStyle = '#dc2626';
+    ctx.stroke();
+    
+    // Vẽ phần còn lại (màu xanh)
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, -Math.PI/2 + (spentPct/100) * Math.PI*2, -Math.PI/2 + Math.PI*2);
+    ctx.lineWidth = w;
+    ctx.strokeStyle = '#16a34a';
+    ctx.stroke();
+    
+    // Text ở giữa
+    ctx.fillStyle = '#e8eaf0';
+    ctx.font = 'bold 18px IBM Plex Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText(spentPct.toFixed(1) + '%', cx, cy - 2);
+    ctx.fillStyle = '#7a8099';
+    ctx.font = '10px IBM Plex Sans';
+    ctx.fillText('đã sử dụng', cx, cy + 14);
+}
+window.updateMobileTotal = updateMobileTotal;
+
 // ========== INIT ==========
 export function initMobileEvents() {
 // Fix chiều cao trên điện thoại thật
