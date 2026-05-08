@@ -375,7 +375,7 @@ kbd{display:inline-block;padding:3px 6px;font-family:monospace;font-size:11px;fo
     :root{--sidebar-width:50px;}
     .sidebar{width:50px;}
     .sidebar .sidebar-logo{font-size:0;padding:18px 10px;text-align:center;}
-    .sidebar .sidebar-logo::before{content:'🏭';font-size:20px;}
+    /*.sidebar .sidebar-logo::before{content:'🏭';font-size:20px;}*/
     .sidebar .sidebar-user{display:none;}
     .sidebar .nav-item span{display:none;}
     .sidebar .nav-item{justify-content:center;padding:12px 0;}

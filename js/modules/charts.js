@@ -684,68 +684,194 @@ function renderTabContent(tab) {
             </div>
         `;
     }
-    if (tab === 'structures') {
-        const stats = getStructureStats();
-        
-        // Tạo bảng top cấu kiện thay vì biểu đồ tròn
-        let topListHtml = '<div class="metric-sub" style="text-align:center;padding:20px;">📭 Chưa có dữ liệu sản xuất</div>';
-        if (stats.topProduced && stats.topProduced.length > 0) {
-            topListHtml = `
-                <div class="tbl-wrap">
-                    <table style="min-width: 300px;">
-                        <thead>
+if (tab === 'structures') {
+    const stats = getStructureStats();
+    
+    // KPI Cards riêng cho tab Cấu kiện
+    const structureKPIs = `
+        <div class="kpi-grid" style="margin-bottom:16px;">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(55,138,221,0.15)">🏗️</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">TỔNG CẤU KIỆN</div>
+                    <div class="kpi-value">${stats.totalStructures || 0}</div>
+                    <div class="kpi-sub">Loại cấu kiện</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(151,196,89,0.15)">🏭</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">ĐÃ SẢN XUẤT</div>
+                    <div class="kpi-value">${Number(stats.totalProduced || 0).toLocaleString('vi-VN')}</div>
+                    <div class="kpi-sub">${stats.totalProductionRuns || 0} đợt sản xuất</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(240,149,149,0.15)">📤</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">ĐÃ XUẤT CT</div>
+                    <div class="kpi-value">${Number(stats.totalExported || 0).toLocaleString('vi-VN')}</div>
+                    <div class="kpi-sub">${formatMoneyVND(stats.totalExportValue || 0)}</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(250,199,117,0.15)">⚠️</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">TỒN THẤP</div>
+                    <div class="kpi-value" style="color: ${stats.lowStockCount > 0 ? 'var(--danger-text)' : 'var(--success-text)'};">${stats.lowStockCount || 0}</div>
+                    <div class="kpi-sub">${stats.lowStockCount > 0 ? 'Cần sản xuất thêm' : 'Tất cả ổn ✅'}</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Tạo bảng top cấu kiện
+    let topListHtml = '<div class="metric-sub" style="text-align:center;padding:20px;">📭 Chưa có dữ liệu sản xuất</div>';
+    if (stats.topProduced && stats.topProduced.length > 0) {
+        topListHtml = `
+            <div class="tbl-wrap">
+                <table style="min-width: 300px;">
+                    <thead>
+                        <tr>
+                            <th>Tên cấu kiện</th>
+                            <th style="text-align:right;">Số lượng</th>
+                            <th>ĐVT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stats.topProduced.map(p => `
                             <tr>
-                                <th>Tên cấu kiện</th>
-                                <th style="text-align:right;">Số lượng</th>
-                                <th>ĐVT</th>
+                                <td><strong>${escapeHtml(p.name)}</strong></td>
+                                <td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(p.qty).toLocaleString('vi-VN')}</td>
+                                <td>${p.unit}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            ${stats.topProduced.map(p => `
-                                <tr>
-                                    <td><strong>${escapeHtml(p.name)}</strong></td>
-                                    <td style="text-align:right;font-weight:bold;color:var(--accent);">${Number(p.qty).toLocaleString('vi-VN')}</td>
-                                    <td>${p.unit}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        
-        return filters + renderStructureKPIs(stats) + `
-            <div class="grid2" style="margin-bottom:18px;">
-                <div class="card">
-                    <div class="sec-title">📈 XU HƯỚNG SẢN XUẤT 6 THÁNG</div>
-                    <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
-                </div>
-                <div class="card">
-                    <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT NHIỀU NHẤT</div>
-                    ${topListHtml}
-                </div>
-            </div>
-            <div class="card">
-                <div class="sec-title">📦 TỒN KHO CẤU KIỆN CHI TIẾT</div>
-                ${renderStructureInventory(stats)}
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
         `;
     }
-    if (tab === 'forecast') {
-        return `
-            ${renderFiltersAndTabs()}
-            <div class="card">
-                <div class="sec-title">📦 DỰ BÁO NHU CẦU VẬT TƯ (3 tháng gần nhất)</div>
-                <div id="forecast-container">
-                    <div class="metric-sub" style="text-align:center;">Đang tải dữ liệu...</div>
+    
+    // Bảng tồn kho cấu kiện có phân trang
+    const limit = parseInt(document.getElementById('structure-limit')?.value || '50');
+    const page = parseInt(document.getElementById('structure-page')?.value || '1');
+    const stockStats = stats.stockStats || [];
+    const totalItems = stockStats.length;
+    const totalPages = Math.ceil(totalItems / limit) || 1;
+    const startIdx = (page - 1) * limit;
+    const paginatedData = stockStats.slice(startIdx, startIdx + limit);
+    
+    const inventoryHtml = stockStats.length > 0 ? `
+        <div class="card">
+            <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>📦 TỒN KHO CẤU KIỆN CHI TIẾT</span>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <span class="metric-sub">Hiển thị:</span>
+                    <select id="structure-limit" onchange="switchDashboardTab('structures')" style="width:80px;">
+                        <option value="20" ${limit === 20 ? 'selected' : ''}>20</option>
+                        <option value="50" ${limit === 50 ? 'selected' : ''}>50</option>
+                        <option value="100" ${limit === 100 ? 'selected' : ''}>100</option>
+                        <option value="500" ${limit === 500 ? 'selected' : ''}>500</option>
+                    </select>
                 </div>
             </div>
-        `;
-    }
+            <div class="tbl-wrap">
+                <table style="min-width: 700px;">
+                    <thead>
+                        <tr>
+                            <th>Tên cấu kiện</th>
+                            <th style="text-align:right;">Tồn kho</th>
+                            <th>ĐVT</th>
+                            <th style="text-align:right;">Đơn giá</th>
+                            <th style="text-align:right;">Thành tiền</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${paginatedData.map(s => {
+                            const statusClass = s.qty < 10 ? 'status-danger' : s.qty < 30 ? 'status-warn' : 'status-good';
+                            const statusText = s.qty < 10 ? '⚠️ Sắp hết' : s.qty < 30 ? '📦 TB' : '✅ Tốt';
+                            return `<tr style="cursor:pointer;" onclick="window.showStructureDetail('${s.id}')">
+                                <td><strong style="color:var(--accent);">${escapeHtml(s.name)}</strong></td>
+                                <td style="text-align:right; ${s.qty < 10 ? 'color:var(--danger-text);font-weight:bold;' : ''}">${Number(s.qty || 0).toLocaleString('vi-VN')} ${s.unit}</td>
+                                <td>${s.unit}</td>
+                                <td style="text-align:right;">${formatMoneyVND(s.cost || 0)}</td>
+                                <td style="text-align:right;color:var(--accent);font-weight:500;">${formatMoneyVND(s.totalValue || 0)}</td>
+                                <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding: 0 8px;">
+                <button class="sm" onclick="document.getElementById('structure-page').value=${page-1};switchDashboardTab('structures')" ${page <= 1 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>◀ Trang trước</button>
+                <span class="metric-sub">Trang ${page} / ${totalPages} (${totalItems} cấu kiện)</span>
+                <button class="sm" onclick="document.getElementById('structure-page').value=${page+1};switchDashboardTab('structures')" ${page >= totalPages ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>Trang sau ▶</button>
+            </div>
+            <input type="hidden" id="structure-page" value="${page}">
+        </div>
+    ` : '<div class="card"><div class="metric-sub" style="text-align:center;padding:20px;">📭 Chưa có cấu kiện nào</div></div>';
+    
+    return filters + structureKPIs + `
+        <div class="grid2" style="margin-bottom:18px;">
+            <div class="card">
+                <div class="sec-title">📈 XU HƯỚNG SẢN XUẤT 6 THÁNG</div>
+                <div class="chart-container" style="height:280px;"><canvas id="structure-trend-chart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="sec-title">🥧 TOP CẤU KIỆN SẢN XUẤT NHIỀU NHẤT</div>
+                ${topListHtml}
+            </div>
+        </div>
+        ${inventoryHtml}
+    `;
+}
+if (tab === 'forecast') {
+    return `
+        ${renderFiltersAndTabs()}
+        <div class="kpi-grid" style="margin-bottom:16px;">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(55,138,221,0.15)">📊</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">TỔNG VẬT TƯ</div>
+                    <div class="kpi-value">${state.data.materials.length}</div>
+                    <div class="kpi-sub">Đang theo dõi</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(240,149,149,0.15)">⚠️</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">CẦN NHẬP GẤP</div>
+                    <div class="kpi-value" id="forecast-urgent-count" style="color:var(--danger-text);">—</div>
+                    <div class="kpi-sub">Dưới ngưỡng an toàn</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(250,199,117,0.15)">📦</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">SẮP HẾT</div>
+                    <div class="kpi-value" id="forecast-warning-count" style="color:var(--warn-text);">—</div>
+                    <div class="kpi-sub">Cần theo dõi</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background:rgba(151,196,89,0.15)">✅</div>
+                <div class="kpi-info">
+                    <div class="kpi-label">ĐỦ HÀNG</div>
+                    <div class="kpi-value" id="forecast-good-count" style="color:var(--success-text);">—</div>
+                    <div class="kpi-sub">An toàn</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="sec-title">📦 DỰ BÁO NHU CẦU VẬT TƯ (3 tháng gần nhất)</div>
+            <div id="forecast-container">
+                <div class="metric-sub" style="text-align:center;">🔄 Đang tải dữ liệu...</div>
+            </div>
+        </div>
+    `;
+}
 
-    if (tab === 'forecast') {
-        return ;
-    }
 
     return '';
 }
@@ -949,39 +1075,60 @@ async function loadForecast() {
         
         if (!data.success || !data.data || data.data.length === 0) {
             container.innerHTML = '<div class="metric-sub" style="text-align:center;">📭 Chưa có dữ liệu dự báo</div>';
+            // Reset KPIs
+            document.getElementById('forecast-urgent-count').textContent = '0';
+            document.getElementById('forecast-warning-count').textContent = '0';
+            document.getElementById('forecast-good-count').textContent = '0';
             return;
         }
+        
+        // Cập nhật KPI cards
+        const urgentCount = data.data.filter(item => item.warning_level === 'danger').length;
+        const warningCount = data.data.filter(item => item.warning_level === 'warning').length;
+        const goodCount = data.data.filter(item => item.warning_level === 'good' || item.warning_level === 'info').length;
+        
+        const urgentEl = document.getElementById('forecast-urgent-count');
+        const warningEl = document.getElementById('forecast-warning-count');
+        const goodEl = document.getElementById('forecast-good-count');
+        
+        if (urgentEl) urgentEl.textContent = urgentCount;
+        if (warningEl) warningEl.textContent = warningCount;
+        if (goodEl) goodEl.textContent = goodCount;
         
         let html = '<div class="tbl-wrap"><table style="min-width:800px;"><thead><tr>' +
             '<th>Vật tư</th><th>ĐVT</th><th style="text-align:right;">Tồn kho</th>' +
             '<th style="text-align:right;">TB tháng</th><th style="text-align:right;">Đề xuất nhập</th>' +
             '<th>Trạng thái</th><th>Gợi ý</th>' +
-            '</thead><tbody>';
+            '</tr></thead><tbody>';
         
         data.data.forEach(item => {
-            const statusClass = item.warning_level === 'danger' ? 'b-danger' : item.warning_level === 'warning' ? 'b-low' : 'b-ok';
+            const statusClass = item.warning_level === 'danger' ? 'status-danger' : 
+                               item.warning_level === 'warning' ? 'status-warn' : 
+                               item.warning_level === 'info' ? 'status-good' : 'status-good';
             let suggestion = '';
             if (item.current_stock <= item.min_stock) {
                 suggestion = '⚠️ Cần nhập gấp!';
             } else if (item.total_exported > 0 && item.current_stock < item.avg_monthly_usage) {
                 suggestion = `📦 Nên nhập ${item.suggested_order} ${item.unit}`;
+            } else if (item.total_exported === 0) {
+                suggestion = '💤 Chưa có nhu cầu';
             } else {
                 suggestion = '✅ Tạm ổn';
             }
             
             html += `<tr onclick="window.showMaterialDetail('${item.id}')" style="cursor:pointer;">
                 <td><strong>${escapeHtml(item.name)}</strong></td>
-                <td>${item.unit}</span></td>
-                <td style="text-align:right; ${item.warning_level !== 'good' ? 'color:var(--danger-text);font-weight:bold;' : ''}">${Number(item.current_stock).toLocaleString('vi-VN')}</span></td>
-                <td style="text-align:right;">${Number(item.avg_monthly_usage).toLocaleString('vi-VN')}</span></td>
-                <td style="text-align:right;color:var(--accent);font-weight:bold;">${Number(item.suggested_order).toLocaleString('vi-VN')} ${item.unit}</span></td>
-                <td><span class="badge ${statusClass}">${item.status}</span></span></td>
-                <td>${suggestion}</span></td>
-              </tr>`;
+                <td>${item.unit}</td>
+                <td style="text-align:right; ${item.warning_level === 'danger' ? 'color:var(--danger-text);font-weight:bold;' : ''}">${Number(item.current_stock).toLocaleString('vi-VN')}</td>
+                <td style="text-align:right;">${Number(item.avg_monthly_usage).toLocaleString('vi-VN')}</td>
+                <td style="text-align:right;color:var(--accent);font-weight:bold;">${Number(item.suggested_order).toLocaleString('vi-VN')} ${item.unit}</td>
+                <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                <td>${suggestion}</td>
+            </tr>`;
         });
         
         html += '</tbody></table></div>';
-        html += '<div class="metric-sub" style="margin-top:12px;">📌 Dự báo dựa trên nhu cầu 3 tháng gần nhất (trung bình tháng × 2 - tồn kho)</div>';
+        html += '<div class="metric-sub" style="margin-top:12px;">📌 Dự báo dựa trên nhu cầu 3 tháng gần nhất (trung bình tháng × 2 - tồn kho hiện tại)</div>';
         container.innerHTML = html;
         console.log('✅ Forecast rendered successfully');
     } catch(e) {
@@ -989,6 +1136,5 @@ async function loadForecast() {
         container.innerHTML = '<div class="metric-sub" style="text-align:center;">❌ Lỗi tải dữ liệu: ' + e.message + '</div>';
     }
 }
-
 // Export global
 window.loadForecast = loadForecast;
