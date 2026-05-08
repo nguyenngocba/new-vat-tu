@@ -43,14 +43,23 @@ window.doLogin = function() {
     
     if (!username || !password) { if (errorEl) { errorEl.textContent = '⚠️ Vui lòng nhập đầy đủ!'; errorEl.style.display = 'block'; } return; }
     const user = state.data.users.find(u => u.username.toLowerCase() === username && u.password === password);
-    if (user) { if (errorEl) errorEl.style.display = 'none'; login(user.id); }
+    if (user) { 
+        if (errorEl) errorEl.style.display = 'none'; 
+        localStorage.setItem('steeltrack_current_user', JSON.stringify(user));
+        login(user.id); 
+    }
     else { if (errorEl) { errorEl.textContent = '❌ Sai tài khoản hoặc mật khẩu!'; errorEl.style.display = 'block'; } }
 };
 
 document.addEventListener('keydown', function(e) { if (e.key === 'Enter' && document.getElementById('login-username')) window.doLogin(); });
 
 export function login(uid) { state.currentUser = state.data.users.find(u => u.id === uid); addLog('Đăng nhập', 'Đăng nhập thành công'); state.currentPane = 'dashboard'; if (window.render) window.render(); }
-export function logout() { addLog('Đăng xuất', 'Đăng xuất'); state.currentUser = null; if (window.render) window.render(); }
+export function logout() { 
+    localStorage.removeItem('steeltrack_current_user');
+    addLog('Đăng xuất', 'Đăng xuất'); 
+    state.currentUser = null; 
+    if (window.render) window.render(); 
+}
 export function switchPane(pane) { state.currentPane = pane; if (window.render) window.render(); }
 export function setCurrentUser(user) { state.currentUser = user; }
 export function getCurrentUser() { return state.currentUser; }

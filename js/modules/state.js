@@ -14,6 +14,15 @@ export let state = {
   filters: { projectSearch: '', supplierSearch: '', materialSearch: '' }
 };
 
+// DEBUG: Bẫy ai reset currentUser - ĐẶT SAU DẤU };
+var _currentUser = state.currentUser;
+Object.defineProperty(state, 'currentUser', {
+  get: function() { return _currentUser; },
+  set: function(val) {
+    console.trace('🔥 currentUser thay đổi từ', _currentUser?.name, 'thành', val?.name);
+    _currentUser = val;
+  }
+});
 function timeCode() {
     const now = new Date();
     return String(now.getFullYear()).substr(2) +
@@ -23,10 +32,25 @@ function timeCode() {
            String(now.getMinutes()).padStart(2,'0');
 }
 
+
 export async function loadState() {
   try {
+    // KHÔI PHỤC USER TỪ LOCALSTORAGE
+    if (!state.currentUser || !state.currentUser.id) {
+      var saved = localStorage.getItem('steeltrack_current_user');
+      if (saved) {
+        try { 
+          state.currentUser = JSON.parse(saved); 
+          console.log('Đã khôi phục user:', state.currentUser.name);
+        } catch(e) {}
+      }
+    }
+    
     const res = await fetch('/api/data').then(r => r.json());
+ // LƯU USER HIỆN TẠI TRƯỚC KHI LOAD
+    var savedUser = state.currentUser;
     if (res.success && res.data) {
+// Giữ lại user đang đăng nhập
       if (res.data.materials?.length) state.data.materials = res.data.materials;
       if (res.data.transactions?.length) state.data.transactions = res.data.transactions.map(t => ({ ...t, supplierId: t.supplier_id, projectId: t.project_id, unitPrice: t.unit_price, vatRate: t.vat_rate, totalAmount: t.total_amount, vatAmount: t.vat_amount, invoiceImage: t.invoice_image }));
   console.log("First transaction attachment:", res.data.transactions[0]?.attachment);
@@ -34,7 +58,7 @@ export async function loadState() {
       if (res.data.projects?.length) state.data.projects = res.data.projects;
       if (res.data.suppliers?.length) state.data.suppliers = res.data.suppliers;
       if (res.data.users?.length) state.data.users = res.data.users;
-      if (res.data.logs?.length) state.data.logs = res.data.logs;
+if (res.data.logs?.length) state.data.logs = res.data.logs.map(function(l) { return { ...l, userName: l.user_name || l.userName, userId: l.user_id || l.userId }; });     
       if (res.data.categories?.length) state.data.categories = res.data.categories;
       if (res.data.units?.length) state.data.units = res.data.units;
       if (res.data.projectSchedules?.length) state.data.projectSchedules = res.data.projectSchedules.map(s => ({...s, ...(typeof s.data === 'string' ? JSON.parse(s.data) : s.data)}));
@@ -47,6 +71,12 @@ export async function loadState() {
       }
     }
   } catch(e) {}
+//  if (savedUser) state.currentUser = savedUser;
+// LUÔN KHÔI PHỤC USER TỪ LOCALSTORAGE SAU KHI LOAD
+  var saved = localStorage.getItem('steeltrack_current_user');
+  if (saved) {
+    try { state.currentUser = JSON.parse(saved); } catch(e) {}
+  }
   applyTheme(state.theme);
 }
 
@@ -65,14 +95,31 @@ export function saveState() {
     });
   }
 }
-
 export function addLog(action, details) {
-  if (!state.currentUser) state.currentUser = { id: "system", name: "System" };
-  const id = 'LOG' + timeCode() + String(state.data.nextLogId++).padStart(3,'0');
-  state.data.logs.unshift({ id, timestamp: new Date().toISOString(), timeStr: new Date().toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}), userId: state.currentUser.id, userName: state.currentUser.name, action, details });
-  fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state.data.logs[0]) });
+  var user = (window.state && window.state.currentUser) || state.currentUser;
+  
+  console.log('DEBUG addLog - state.currentUser:', state.currentUser?.name);
+  console.log('DEBUG addLog - window.state.currentUser:', window.state?.currentUser?.name);
+  console.log('DEBUG addLog - localStorage:', localStorage.getItem('steeltrack_current_user'));
+  console.log('DEBUG addLog - user cuối cùng:', user?.name);
+  
+  if (!user || !user.id) {
+    user = { id: "system", name: "System" };
+  }
+  
+  var id = 'LOG' + timeCode() + String(state.data.nextLogId++).padStart(3,'0');
+  var logEntry = { 
+    id: id, 
+    timestamp: new Date().toISOString(), 
+    timeStr: new Date().toLocaleString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'}), 
+    userId: user.id, 
+    userName: user.name, 
+    action: action, 
+    details: details 
+  };
+  state.data.logs.unshift(logEntry);
+  fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(logEntry) });
 }
-
 // ID theo quy tắc: tvsvt = vật tư, tvsct = công trình, tvsnc = nhà cung cấp, tvskh = giao dịch
 let _matCounter = 0, _projCounter = 0, _supCounter = 0, _txnCounter = 0;
 export function genMid() { _matCounter++; return 'tvsvt' + timeCode() + String(_matCounter).padStart(3,'0'); }

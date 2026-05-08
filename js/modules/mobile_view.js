@@ -562,7 +562,9 @@ window.doMobileImport = async function() {
     if (data.success) {
         if (navigator.vibrate) navigator.vibrate(50);
         window._upPaths = {};
-        window.loadState().then(() => renderMobileViewOnly());
+        var matLog = state.data.materials.find(function(m) { return m.id === mid; });
+        addLog('Nhập kho (Mobile)', (matLog?.name||'N/A') + ' - SL: ' + qty.toLocaleString('vi-VN') + ' - VAT: ' + vat + '%');
+        window.loadState().then(function() { renderMobileViewOnly(); });    
     } else {
         alert('❌ ' + (data.error || 'Lỗi'));
     }
@@ -596,7 +598,10 @@ window.doMobileExport = async function() {
     if (data.success) {
         if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
         window._upPaths = {};
-        window.loadState().then(() => renderMobileViewOnly());
+        var matLog2 = state.data.materials.find(function(m) { return m.id === mid; });
+        var projLog = state.data.projects.find(function(p) { return p.id === projectId; });
+        addLog('Xuất kho (Mobile)', (matLog2?.name||'N/A') + ' - SL: ' + qty.toLocaleString('vi-VN') + ' - CT: ' + (projLog?.name||'N/A'));
+        window.loadState().then(function() { renderMobileViewOnly(); });    
     } else {
         alert('❌ ' + (data.error || 'Lỗi'));
     }
@@ -656,6 +661,9 @@ window.doMobileReturn = async function() {
     var data = await res.json();
     if (data.success) {
         window._upPaths = {};
+        var matLog3 = state.data.materials.find(function(m) { return m.id === mid; });
+        var projLog2 = state.data.projects.find(function(p) { return p.id === pid; });
+        addLog('Trả hàng (Mobile)', (matLog3?.name||'N/A') + ' - SL: ' + qty.toLocaleString('vi-VN') + ' - CT: ' + (projLog2?.name||'N/A'));
         window.loadState().then(function() { renderMobileViewOnly(); });
     } else {
         alert('❌ ' + (data.error || 'Lỗi'));
