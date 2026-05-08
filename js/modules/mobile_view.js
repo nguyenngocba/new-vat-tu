@@ -98,9 +98,6 @@ export function renderMobileView() {
                     <div class="m-nav-item" onclick="toggleMSidebar();showMobileLowStock()">
                         <span>⚠️</span><span>Sắp hết hàng</span>
                     </div>
-                    <div class="m-nav-item" onclick="toggleMSidebar();switchMobileMode('desktop')">
-                        <span>💻</span><span>Chế độ Desktop</span>
-                    </div>
                 </div>
                 <div class="m-sidebar-footer">
                     <div class="m-nav-item" onclick="logout()">
@@ -284,15 +281,16 @@ window.showMobileStock = function() {
     const materials = state.data.materials || [];
     
     let html = `
-        <div class="m-modal">
+        <div class="m-modal" id="m-stock-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
                 <span>📦 TỒN KHO (${materials.length})</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd" style="padding:0;">
-                <div style="padding:12px;"><input type="text" id="ms-search" class="m-search" placeholder="🔍 Tìm vật tư..." oninput="filterMStock()"></div>
-                <div id="ms-list">
+            <div class="m-modal-bd" style="padding:12px;">
+                <input type="text" id="ms-search" class="m-search" placeholder="🔍 Tìm vật tư..." oninput="filterMStock()">
+            </div>
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;" id="ms-list">
     `;
     
     materials.forEach(m => {
@@ -311,8 +309,9 @@ window.showMobileStock = function() {
         `;
     });
     
-    html += `</div></div></div>`;
+    html += `</div></div>`;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
 };
 
 // ========== MODAL SẮP HẾT ==========
@@ -320,13 +319,13 @@ window.showMobileLowStock = function() {
     const materials = state.data.materials.filter(m => m.qty <= m.low);
     
     let html = `
-        <div class="m-modal">
+        <div class="m-modal" id="m-low-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
-                <span>⚠️ SẮP HẾT HÀNG</span>
+                <span>⚠️ SẮP HẾT HÀNG (${materials.length})</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd" style="padding:0;">
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
     `;
     
     if (materials.length === 0) {
@@ -350,44 +349,48 @@ window.showMobileLowStock = function() {
     
     html += `</div></div>`;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
 };
-
 // ========== MODAL CÔNG TRÌNH ==========
 window.showMobileProjects = function() {
     const projects = state.data.projects || [];
     
     let html = `
-        <div class="m-modal">
+        <div class="m-modal" id="m-project-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
-                <span>🏗️ CÔNG TRÌNH</span>
+                <span>🏗️ CÔNG TRÌNH (${projects.length})</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd" style="padding:0;">
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
     `;
     
-    projects.forEach(p => {
-        const spent = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
-        const ret = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
-        const net = spent - ret;
-        const pct = p.budget > 0 ? Math.min(100, (net / p.budget) * 100) : 0;
-        
-        html += `
-            <div class="m-project-item" onclick="window.showProjectDetail('${p.id}')">
-                <div class="m-project-info">
-                    <div class="m-project-name">${escapeHtml(p.name)}</div>
-                    <div class="m-project-meta">${formatMoneyVND(net)} / ${formatMoneyVND(p.budget)}</div>
-                    <div class="m-project-bar"><div class="m-project-fill" style="width:${pct}%;background:${pct>90?'var(--red)':pct>70?'var(--orange)':'var(--blue)'};"></div></div>
+    if (projects.length === 0) {
+        html += '<div class="m-empty">📭 Chưa có công trình</div>';
+    } else {
+        projects.forEach(p => {
+            const spent = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'usage').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
+            const ret = state.data.transactions.filter(t => t.projectId === p.id && t.type === 'return').reduce((s,t) => s + (Number(t.totalAmount)||0), 0);
+            const net = spent - ret;
+            const pct = p.budget > 0 ? Math.min(100, (net / p.budget) * 100) : 0;
+            
+            html += `
+                <div class="m-project-item" onclick="window.showProjectDetail('${p.id}')">
+                    <div class="m-project-info">
+                        <div class="m-project-name">${escapeHtml(p.name)}</div>
+                        <div class="m-project-meta">💰 Đã chi: ${formatMoneyVND(net)} / ${formatMoneyVND(p.budget)}</div>
+                        <div class="m-project-bar"><div class="m-project-fill" style="width:${pct}%;background:${pct>90?'var(--red)':pct>70?'var(--orange)':'var(--blue)'};"></div></div>
+                    </div>
+                    <div class="m-project-pct">${pct.toFixed(0)}%</div>
                 </div>
-                <div class="m-project-pct">${pct.toFixed(0)}%</div>
-            </div>
-        `;
-    });
+            `;
+        });
+    }
     
     html += `</div></div>`;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
 };
-
 // ========== MODAL TRẢ HÀNG ==========
 window.showMobileReturn = function() {
     const projects = state.data.projects.filter(p => state.data.transactions.some(t => t.projectId === p.id && t.type === 'usage'));
@@ -533,6 +536,16 @@ window.changeTxnLimit = function(limit) {
         listEl.innerHTML = renderRecentTxns(state.data.transactions || [], txnPage, txnLimit);
     }
 };
+function fixAllModalHeight() {
+    setTimeout(function() {
+        var modals = document.querySelectorAll('.m-modal');
+        modals.forEach(function(modal) {
+            modal.style.height = window.innerHeight + 'px';
+            modal.style.display = 'flex';
+            modal.style.flexDirection = 'column';
+        });
+    }, 50);
+}
 // ========== INIT ==========
 export function initMobileEvents() {
 // Fix chiều cao trên điện thoại thật

@@ -991,7 +991,16 @@ flex-shrink: 0;
 .m-page-info { font-size: 11px; color: #7a8099; white-space: nowrap; }
 
 /* Modal */
-.m-modal { background: #0f1117; min-height: 100vh; }
+.m-modal { 
+    background: #0f1117; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
 .m-modal-hd {
     background: #181c25;
     padding: 12px 16px;
@@ -999,12 +1008,10 @@ flex-shrink: 0;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid rgba(255,255,255,0.07);
-    position: sticky;
-    top: 0;
-    z-index: 10;
     font-weight: 700;
     font-size: 16px;
     color: #e8eaf0;
+    flex-shrink: 0;
 }
 .m-back {
     background: none;
