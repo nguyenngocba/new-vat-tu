@@ -157,12 +157,10 @@ export function renderMobileView() {
 				 </div>
 				</div>
             </div>
-            
             <!-- MENU POPUP -->
             <div id="m-menu" class="m-menu" style="display:none;" onclick="event.stopPropagation()">
-                <div class="m-menu-item" onclick="switchMobileMode('desktop')">🖥️ Chuyển Desktop</div>
                 <div class="m-menu-item" onclick="logout()">🚪 Đăng xuất</div>
-            </div>
+            </div>            
         </div>
     `;
 }
@@ -177,6 +175,7 @@ window.toggleMSidebar = function() {
 };
 
 // ========== MODAL NHẬP KHO ==========
+// ========== MODAL NHẬP KHO ==========
 window.showMobileImport = function() {
     const materials = state.data.materials || [];
     const suppliers = state.data.suppliers || [];
@@ -184,27 +183,34 @@ window.showMobileImport = function() {
     if (materials.length === 0) { alert('Chưa có vật tư!'); return; }
     if (suppliers.length === 0) { alert('Chưa có nhà cung cấp!'); return; }
     
+    const now = new Date();
+    const dt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
     const html = `
-        <div class="m-modal">
+        <div class="m-modal" id="m-import-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
                 <span>📥 NHẬP KHO</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd">
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;">
                 <div class="m-field">
-                    <label>Nhà cung cấp</label>
+                    <label>📅 Thời gian</label>
+                    <input type="datetime-local" id="mi-datetime" value="${dt}">
+                </div>
+                <div class="m-field">
+                    <label>🏭 Nhà cung cấp</label>
                     <select id="mi-supplier">${suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
                 </div>
                 <div class="m-field">
-                    <label>Vật tư</label>
+                    <label>📦 Vật tư</label>
                     <select id="mi-material" onchange="updateMPrice()">${materials.map(m => `<option value="${m.id}" data-cost="${m.cost}" data-unit="${m.unit}">${escapeHtml(m.name)} (${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}</select>
                 </div>
                 <div class="m-field">
-                    <label>Số lượng</label>
+                    <label>🔢 Số lượng</label>
                     <div class="m-qty-box">
                         <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
-                        <input type="text" id="mi-qty" value="1" dir="ltr" class="m-qty-input">
+                        <input type="text" id="mi-qty" value="1" dir="ltr" class="m-qty-input" oninput="updateMobileTotal()">
                         <button class="m-qty-btn" onclick="changeMQty(1)">+</button>
                     </div>
                     <div class="m-qty-presets">
@@ -215,24 +221,40 @@ window.showMobileImport = function() {
                     </div>
                 </div>
                 <div class="m-field">
-                    <label>Đơn giá (VNĐ)</label>
-                    <input type="text" id="mi-price" value="0" dir="ltr">
+                    <label>💰 Đơn giá (VNĐ)</label>
+                    <input type="text" id="mi-price" value="0" dir="ltr" oninput="updateMobileTotal()">
+                </div>
+                <div class="m-field">
+                    <label>🧾 VAT (%)</label>
+                    <input type="text" id="mi-vat" value="10" dir="ltr" oninput="updateMobileTotal()">
+                </div>
+                <div class="m-field">
+                    <label>📝 Ghi chú</label>
+                    <input type="text" id="mi-note" placeholder="Mã hóa đơn, số chứng từ...">
+                </div>
+                <div class="m-field">
+                    <label>📎 File đính kèm</label>
+                    <input type="file" id="mi-files" multiple accept="image/*,.pdf,.xlsx,.csv,.doc,.docx" onchange="handleMobileFiles(this,'purchase')" style="padding:10px;">
+                    <div id="mi-file-list" style="margin-top:6px;font-size:11px;color:#7a8099;"></div>
                 </div>
                 <div class="m-summary">
-                    VAT 10% · Thành tiền: <strong id="mi-total" style="color:var(--green);">0 ₫</strong>
+                    <div>💰 Tiền hàng: <strong id="mi-subtotal">0 ₫</strong></div>
+                    <div>🧾 VAT (<span id="mi-vat-rate">10</span>%): <strong id="mi-vat-amount">0 ₫</strong></div>
+                    <div style="font-size:16px;margin-top:4px;">💵 TỔNG: <strong id="mi-total" style="color:#16a34a;">0 ₫</strong></div>
                 </div>
                 <button class="m-submit" onclick="doMobileImport()">✅ XÁC NHẬN NHẬP KHO</button>
             </div>
         </div>
     `;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
     setTimeout(() => {
         const sel = document.getElementById('mi-material');
         if (sel) { const opt = sel.options[sel.selectedIndex]; document.getElementById('mi-price').value = Number(opt?.dataset?.cost || 0).toLocaleString('vi-VN'); }
         updateMobileTotal();
     }, 100);
 };
-
+// ========== MODAL XUẤT KHO ==========
 // ========== MODAL XUẤT KHO ==========
 window.showMobileExport = function() {
     const materials = state.data.materials || [];
@@ -241,24 +263,31 @@ window.showMobileExport = function() {
     if (materials.length === 0) { alert('Chưa có vật tư!'); return; }
     if (projects.length === 0) { alert('Chưa có công trình!'); return; }
     
+    const now = new Date();
+    const dt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
     const html = `
-        <div class="m-modal">
+        <div class="m-modal" id="m-export-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
                 <span>📤 XUẤT KHO</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd">
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;">
                 <div class="m-field">
-                    <label>Công trình</label>
+                    <label>📅 Thời gian</label>
+                    <input type="datetime-local" id="me-datetime" value="${dt}">
+                </div>
+                <div class="m-field">
+                    <label>🏗️ Công trình</label>
                     <select id="me-project">${projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
                 </div>
                 <div class="m-field">
-                    <label>Vật tư</label>
+                    <label>📦 Vật tư</label>
                     <select id="me-material">${materials.map(m => `<option value="${m.id}" data-cost="${m.cost}" data-unit="${m.unit}" data-qty="${m.qty}">${escapeHtml(m.name)} (Còn: ${Number(m.qty).toLocaleString('vi-VN')} ${m.unit})</option>`).join('')}</select>
                 </div>
                 <div class="m-field">
-                    <label>Số lượng</label>
+                    <label>🔢 Số lượng</label>
                     <div class="m-qty-box">
                         <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
                         <input type="text" id="me-qty" value="1" dir="ltr" class="m-qty-input">
@@ -266,16 +295,21 @@ window.showMobileExport = function() {
                     </div>
                 </div>
                 <div class="m-field">
-                    <label>Ghi chú</label>
+                    <label>📝 Ghi chú</label>
                     <input type="text" id="me-note" placeholder="Vị trí sử dụng...">
                 </div>
-                <button class="m-submit" style="background:var(--red);" onclick="doMobileExport()">✅ XÁC NHẬN XUẤT KHO</button>
+                <div class="m-field">
+                    <label>📎 File đính kèm</label>
+                    <input type="file" id="me-files" multiple accept="image/*,.pdf,.xlsx,.csv,.doc,.docx" onchange="handleMobileFiles(this,'usage')" style="padding:10px;">
+                    <div id="me-file-list" style="margin-top:6px;font-size:11px;color:#7a8099;"></div>
+                </div>
+                <button class="m-submit" style="background:#dc2626;" onclick="doMobileExport()">✅ XÁC NHẬN XUẤT KHO</button>
             </div>
         </div>
     `;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
 };
-
 // ========== MODAL TỒN KHO ==========
 window.showMobileStock = function() {
     const materials = state.data.materials || [];
@@ -397,24 +431,31 @@ window.showMobileReturn = function() {
     
     if (projects.length === 0) { alert('Chưa có công trình nào được xuất kho!'); return; }
     
-    let html = `
-        <div class="m-modal">
+    const now = new Date();
+    const dt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    const html = `
+        <div class="m-modal" id="m-return-modal">
             <div class="m-modal-hd">
                 <button class="m-back" onclick="renderMobileViewOnly()">←</button>
                 <span>🔄 TRẢ HÀNG</span>
                 <div></div>
             </div>
-            <div class="m-modal-bd">
+            <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;">
                 <div class="m-field">
-                    <label>Công trình</label>
+                    <label>📅 Thời gian</label>
+                    <input type="datetime-local" id="mr-datetime" value="${dt}">
+                </div>
+                <div class="m-field">
+                    <label>🏗️ Công trình</label>
                     <select id="mr-project" onchange="loadReturnMaterials()">${projects.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')}</select>
                 </div>
                 <div class="m-field">
-                    <label>Vật tư</label>
+                    <label>📦 Vật tư</label>
                     <select id="mr-material" onchange="updateRPrice()"></select>
                 </div>
                 <div class="m-field">
-                    <label>Số lượng</label>
+                    <label>🔢 Số lượng</label>
                     <div class="m-qty-box">
                         <button class="m-qty-btn" onclick="changeMQty(-1)">−</button>
                         <input type="text" id="mr-qty" value="1" dir="ltr" class="m-qty-input">
@@ -422,17 +463,26 @@ window.showMobileReturn = function() {
                     </div>
                 </div>
                 <div class="m-field">
-                    <label>Đơn giá</label>
+                    <label>💰 Đơn giá hoàn</label>
                     <input type="text" id="mr-price" value="0" dir="ltr" readonly>
                 </div>
-                <button class="m-submit" style="background:var(--teal);" onclick="doMobileReturn()">✅ XÁC NHẬN TRẢ HÀNG</button>
+                <div class="m-field">
+                    <label>📝 Ghi chú</label>
+                    <input type="text" id="mr-note" placeholder="Lý do trả hàng...">
+                </div>
+                <div class="m-field">
+                    <label>📎 File đính kèm</label>
+                    <input type="file" id="mr-files" multiple accept="image/*,.pdf,.xlsx,.csv,.doc,.docx" onchange="handleMobileFiles(this,'return')" style="padding:10px;">
+                    <div id="mr-file-list" style="margin-top:6px;font-size:11px;color:#7a8099;"></div>
+                </div>
+                <button class="m-submit" style="background:#0d9488;" onclick="doMobileReturn()">✅ XÁC NHẬN TRẢ HÀNG</button>
             </div>
         </div>
     `;
     document.getElementById('root').innerHTML = html;
+    fixAllModalHeight();
     setTimeout(() => loadReturnMaterials(), 100);
 };
-
 // ========== CÁC HÀM XỬ LÝ ==========
 window.changeMQty = function(delta) {
     const input = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty');
@@ -451,34 +501,99 @@ window.setMQty = function(val) {
 
 window.updateMPrice = function() { const sel = document.getElementById('mi-material'); const priceInput = document.getElementById('mi-price'); if (sel && priceInput) { priceInput.value = Number(sel.options[sel.selectedIndex]?.dataset?.cost || 0).toLocaleString('vi-VN'); } updateMobileTotal(); };
 
-function updateMobileTotal() { const qtyInput = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty'); const priceInput = document.getElementById('mi-price') || document.getElementById('mr-price'); const totalEl = document.getElementById('mi-total'); if (qtyInput && priceInput && totalEl) { const qty = parseFloat(qtyInput.value.replace(',', '.')) || 0; const price = parseFloat(priceInput.value.replace(/\./g, '').replace(',', '.')) || 0; totalEl.textContent = formatMoneyVND(qty * price * 1.1); } }
-
+function updateMobileTotal() {
+    const qtyInput = document.getElementById('mi-qty') || document.getElementById('me-qty') || document.getElementById('mr-qty');
+    const priceInput = document.getElementById('mi-price') || document.getElementById('mr-price');
+    const vatInput = document.getElementById('mi-vat');
+    const subtotalEl = document.getElementById('mi-subtotal');
+    const vatRateEl = document.getElementById('mi-vat-rate');
+    const vatAmountEl = document.getElementById('mi-vat-amount');
+    const totalEl = document.getElementById('mi-total');
+    
+    if (qtyInput && priceInput) {
+        const qty = parseFloat(qtyInput.value.replace(',', '.')) || 0;
+        const price = parseFloat(priceInput.value.replace(/\./g, '').replace(',', '.')) || 0;
+        const vat = vatInput ? (parseFloat(vatInput.value.replace(',', '.')) || 0) : 0;
+        const subtotal = qty * price;
+        const vatAmount = subtotal * vat / 100;
+        const total = subtotal + vatAmount;
+        
+        if (subtotalEl) subtotalEl.textContent = formatMoneyVND(subtotal);
+        if (vatRateEl) vatRateEl.textContent = vat;
+        if (vatAmountEl) vatAmountEl.textContent = formatMoneyVND(vatAmount);
+        if (totalEl) totalEl.textContent = formatMoneyVND(total);
+    }
+}
 window.doMobileImport = async function() {
     const supplierId = document.getElementById('mi-supplier')?.value;
     const mid = document.getElementById('mi-material')?.value;
+    const dt = document.getElementById('mi-datetime')?.value || new Date().toISOString();
     const qty = parseFloat(document.getElementById('mi-qty')?.value?.replace(',', '.')) || 0;
     const price = parseFloat(document.getElementById('mi-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
+    const vat = parseFloat(document.getElementById('mi-vat')?.value?.replace(',', '.')) || 0;
+    const note = document.getElementById('mi-note')?.value || '';
+    
     if (!supplierId || !mid || !qty || !price) { alert('Vui lòng nhập đầy đủ!'); return; }
-    const total = qty * price;
-    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, supplierId, type: 'purchase', qty, unitPrice: price, vatRate: 10, subtotal: total, vatAmount: total * 0.1, totalAmount: total * 1.1, note: 'Nhập từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    
+    const subtotal = qty * price;
+    const vatAmount = subtotal * vat / 100;
+    const total = subtotal + vatAmount;
+    const attachment = JSON.stringify((window._upPaths && window._upPaths.purchase) || []);
+    
+    const res = await fetch('/api/transactions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id: 'm_' + Date.now(), mid, supplierId, type: 'purchase',
+            qty, unitPrice: price, vatRate: vat,
+            subtotal, vatAmount, totalAmount: total,
+            note: note || 'Nhập từ mobile',
+            date: dt.split('T')[0], datetime: dt,
+            attachment: attachment
+        })
+    });
     const data = await res.json();
-    if (data.success) { if (navigator.vibrate) navigator.vibrate(50); window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+    if (data.success) {
+        if (navigator.vibrate) navigator.vibrate(50);
+        window._upPaths = {};
+        window.loadState().then(() => renderMobileViewOnly());
+    } else {
+        alert('❌ ' + (data.error || 'Lỗi'));
+    }
 };
-
 window.doMobileExport = async function() {
     const projectId = document.getElementById('me-project')?.value;
     const mid = document.getElementById('me-material')?.value;
+    const dt = document.getElementById('me-datetime')?.value || new Date().toISOString();
     const qty = parseFloat(document.getElementById('me-qty')?.value?.replace(',', '.')) || 0;
     const note = document.getElementById('me-note')?.value;
+    
     if (!projectId || !mid || !qty) { alert('Vui lòng nhập đầy đủ!'); return; }
+    
     const mat = state.data.materials.find(m => m.id === mid);
     if (mat && mat.qty < qty) { alert(`Không đủ tồn! Còn ${mat.qty} ${mat.unit}`); return; }
+    
     const total = qty * (mat?.cost || 0);
-    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, projectId, type: 'usage', qty, unitPrice: mat?.cost || 0, totalAmount: total, note: note || 'Xuất từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    const attachment = JSON.stringify((window._upPaths && window._upPaths.usage) || []);
+    
+    const res = await fetch('/api/transactions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id: 'm_' + Date.now(), mid, projectId, type: 'usage',
+            qty, unitPrice: mat?.cost || 0, totalAmount: total,
+            note: note || 'Xuất từ mobile',
+            date: dt.split('T')[0], datetime: dt,
+            attachment: attachment
+        })
+    });
     const data = await res.json();
-    if (data.success) { if (navigator.vibrate) navigator.vibrate([50, 50, 50]); window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+    if (data.success) {
+        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+        window._upPaths = {};
+        window.loadState().then(() => renderMobileViewOnly());
+    } else {
+        alert('❌ ' + (data.error || 'Lỗi'));
+    }
 };
-
 window.loadReturnMaterials = function() {
     const pid = document.getElementById('mr-project')?.value;
     const sel = document.getElementById('mr-material');
@@ -499,15 +614,34 @@ window.updateRPrice = function() { const sel = document.getElementById('mr-mater
 window.doMobileReturn = async function() {
     const pid = document.getElementById('mr-project')?.value;
     const mid = document.getElementById('mr-material')?.value;
+    const dt = document.getElementById('mr-datetime')?.value || new Date().toISOString();
     const qty = parseFloat(document.getElementById('mr-qty')?.value?.replace(',', '.')) || 0;
     const price = parseFloat(document.getElementById('mr-price')?.value?.replace(/\./g, '').replace(',', '.')) || 0;
+    const note = document.getElementById('mr-note')?.value || '';
+    
     if (!pid || !mid || !qty) { alert('Vui lòng nhập đầy đủ!'); return; }
+    
     const total = qty * price;
-    const res = await fetch('/api/transactions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: 'm_' + Date.now(), mid, projectId: pid, type: 'return', qty, unitPrice: price, totalAmount: total, note: 'Trả từ mobile', date: new Date().toISOString().split('T')[0], datetime: new Date().toISOString(), attachment: '[]' }) });
+    const attachment = JSON.stringify((window._upPaths && window._upPaths.return) || []);
+    
+    const res = await fetch('/api/transactions', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id: 'm_' + Date.now(), mid, projectId: pid, type: 'return',
+            qty, unitPrice: price, totalAmount: total,
+            note: note || 'Trả từ mobile',
+            date: dt.split('T')[0], datetime: dt,
+            attachment: attachment
+        })
+    });
     const data = await res.json();
-    if (data.success) { window.loadState().then(() => renderMobileViewOnly()); } else { alert('❌ ' + (data.error || 'Lỗi')); }
+    if (data.success) {
+        window._upPaths = {};
+        window.loadState().then(() => renderMobileViewOnly());
+    } else {
+        alert('❌ ' + (data.error || 'Lỗi'));
+    }
 };
-
 window.filterMStock = function() { const kw = document.getElementById('ms-search')?.value?.toLowerCase() || ''; document.querySelectorAll('#ms-list .m-stock-item').forEach(el => { el.style.display = (el.dataset.name || '').includes(kw) ? '' : 'none'; }); };
 
 window.showMobileMenu = function() { const menu = document.getElementById('m-menu'); if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none'; };
@@ -546,6 +680,30 @@ function fixAllModalHeight() {
         });
     }, 50);
 }
+// ========== XỬ LÝ FILE UPLOAD TỪ MOBILE ==========
+window.handleMobileFiles = function(input, type) {
+    if (!window._upPaths) window._upPaths = {};
+    if (!window._upPaths[type]) window._upPaths[type] = [];
+    
+    const listId = (type === 'purchase' ? 'mi' : type === 'usage' ? 'me' : 'mr') + '-file-list';
+    const list = document.getElementById(listId);
+    
+    for (let i = 0; i < input.files.length; i++) {
+        const f = input.files[i];
+        const fd = new FormData();
+        fd.append('file', f);
+        const id = type + '_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+        
+        fetch('/api/upload/' + type + '/' + id, { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    window._upPaths[type].push(d.path);
+                    if (list) list.innerHTML += '<a href="' + d.path + '" target="_blank" style="color:#378ADD;margin-right:6px;display:inline-block;">📎 ' + d.filename + '</a> ';
+                }
+            });
+    }
+};
 // ========== INIT ==========
 export function initMobileEvents() {
 // Fix chiều cao trên điện thoại thật
