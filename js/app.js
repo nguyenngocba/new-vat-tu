@@ -1,8 +1,9 @@
 import { state, saveState, loadState, addLog } from './modules/state.js';
 window.state = state;
 window.saveState = saveState;
-window.loadState = loadState;  // THÊM DÒNG NÀY
-window.addLog = addLog;        // THÊM DÒNG NÀY (nếu cần)
+window.loadState = loadState;
+window.addLog = addLog;
+
 import { renderLogin, renderSidebar, renderTopbar, switchPane, setCurrentUser, getCurrentUser, closeModal, showModal } from './modules/auth.js';
 import { renderMaterials, openMatModal, editMaterial, updateMaterial, deleteMaterial, saveMat } from './modules/materials.js';
 import { renderProjects, openProjectModal, saveProject, deleteProject, showProjectDetail, exportProjectDetail, exportAllProjectsReport } from './modules/projects.js';
@@ -16,17 +17,34 @@ import { initShortcuts } from './modules/shortcuts.js';
 import { renderSettings, addCategory, addUnit, toggleTheme, addUser, deleteUser, changePassword, toggleUserPermission } from './modules/settings.js';
 import { showImportModal, importMaterialsFromExcel, importProjectsFromExcel, importSuppliersFromExcel } from './modules/import.js';
 
+let sidebarCollapsed = localStorage.getItem('steeltrack_sidebar_collapsed') === 'true';
+
 function render() {
     const root = document.getElementById('root');
     const currentUser = getCurrentUser();
     if (!currentUser) { root.innerHTML = renderLogin(); return; }
+    
     const cp = state.currentPane;
-    root.innerHTML = `<div id="app-layout"><div class="sidebar">${renderSidebar()}</div><div class="main-content">${renderTopbar()}<div id="pane-entry" class="pane ${cp==='entry'?'active':''}">${renderMaterials()}</div><div id="pane-dashboard" class="pane ${cp==='dashboard'?'active':''}">${renderDashboard()}</div><div id="pane-structures" class="pane ${cp==='structures'?'active':''}">${renderStructures()}</div>
+    root.innerHTML = `<div id="app-layout"><div class="sidebar ${sidebarCollapsed ? 'collapsed' : ''}">${renderSidebar()}</div><div class="main-content">${renderTopbar()}<div id="pane-entry" class="pane ${cp==='entry'?'active':''}">${renderMaterials()}</div><div id="pane-dashboard" class="pane ${cp==='dashboard'?'active':''}">${renderDashboard()}</div><div id="pane-structures" class="pane ${cp==='structures'?'active':''}">${renderStructures()}</div>
         <div id="pane-projects" class="pane ${cp==='projects'?'active':''}">${renderProjects()}</div><div id="pane-suppliers" class="pane ${cp==='suppliers'?'active':''}">${renderSuppliers()}</div><div id="pane-logs" class="pane ${cp==='logs'?'active':''}">${renderLogs()}</div><div id="pane-settings" class="pane ${cp==='settings'?'active':''}">${renderSettings()}</div><div id="modal-area"></div></div></div>`;
     if (cp === 'dashboard') setTimeout(() => { renderDashboardChart(); bindDashboardSearchEvents(); }, 100);
 }
 
-// Khởi tạo
+window.toggleSidebar = function() {
+    sidebarCollapsed = !sidebarCollapsed;
+    localStorage.setItem('steeltrack_sidebar_collapsed', sidebarCollapsed);
+    
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        if (sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+        } else {
+            sidebar.classList.remove('collapsed');
+        }
+    }
+    render();
+};
+
 loadState().then(() => {
     checkAutoBackup();
     initShortcuts();
@@ -46,26 +64,12 @@ loadState().then(() => {
     window.openTxnModal = (type, pid = null) => openTxnModal(type, pid); window.saveExport = saveExport;
     window.calculatePurchaseTotal = calculatePurchaseTotal; window.calculateExportTotal = calculateExportTotal;
     window.openPurchaseModalWithSupplier = openPurchaseModalWithSupplier;
-window.savePurchaseWithSupplier = savePurchaseWithSupplier;
+    window.savePurchaseWithSupplier = savePurchaseWithSupplier;
     window.openReturnModal = openReturnModal; window.saveReturn = saveReturn; window.clearReturnAttachment = clearReturnAttachment;
-window.openPurchaseModalWithSupplier = openPurchaseModalWithSupplier;
-window.savePurchaseWithSupplier = savePurchaseWithSupplier;
     window.addCategory = addCategory; window.addUnit = addUnit; window.toggleTheme = toggleTheme;
-window.saveNow = function() { saveState(); alert("✅ Đã lưu vào database!"); };
+    window.saveNow = function() { saveState(); alert("✅ Đã lưu vào database!"); };
     window.addUser = addUser; window.deleteUser = deleteUser; window.changePassword = changePassword; window.toggleUserPermission = toggleUserPermission;
-window.addUser = addUser;
-window.deleteUser = deleteUser;
-window.changePassword = changePassword;
     window.exportToExcel = exportToExcel; window.showImportModal = showImportModal;
     window.render = render;
-window.addUser = function() { import("./modules/settings.js").then(m => m.addUser()); };
-window.deleteUser = function(uid) { import("./modules/settings.js").then(m => m.deleteUser(uid)); };
-window.changePassword = function(uid) { import("./modules/settings.js").then(m => m.changePassword(uid)); };
-window.toggleSidebar = function() {
-  const s = document.querySelector(".sidebar");
-  if (s) s.classList.toggle("collapsed");
-  localStorage.setItem("steeltrack_sidebar_collapsed", s?.classList.contains("collapsed"));
-};
-window.render = render;
     render();
 });

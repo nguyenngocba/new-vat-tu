@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SteelTrack Pro - Mobile</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #e2e8f0; min-height: 100vh; }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 20px;
+        }
+        .login-card {
+            background: white;
+            border-radius: 32px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .login-card h2 { text-align: center; margin-bottom: 28px; color: #1e3a8a; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #334155; }
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+        .input-group input:focus { outline: none; border-color: #3b82f6; }
+        
+        .mode-selector { margin: 24px 0; padding: 16px; background: #f8fafc; border-radius: 24px; }
+        .mode-selector h4 { margin-bottom: 12px; color: #1e293b; }
+        .mode-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .mode-option:hover { background: #e2e8f0; }
+        .mode-option input { width: 20px; height: 20px; cursor: pointer; }
+        .mode-desc { font-size: 0.75rem; color: #64748b; margin-left: 32px; }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .login-btn:hover { background: #2563eb; }
+        
+        /* App container */
+        .app-container { display: none; padding: 16px; max-width: 1400px; margin: 0 auto; }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .logout-btn {
+            padding: 8px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        
+        /* Desktop mode */
+        .desktop-table {
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .desktop-table table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .desktop-table th, .desktop-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .desktop-table th { background: #f8fafc; }
+        .desktop-only { display: block; }
+        .mobile-only { display: none; }
+        
+        /* Mobile mode */
+        .product-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .product-card .product-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; }
+        .product-card .product-stock { font-size: 1.5rem; font-weight: bold; color: #1e3a8a; margin: 8px 0; }
+        .product-card .product-info { font-size: 0.85rem; color: #64748b; display: flex; justify-content: space-between; }
+        
+        .mobile-action-bar {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            position: sticky;
+            bottom: 16px;
+            padding: 8px 0;
+        }
+        .mobile-action-bar button {
+            flex: 1;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+        .btn-nhap-mobile { background: #22c55e; color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .btn-xuat-mobile { background: #ef4444; color: white; box-shadow: 0 4px 12px rgba(239,68,68,0.3); }
+        
+        .quick-form-mobile {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .quick-form-mobile input, .quick-form-mobile select {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            border: 1px solid #cbd5e1;
+            margin-bottom: 12px;
+        }
+        .mobile-tools { display: flex; gap: 12px; margin-top: 16px; }
+        .mobile-tools button { flex: 1; padding: 14px; border-radius: 40px; background: #f1f5f9; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-container">
+    <div class="login-card">
+        <h2>🏭 STEELTRACK PRO</h2>
+        <div class="input-group">
+            <label>👤 Tên đăng nhập</label>
+            <input type="text" id="username" placeholder="Nhập tên" value="admin">
+        </div>
+        <div class="input-group">
+            <label>🔒 Mật khẩu</label>
+            <input type="password" id="password" placeholder="Nhập mật khẩu" value="admin123">
+        </div>
+        <div class="mode-selector">
+            <h4>📱 Chọn chế độ hiển thị</h4>
+            <div class="mode-option" onclick="document.getElementById('modeDesktop').checked=true">
+                <input type="radio" name="displayMode" id="modeDesktop" value="desktop" checked>
+                <label>🖥️ Desktop (đầy đủ cột, nhiều chức năng)</label>
+            </div>
+            <div class="mode-desc">→ Giao diện quen thuộc, hiển thị đầy đủ thông tin</div>
+            <div class="mode-option" onclick="document.getElementById('modeMobile').checked=true">
+                <input type="radio" name="displayMode" id="modeMobile" value="mobile">
+                <label>📱 Mobile (giao diện đơn giản, nút to)</label>
+            </div>
+            <div class="mode-desc">→ Chỉ hiển thị thông tin cơ bản + nút nhập/xuất to</div>
+        </div>
+        <button class="login-btn" onclick="login()">🔓 ĐĂNG NHẬP</button>
+    </div>
+</div>
+
+<div id="appScreen" class="app-container">
+    <div class="app-header">
+        <h3>🏪 STEELTRACK PRO</h3>
+        <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+    </div>
+
+    <div id="desktopView" class="desktop-only">
+        <div class="desktop-table">
+            <table>
+                <thead><tr><th>TT</th><th>Sản phẩm</th><th>Tồn kho</th><th>Đơn vị</th><th>Đơn giá</th><th>Nhà cung cấp</th></tr></thead>
+                <tbody id="desktopTableBody"></tbody>
+            </table>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:12px;">
+            <button onclick="quickNhapDesktop()" style="padding:12px 24px;background:#22c55e;color:white;border:none;border-radius:30px;">📦 Nhập kho</button>
+            <button onclick="quickXuatDesktop()" style="padding:12px 24px;background:#ef4444;color:white;border:none;border-radius:30px;">📤 Xuất kho</button>
+        </div>
+    </div>
+
+    <div id="mobileView" class="mobile-only">
+        <div class="mobile-action-bar">
+            <button class="btn-nhap-mobile" onclick="openMobileNhap()">📦 NHẬP +</button>
+            <button class="btn-xuat-mobile" onclick="openMobileXuat()">📤 XUẤT -</button>
+        </div>
+        <div id="mobileProductList"></div>
+        <div class="quick-form-mobile" id="mobileQuickForm">
+            <h4 id="mobileFormTitle">📝 Nhập kho</h4>
+            <select id="mobileProductSelect"></select>
+            <input type="number" id="mobileQuantity" placeholder="Số lượng" value="1">
+            <button id="mobileSubmitBtn" style="width:100%;padding:16px;background:#1e3a8a;color:white;border:none;border-radius:40px;font-weight:bold;">✅ Xác nhận</button>
+            <div class="mobile-tools">
+                <button onclick="capturePhotoMobile()">📸 Chụp ảnh</button>
+                <button onclick="importQuickMobile()">⚡ Import nhanh</button>
+            </div>
+            <p id="mobilePhotoMsg" style="font-size:0.75rem;color:gray;margin-top:8px;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let khoData = [
+        { id: 1, ten: "Thép tấm 10mm", tonKho: 89.9, donVi: "tấn", donGia: 15000000, nhaCungCap: "Công ty Thép ABC" },
+        { id: 2, ten: "Thép hộp 50x100", tonKho: 385, donVi: "cây", donGia: 850000, nhaCungCap: "Công ty Thép ABC" },
+        { id: 3, ten: "Bu lông M16", tonKho: 2505, donVi: "cái", donGia: 5000, nhaCungCap: "Công ty Bulong Việt" },
+        { id: 4, ten: "Que hàn LB52", tonKho: 1813, donVi: "kg", donGia: 85000, nhaCungCap: "Công ty Que hàn Hàn Quốc" },
+        { id: 5, ten: "Sơn chống rỉ", tonKho: 24, donVi: "thùng", donGia: 450000, nhaCungCap: "Công ty Sơn Jotun" }
+    ];
+
+    let currentMode = 'desktop';
+    let currentMobileAction = 'nhap';
+
+    function renderDesktop() {
+        let html = '';
+        khoData.forEach((item, idx) => {
+            html += `<tr>
+                <td>${idx+1}</td>
+                <td><strong>${item.ten}</strong></td>
+                <td>${item.tonKho.toLocaleString('vi-VN')}</td>
+                <td>${item.donVi}</td>
+                <td>${item.donGia.toLocaleString('vi-VN')} ₫</td>
+                <td>${item.nhaCungCap}</td>
+            </tr>`;
+        });
+        document.getElementById('desktopTableBody').innerHTML = html;
+    }
+
+    function renderMobile() {
+        let html = '';
+        khoData.forEach(item => {
+            html += `
+                <div class="product-card">
+                    <div class="product-name">📦 ${item.ten}</div>
+                    <div class="product-stock">📊 Tồn: ${item.tonKho.toLocaleString('vi-VN')} ${item.donVi}</div>
+                    <div class="product-info">
+                        <span>💰 ${item.donGia.toLocaleString('vi-VN')} ₫/${item.donVi}</span>
+                        <span>🏭 ${item.nhaCungCap}</span>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('mobileProductList').innerHTML = html;
+        
+        let select = document.getElementById('mobileProductSelect');
+        select.innerHTML = '';
+        khoData.forEach(item => {
+            let option = document.createElement('option');
+            option.value = item.ten;
+            option.textContent = `${item.ten} (tồn: ${item.tonKho.toLocaleString('vi-VN')} ${item.donVi})`;
+            select.appendChild(option);
+        });
+    }
+
+    function refreshAll() {
+        if (currentMode === 'desktop') renderDesktop();
+        else renderMobile();
+    }
+
+    function xuLyNhapXuat(tenSanPham, soLuong, loai) {
+        let product = khoData.find(p => p.ten === tenSanPham);
+        if (!product) return false;
+        if (loai === 'nhap') {
+            product.tonKho += soLuong;
+            alert(`✅ Đã nhập ${soLuong} ${product.donVi} ${tenSanPham}. Tồn mới: ${product.tonKho.toLocaleString('vi-VN')} ${product.donVi}`);
+        } else {
+            if (product.tonKho < soLuong) {
+                alert(`❌ Không đủ tồn! Chỉ còn ${product.tonKho.toLocaleString('vi-VN')} ${product.donVi}`);
+                return false;
+            }
+            product.tonKho -= soLuong;
+            alert(`✅ Đã xuất ${soLuong} ${product.donVi} ${tenSanPham}. Tồn mới: ${product.tonKho.toLocaleString('vi-VN')} ${product.donVi}`);
+        }
+        refreshAll();
+        return true;
+    }
+
+    function quickNhapDesktop() {
+        let sp = prompt("Nhập tên sản phẩm:", khoData[0].ten);
+        if(!sp) return;
+        let sl = parseFloat(prompt("Số lượng nhập:", "1"));
+        if(sl > 0) xuLyNhapXuat(sp, sl, 'nhap');
+    }
+    function quickXuatDesktop() {
+        let sp = prompt("Nhập tên sản phẩm:", khoData[0].ten);
+        if(!sp) return;
+        let sl = parseFloat(prompt("Số lượng xuất:", "1"));
+        if(sl > 0) xuLyNhapXuat(sp, sl, 'xuat');
+    }
+
+    function openMobileNhap() {
+        currentMobileAction = 'nhap';
+        document.getElementById('mobileFormTitle').innerHTML = '📥 NHẬP KHO';
+        document.getElementById('mobileQuickForm').scrollIntoView({ behavior: 'smooth' });
+    }
+    function openMobileXuat() {
+        currentMobileAction = 'xuat';
+        document.getElementById('mobileFormTitle').innerHTML = '📤 XUẤT KHO';
+        document.getElementById('mobileQuickForm').scrollIntoView({ behavior: 'smooth' });
+    }
+    function submitMobile() {
+        let productName = document.getElementById('mobileProductSelect').value;
+        let qty = parseFloat(document.getElementById('mobileQuantity').value);
+        if (isNaN(qty) || qty <= 0) { alert('Số lượng hợp lệ > 0'); return; }
+        xuLyNhapXuat(productName, qty, currentMobileAction);
+        document.getElementById('mobileQuantity').value = '1';
+    }
+    function capturePhotoMobile() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        input.onchange = (e) => {
+            if(e.target.files[0]) {
+                document.getElementById('mobilePhotoMsg').innerHTML = `📸 Đã chụp: ${e.target.files[0].name}`;
+            }
+        };
+        input.click();
+    }
+    function importQuickMobile() {
+        let newId = khoData.length + 1;
+        khoData.push({
+            id: newId,
+            ten: `SP Import ${newId}`,
+            tonKho: 100,
+            donVi: "cái",
+            donGia: 100000,
+            nhaCungCap: "Import"
+        });
+        refreshAll();
+        alert("✅ Đã import thêm 1 sản phẩm mẫu");
+    }
+
+    function login() {
+        let user = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        if (user === 'admin' && pass === 'admin123') {
+            let desktopRadio = document.getElementById('modeDesktop');
+            currentMode = desktopRadio.checked ? 'desktop' : 'mobile';
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            let appScreen = document.getElementById('appScreen');
+            appScreen.style.display = 'block';
+            
+            if (currentMode === 'desktop') {
+                document.getElementById('desktopView').style.display = 'block';
+                document.getElementById('mobileView').style.display = 'none';
+                renderDesktop();
+            } else {
+                document.getElementById('desktopView').style.display = 'none';
+                document.getElementById('mobileView').style.display = 'block';
+                renderMobile();
+            }
+        } else {
+            alert('Sai tên đăng nhập hoặc mật khẩu (demo: admin / admin123)');
+        }
+    }
+    
+    function logout() {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('appScreen').style.display = 'none';
+    }
+    
+    document.getElementById('mobileSubmitBtn').onclick = submitMobile;
+    document.getElementById('appScreen').style.display = 'none';
+</script>
+</body>
+</html>

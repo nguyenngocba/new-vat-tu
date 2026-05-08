@@ -646,142 +646,322 @@ input[type=text][dir=ltr] {
     color: var(--warn-text);
 }
 
+/* =====================================================
+   RESPONSIVE MOBILE (Dưới 768px)
+   ===================================================== */
 
-/* ===== SIDEBAR THU GỌN ===== */
-.sidebar.collapsed {
-    width: 65px !important;
-    min-width: 65px !important;
+@media (max-width: 768px) {
+    /* Ẩn sidebar khi không cần */
+    .sidebar {
+        position: fixed;
+        left: -220px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        width: 200px !important;
+    }
+    
+    .sidebar.open {
+        left: 0;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+    
+    /* Nút mở menu */
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background: var(--accent);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    
+    /* Main content chiếm toàn bộ */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+    
+    /* Topbar */
+    .topbar {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .topbar-title {
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Grid chuyển thành 1 cột */
+    .grid4, .grid2, .kpi-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    /* Cards */
+    .card {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    /* Bảng - cuộn ngang */
+    .tbl-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .tbl-wrap table {
+        min-width: 600px;
+    }
+    
+    /* Modal chiếm toàn màn hình */
+    .modal {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px auto;
+    }
+    
+    .modal-bd {
+        padding: 12px;
+        max-height: 60vh;
+    }
+    
+    /* KPI cards */
+    .kpi-card {
+        padding: 12px;
+    }
+    
+    .kpi-value {
+        font-size: 20px;
+    }
+    
+    /* Dashboard tabs */
+    .dashboard-tabs {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .dashboard-tab {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    /* Form */
+    .form-grid2 {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    input, select, textarea {
+        font-size: 14px; /* Tránh zoom trên mobile */
+        padding: 10px;
+    }
+    
+    button {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+    
+    /* Nút trong bảng */
+    button.sm {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+    
+    /* Metric cards */
+    .metric-val {
+        font-size: 18px;
+    }
+    
+    /* Log entries */
+    .log-entry {
+        font-size: 11px;
+        flex-wrap: wrap;
+    }
+    
+    /* Project grid */
+    .project-grid-large, .project-grid-small {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Supplier grid */
+    .supplier-grid-large, .supplier-grid-small {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Project list item */
+    .project-list-item, .supplier-list-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
 }
 
-.sidebar.collapsed .sidebar-user {
-    display: none !important;
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .grid4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .project-grid-large, .supplier-grid-large {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.sidebar.collapsed .nav-item span {
-    display: none !important;
+/* Desktop (trên 1024px) - giữ nguyên */
+@media (min-width: 1025px) {
+    .grid4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
-
-.sidebar.collapsed .nav-item {
-    justify-content: center !important;
-    padding: 12px 0 !important;
-}
-
-.sidebar.collapsed .nav-icon {
-    width: 28px !important;
-    height: 28px !important;
-    margin: 0 auto !important;
-}
-
-.sidebar.collapsed .logo-full {
-    display: none !important;
-}
-
-.sidebar.collapsed .logo-mini {
-    display: block !important;
-    margin: 0 auto !important;
-}
-
-.sidebar:not(.collapsed) .logo-mini {
-    display: none !important;
-}
-
-.sidebar.collapsed .sidebar-bottom button span {
-    display: none !important;
-}
-
-.sidebar.collapsed .sidebar-bottom button::before {
-    content: '🚪';
-    font-size: 20px;
-}
-
-.sidebar.collapsed .sidebar-logo {
-    justify-content: center !important;
-}
-
-.sidebar.collapsed .sidebar-toggle-btn {
-    position: absolute;
-    right: -10px;
-    top: 12px;
-    background: var(--accent);
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
+/* =====================================================
+   MOBILE APP STYLE (Giao diện riêng)
+   ===================================================== */
+.mobile-app {
     display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg);
+}
+
+.mobile-header {
+    background: var(--surface);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    color: white;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
     z-index: 10;
 }
 
-/* Sidebar thu gọn */
-.sidebar.collapsed .sidebar-user,
-.sidebar.collapsed .nav-item span,
-.sidebar.collapsed .logo-full {
-    display: none !important;
+.mobile-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 16px;
 }
 
-.sidebar.collapsed .logo-mini {
-    display: block !important;
+.mobile-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
 }
 
-.sidebar:not(.collapsed) .logo-mini {
-    display: none !important;
+.mobile-bottom-nav {
+    display: flex;
+    background: var(--surface);
+    border-top: 0.5px solid var(--border);
+    padding: 8px 0;
+    position: sticky;
+    bottom: 0;
 }
 
-.sidebar.collapsed .nav-item {
-    justify-content: center !important;
-    padding: 12px 0 !important;
+.mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 12px;
+    transition: all 0.2s;
 }
 
-.sidebar.collapsed .nav-icon {
-    width: 28px !important;
-    height: 28px !important;
+.mobile-nav-item span:first-child {
+    font-size: 22px;
 }
 
-.sidebar.collapsed .sidebar-bottom button span {
-    display: none !important;
+.mobile-nav-item.active {
+    color: var(--accent);
+    background: var(--accent-bg);
+    border-radius: 12px;
 }
 
-.sidebar.collapsed .sidebar-bottom button::before {
-    content: '🚪';
-    font-size: 18px;
+.mobile-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 0.5px solid var(--border);
 }
 
-/* Sidebar thu gọn */
-.sidebar.collapsed {
-    width: 65px !important;
+.mobile-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
 }
 
-.sidebar.collapsed .sidebar-user,
-.sidebar.collapsed .nav-item span,
-.sidebar.collapsed .logo-full {
-    display: none !important;
+.mobile-form-group {
+    margin-bottom: 12px;
 }
 
-.sidebar.collapsed .logo-mini {
-    display: block !important;
+.mobile-form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
 }
 
-.sidebar:not(.collapsed) .logo-mini {
-    display: none !important;
+.mobile-form-group input, 
+.mobile-form-group select {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border2);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
 }
 
-.sidebar.collapsed .nav-item {
-    justify-content: center !important;
-    padding: 12px 0 !important;
+.mobile-btn {
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
 }
 
-.sidebar.collapsed .nav-icon {
-    width: 28px !important;
-    height: 28px !important;
+.mobile-btn.primary {
+    background: var(--accent);
+    color: white;
 }
 
-.sidebar.collapsed .sidebar-bottom button span {
-    display: none !important;
+.mobile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    cursor: pointer;
 }
 
-.sidebar.collapsed .sidebar-bottom button::before {
-    content: '🚪';
-    font-size: 18px;
+.mobile-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-item-value {
+    color: var(--accent);
+    font-weight: 500;
 }
