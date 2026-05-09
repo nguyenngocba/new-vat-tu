@@ -19,7 +19,8 @@ let advancedFilters = {
 };
 
 let currentDashboardTab = 'overview';
-
+// Filter riêng cho tab Công trình
+let filterProjects = { dateFrom: '', dateTo: '', projectId: 'all' };
 // ========== CACHE CHO DASHBOARD ==========
 let dashboardCache = {
     html_cache: null,
@@ -307,8 +308,19 @@ function resetFilters() {
 function updateDashboardContent() {
     const pane = document.getElementById('pane-dashboard');
     if (pane) {
-        pane.innerHTML = renderDashboard();
-        setTimeout(() => { renderDashboardChart(); bindDashboardFilterEvents(); }, 100);
+        if (currentDashboardTab === 'projects') {
+            pane.innerHTML = renderTabContent('projects');
+        } else {
+            pane.innerHTML = renderDashboard();
+        }
+        setTimeout(() => { 
+            renderDashboardChart(); 
+            bindDashboardFilterEvents();
+            // RENDER LẠI CHART SAU KHI FILTER
+            if (currentDashboardTab === 'projects') {
+                window.switchDashboardTab('projects');
+            }
+        }, 200);
     }
 }
 
@@ -528,7 +540,7 @@ function renderFiltersAndTabs() {
             <div class="dashboard-tab ${currentDashboardTab==='suppliers'?'active':''}" onclick="window.switchDashboardTab('suppliers')">🏭 Nhà cung cấp</div>
             <div class="dashboard-tab ${currentDashboardTab==='structures'?'active':''}" onclick="window.switchDashboardTab('structures')">🏗️ Cấu kiện</div>
         </div>
-        ${renderAdvancedFilters()}
+        ${currentDashboardTab === 'projects' ? renderFilterProjects() : renderAdvancedFilters()}
     `;
 }
 window.switchDashboardTab = function(tab) {
@@ -543,14 +555,19 @@ window.switchDashboardTab = function(tab) {
                 if (ctx1 && ctx2) {
                     if (topProjectsChart) topProjectsChart.destroy();
                     if (window._bp) window._bp.destroy();
-                    var pdata = state.data.projects.map(function(p){
+                                        // LỌC THEO CÔNG TRÌNH
+                    var filteredProjs = state.data.projects;
+                    if (filterProjects.projectId !== 'all') {
+                        filteredProjs = filteredProjs.filter(function(p) { return p.id === filterProjects.projectId; });
+                    }
+                    var pdata = filteredProjs.map(function(p){
                         var u = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='usage'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
                         var r = state.data.transactions.filter(function(t){return t.projectId===p.id&&t.type==='return'}).reduce(function(s,t){return s+Number(t.totalAmount||0)},0);
                         return { name: p.name.length>20?p.name.substring(0,20):p.name, spent: u-r };
                     }).sort(function(a,b){return b.spent-a.spent}).slice(0,5);
                     topProjectsChart = new Chart(ctx1, { type:'bar', data:{ labels:pdata.map(function(p){return p.name}), datasets:[{ label:'Chi', data:pdata.map(function(p){return p.spent}), backgroundColor:['#378ADD','#97C459','#FAC775','#F09595','#85B7EB'], borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
                     var tu = pdata.reduce(function(s,p){return s+p.spent},0);
-                    var tb = state.data.projects.reduce(function(s,p){return s+Number(p.budget||0)},0);
+                    var tb = filteredProjs.reduce(function(s,p){return s+Number(p.budget||0)},0);
                     window._bp = new Chart(ctx2, { type:'doughnut', data:{ labels:['Dung','Con'], datasets:[{ data:[tu, Math.max(0,tb-tu)], backgroundColor:['#F09595','#97C459'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false } });
                 }
             }
@@ -593,7 +610,12 @@ function renderTabContent(tab) {
     }, 50);
     
     if (tab === 'projects') {
-        const projects = state.data.projects.map(p => {
+                // LỌC THEO CÔNG TRÌNH ĐƯỢC CHỌN
+        var filteredProjects = state.data.projects;
+        if (filterProjects.projectId !== 'all') {
+            filteredProjects = filteredProjects.filter(function(p) { return p.id === filterProjects.projectId; });
+        }
+        const projects = filteredProjects.map(p => {
             const u = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='usage').reduce((s,t)=>s+(parseFloat(parseFloat(t.totalAmount))||0),0);
             const r = state.data.transactions.filter(t=>t.projectId===p.id&&t.type==='return').reduce((s,t)=>s+(parseFloat(parseFloat(t.totalAmount))||0),0);
             return { ...p, spent: u-r, pct: p.budget>0?(u-r)/p.budget*100:0 };
@@ -1173,7 +1195,41 @@ function renderForecastTable() {
     
     container.innerHTML = html;
 }
+function renderFilterProjects() {
+    var projects = [{ id: 'all', name: 'Tất cả' }].concat(state.data.projects || []);
+    var opts = projects.map(function(p) {
+        return '<option value="' + p.id + '"' + (filterProjects.projectId===p.id?' selected':'') + '>' + p.name + '</option>';
+    }).join('');
+    return '<div class="card" style="margin-bottom:16px;padding:10px 14px;">' +
+        '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">' +
+        '<span style="font-weight:600;">🔧 LỌC CÔNG TRÌNH:</span>' +
+        '<input type="date" id="fproj-date-from" value="' + filterProjects.dateFrom + '" style="width:130px;">' +
+        '<input type="date" id="fproj-date-to" value="' + filterProjects.dateTo + '" style="width:130px;">' +
+        '<select id="fproj-project" style="width:200px;">' + opts + '</select>' +
+        '<button class="sm primary" onclick="applyFilterProjects()">🔍 Áp dụng</button>' +
+        '<button class="sm" onclick="resetFilterProjects()">🗑️ Bỏ</button>' +
+        '</div></div>';
+}
 
+window.applyFilterProjects = function() {
+    filterProjects.dateFrom = document.getElementById('fproj-date-from')?.value || '';
+    filterProjects.dateTo = document.getElementById('fproj-date-to')?.value || '';
+    filterProjects.projectId = document.getElementById('fproj-project')?.value || 'all';
+    advancedFilters.dateFrom = filterProjects.dateFrom;
+    advancedFilters.dateTo = filterProjects.dateTo;
+    advancedFilters.projectId = filterProjects.projectId;
+    clearDashboardCache();
+    updateDashboardContent();
+};
+
+window.resetFilterProjects = function() {
+    filterProjects = { dateFrom: '', dateTo: '', projectId: 'all' };
+    advancedFilters.dateFrom = '';
+    advancedFilters.dateTo = '';
+    advancedFilters.projectId = 'all';
+    clearDashboardCache();
+    updateDashboardContent();
+};
 // Export global
 window.loadForecast = loadForecast;
 window.renderForecastTable = renderForecastTable;
